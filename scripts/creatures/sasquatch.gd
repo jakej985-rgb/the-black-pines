@@ -286,11 +286,11 @@ func _process_retreating(delta: float) -> void:
 	# Fade eye glow and emission into fog
 	var alpha = clamp(retreat_timer / 1.5, 0.0, 1.0)
 	if eye_glow_left:
-		eye_glow_left.light_energy = alpha * 0.8
+		eye_glow_left.light_energy = alpha * 0.25
 	if eye_glow_right:
-		eye_glow_right.light_energy = alpha * 0.8
+		eye_glow_right.light_energy = alpha * 0.25
 	if eye_mat:
-		eye_mat.emission_energy_multiplier = alpha * 4.5
+		eye_mat.emission_energy_multiplier = alpha * 0.8
 
 	if retreat_timer <= 0.0:
 		set_state(State.GONE)

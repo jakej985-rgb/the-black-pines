@@ -519,6 +519,15 @@ def generate_sasquatch_models():
         head.add_cylinder((tx, -0.10, -0.40), (tx, -0.14, -0.40), 0.011, 0.008, segs=4)
         head.add_cylinder((tx, -0.20, -0.38), (tx, -0.16, -0.38), 0.010, 0.007, segs=4)
 
+    # Muscular overlapping cervical neck cowl extending deeply into torso socket
+    head.usemtl("Fur")
+    neck_cowl_pts = [
+        ((0.0,  0.00,  0.02), (0.34, 0.38)),
+        ((0.0, -0.18,  0.08), (0.38, 0.42)),
+        ((0.0, -0.32,  0.14), (0.42, 0.46))
+    ]
+    head.add_tapered_tube(neck_cowl_pts, segs=14)
+
     head.save("assets/models/sasquatch_head.obj", mat_order=["Fur", "Bone"])
 
     # --------------------------------------------------------------------------
@@ -820,6 +829,25 @@ def generate_cabin():
                 mesh.add_cylinder((-half_w, y, -half_d - overhang), (-half_w, y, half_d + overhang), log_r, log_r, segs=10)
                 mesh.add_cylinder((half_w, y, -half_d - overhang), (half_w, y, half_d + overhang), log_r, log_r, segs=10)
 
+    # 2.05 Weather-Tight Interior Wall Chinking & Backer Planks (Prevents gaps between round logs)
+    # Rear Wall Backer
+    mesh.add_box((0.0, (wall_h + f_h) * 0.5, -half_d), (cabin_w, wall_h - f_h, 0.08), rot_y=0.0)
+    # Left Wall Backer (with window cutout)
+    mesh.add_box((-half_w, (wall_h + f_h) * 0.5, -half_d * 0.5 - 0.35), (0.08, wall_h - f_h, half_d - 0.7), rot_y=0.0)
+    mesh.add_box((-half_w, (wall_h + f_h) * 0.5,  half_d * 0.5 + 0.35), (0.08, wall_h - f_h, half_d - 0.7), rot_y=0.0)
+    mesh.add_box((-half_w, (f_h + 1.25) * 0.5, 0.0), (0.08, 1.25 - f_h, 1.40), rot_y=0.0)
+    mesh.add_box((-half_w, (wall_h + 2.25) * 0.5, 0.0), (0.08, wall_h - 2.25, 1.40), rot_y=0.0)
+    # Right Wall Backer (with window cutout)
+    mesh.add_box(( half_w, (wall_h + f_h) * 0.5, -half_d * 0.5 - 0.35), (0.08, wall_h - f_h, half_d - 0.7), rot_y=0.0)
+    mesh.add_box(( half_w, (wall_h + f_h) * 0.5,  half_d * 0.5 + 0.35), (0.08, wall_h - f_h, half_d - 0.7), rot_y=0.0)
+    mesh.add_box(( half_w, (f_h + 1.25) * 0.5, 0.0), (0.08, 1.25 - f_h, 1.40), rot_y=0.0)
+    mesh.add_box(( half_w, (wall_h + 2.25) * 0.5, 0.0), (0.08, wall_h - 2.25, 1.40), rot_y=0.0)
+    # Front Wall Backer (left and right of door, and above door)
+    f_w_side = (half_w - 0.85)
+    mesh.add_box((-half_w + f_w_side * 0.5, (wall_h + f_h) * 0.5, half_d), (f_w_side, wall_h - f_h, 0.08), rot_y=0.0)
+    mesh.add_box(( half_w - f_w_side * 0.5, (wall_h + f_h) * 0.5, half_d), (f_w_side, wall_h - f_h, 0.08), rot_y=0.0)
+    mesh.add_box((0.0, (wall_h + 2.30) * 0.5, half_d), (1.70, wall_h - 2.30, 0.08), rot_y=0.0)
+
     # 2.1 Dimensional Gable Wall Ends (Board & Batten + Siding filling the peak)
     for gz, g_norm in [(half_d, (0, 0, 1)), (-half_d, (0, 0, -1))]:
         num_gable_planks = 10
@@ -972,39 +1000,6 @@ def generate_cabin():
     for rz in [-1.8, -0.9, 0.0, 0.9, 1.8]:
         mesh.add_box((0.0, wall_h - 0.08, rz), (cabin_w - 0.25, 0.16, 0.14), rot_y=0.0)
 
-    # Ranger's Heavy Timber Work Desk (left wall)
-    desk_x = -1.95
-    desk_z = -0.75
-    desk_top_y = f_h + 0.76
-    mesh.add_box((desk_x, desk_top_y, desk_z), (1.65, 0.06, 0.95), rot_y=0.0)
-    for lx in [desk_x - 0.72, desk_x + 0.72]:
-        for lz in [desk_z - 0.38, desk_z + 0.38]:
-            mesh.add_box((lx, f_h + 0.40, lz), (0.09, 0.74, 0.09), rot_y=0.0)
-    # Desk drawer pedestal
-    mesh.add_box((desk_x + 0.52, f_h + 0.40, desk_z), (0.42, 0.68, 0.85), rot_y=0.0)
-    # Timber chair behind desk
-    mesh.add_box((desk_x, f_h + 0.45, desk_z + 0.68), (0.46, 0.05, 0.46), rot_y=0.08)
-    for cx in [desk_x - 0.18, desk_x + 0.18]:
-        for cz in [desk_z + 0.50, desk_z + 0.86]:
-            mesh.add_box((cx, f_h + 0.24, cz), (0.05, 0.44, 0.05), rot_y=0.08)
-    mesh.add_box((desk_x, f_h + 0.78, desk_z + 0.88), (0.46, 0.64, 0.05), rot_y=0.08)
-
-    # Field Cot (back right corner)
-    cot_x = 1.95
-    cot_z = 0.95
-    mesh.add_box((cot_x, f_h + 0.36, cot_z), (0.95, 0.12, 2.15), rot_y=0.0)
-    for clx in [cot_x - 0.42, cot_x + 0.42]:
-        for clz in [cot_z - 0.95, cot_z + 0.95]:
-            mesh.add_box((clx, f_h + 0.18, clz), (0.07, 0.36, 0.07), rot_y=0.0)
-
-    # Wall Shelving Unit (rear wall)
-    shelf_x = 0.0
-    shelf_z = -half_d + 0.28
-    for sy in [f_h + 1.1, f_h + 1.6, f_h + 2.1]:
-        mesh.add_box((shelf_x, sy, shelf_z), (2.2, 0.05, 0.36), rot_y=0.0)
-    mesh.add_box((shelf_x - 1.05, f_h + 1.6, shelf_z), (0.06, 1.1, 0.36), rot_y=0.0)
-    mesh.add_box((shelf_x + 1.05, f_h + 1.6, shelf_z), (0.06, 1.1, 0.36), rot_y=0.0)
-
     # =========================================================================
     # 3. DIMENSIONAL CEDAR SHAKE SHINGLE ROOF & AWNING (usemtl Roof)
     # =========================================================================
@@ -1148,52 +1143,9 @@ def generate_cabin():
     # 4.3 Wall Lantern Housing & Arm Sconce (enclosing PorchLight at (0, 3.0, 3.4))
     mesh.add_cylinder((0.0, 2.75, half_d + 0.05), (0.0, 2.95, half_d + 0.38), 0.03, 0.03, segs=6)
     mesh.add_box((0.0, 3.0, half_d + 0.38), (0.24, 0.34, 0.24), rot_y=0.0)
-
-    # 4.4 Walk-In Interior Metal Fixtures & Storytelling Props
-    # Vintage Shortwave Radio Receiver on ranger desk (desk_x = -1.95, desk_top_y = f_h + 0.76, desk_z = -0.75)
-    desk_x = -1.95
-    desk_z = -0.75
-    desk_top_y = f_h + 0.76
-    # Metal radio chassis
-    mesh.add_box((desk_x - 0.38, desk_top_y + 0.18, desk_z - 0.05), (0.54, 0.30, 0.34), rot_y=0.05)
-    # Frequency dial & tuner knobs on faceplate
-    mesh.add_box((desk_x - 0.38, desk_top_y + 0.18, desk_z + 0.13), (0.45, 0.20, 0.03), rot_y=0.05)
-    # Telescopic whip antenna
-    mesh.add_cylinder((desk_x - 0.58, desk_top_y + 0.32, desk_z - 0.15), (desk_x - 0.58, desk_top_y + 1.15, desk_z - 0.15), 0.012, 0.005, segs=6)
-    # Microphone handset on cradle
-    mesh.add_box((desk_x - 0.02, desk_top_y + 0.08, desk_z + 0.15), (0.10, 0.12, 0.10), rot_y=0.2)
-
-    # Cast-Iron Potbelly Woodstove (front-right cabin corner)
-    stove_x = 1.95
-    stove_z = -1.1
-    # Heavy hearth base plate
-    mesh.add_box((stove_x, f_h + 0.04, stove_z), (0.90, 0.04, 0.90), rot_y=0.0)
-    # Cylindrical belly
-    mesh.add_cylinder((stove_x, f_h + 0.16, stove_z), (stove_x, f_h + 0.92, stove_z), 0.34, 0.38, segs=12)
-    # Cast-iron fire door with draft vents
-    mesh.add_box((stove_x - 0.28, f_h + 0.55, stove_z), (0.05, 0.32, 0.28), rot_y=0.0)
-    # 4 curved stove feet
-    for sfx in [-0.28, 0.28]:
-        for sfz in [-0.28, 0.28]:
-            mesh.add_cylinder((stove_x + sfx, f_h + 0.04, stove_z + sfz), (stove_x + sfx * 0.7, f_h + 0.16, stove_z + sfz * 0.7), 0.04, 0.05, segs=6)
-    # Interior stovepipe connecting upward through ceiling
-    mesh.add_cylinder((stove_x, f_h + 0.92, stove_z), (stove_x, wall_h - 0.05, stove_z), 0.11, 0.11, segs=10)
-
-    # Center hanging rafter lantern fixture (at (0, 2.2, 0))
+    # 4.4 Center hanging rafter lantern fixture (at (0, 2.2, 0))
     mesh.add_cylinder((0.0, wall_h - 0.08, 0.0), (0.0, 2.35, 0.0), 0.012, 0.012, segs=4)
     mesh.add_box((0.0, 2.22, 0.0), (0.22, 0.28, 0.22), rot_y=0.0)
-
-    # Canned food rations and emergency kerosene cans on shelving
-    shelf_z = -half_d + 0.28
-    for cx in [-0.6, -0.3, 0.0, 0.3, 0.6]:
-        mesh.add_cylinder((cx, f_h + 1.13, shelf_z), (cx, f_h + 1.35, shelf_z), 0.065, 0.065, segs=8)
-    mesh.add_box((0.7, f_h + 1.76, shelf_z), (0.24, 0.30, 0.22), rot_y=0.0)
-
-    # 4.5 Wool Blanket on Field Cot (usemtl Stone for rough fabric texture)
-    mesh.usemtl("Stone")
-    cot_x = 1.95
-    cot_z = 0.95
-    mesh.add_box((cot_x, f_h + 0.50, cot_z - 0.55), (0.78, 0.20, 0.85), rot_y=0.0)
 
 
     # =========================================================================

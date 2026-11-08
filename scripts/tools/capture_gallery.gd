@@ -60,7 +60,11 @@ func _init():
     cam.current = true
     cam.fov = 65.0
     root.add_child(cam)
-    
+    await process_frame
+
+    # Ensure output directory exists
+    DirAccess.make_dir_recursive_absolute("reports/visual_review")
+
     # Add a player-style flashlight attached to the camera for illuminated beauty shots
     var spot = SpotLight3D.new()
     spot.spot_range = 35.0
@@ -70,7 +74,7 @@ func _init():
     spot.light_color = Color(0.98, 0.95, 0.88)
     spot.shadow_enabled = true
     cam.add_child(spot)
-    
+
     for target in targets:
         cam.global_position = target["cam_pos"]
         cam.look_at(target["look_at"], Vector3.UP)

@@ -6,6 +6,7 @@ extends CharacterBody3D
 signal stamina_changed(current: float, maximum: float)
 signal health_changed(current: float, maximum: float)
 signal flashlight_toggled(is_on: bool)
+signal flashlight_battery_changed(current: float, maximum: float)
 signal interaction_prompt_changed(text: String)
 signal inspection_displayed(title: String, body: String)
 signal inventory_updated(inventory: Dictionary)
@@ -39,6 +40,10 @@ var health_component = null
 @export_group("Flashlight")
 @export var flashlight_sway_speed: float = 10.0
 @export var flashlight_sway_amount: float = 0.04
+@export var max_battery: float = 100.0
+@export var battery: float = 100.0
+@export var battery_drain_rate: float = 0.8
+@export var low_battery_threshold: float = 20.0
 
 var stamina: float = 100.0
 var health: float = 100.0
@@ -89,6 +94,7 @@ func _ready() -> void:
 	)
 
 	health_changed.emit(health, 100.0)
+	flashlight_battery_changed.emit(battery, max_battery)
 	if flashlight:
 		flashlight_toggled.emit(flashlight.visible)
 
@@ -111,10 +117,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("toggle_flashlight"):
 		if flashlight:
-			flashlight.visible = not flashlight.visible
-			flashlight_toggled.emit(flashlight.visible)
-			if AudioDirector.instance:
-				AudioDirector.instance.play_click()
+			if not flashlight.visible and battery <= 0.0:
+				show_notification("Flashlight battery empty. Press [R] to reload.")
+			else:
+				flashlight.visible = not flashlight.visible
+				flashlight_toggled.emit(flashlight.visible)
+				if AudioDirector.instance:
+					AudioDirector.instance.play_click()
+
+	if event.is_action_pressed("reload_battery"):
+		reload_flashlight_battery()
 
 	if event.is_action_pressed("interact"):
 		if current_interactable and current_interactable.is_usable:
@@ -205,12 +217,22 @@ func _physics_process(delta: float) -> void:
 	# Head bob & breathing
 	_process_head_bob(delta, direction.length() > 0.1 and is_on_floor())
 	
-	# Flashlight inertial sway
+	# Flashlight inertial sway & battery drain
 	if flashlight:
 		flashlight_sway = flashlight_sway.lerp(flashlight_sway_target, delta * flashlight_sway_speed)
 		flashlight_sway_target = flashlight_sway_target.lerp(Vector2.ZERO, delta * 5.0)
 		flashlight.rotation.y = flashlight_sway.x
 		flashlight.rotation.x = flashlight_sway.y
+
+		if flashlight.visible:
+			battery = max(0.0, battery - battery_drain_rate * delta)
+			flashlight_battery_changed.emit(battery, max_battery)
+			if battery <= 0.0:
+				flashlight.visible = false
+				flashlight_toggled.emit(false)
+				show_notification("Flashlight battery died! Reload with [R].")
+			elif battery <= low_battery_threshold and randf() < delta * 0.25:
+				trigger_flashlight_flicker(0.35)
 	
 	# Check interactables
 	_process_interaction()
@@ -327,6 +349,26 @@ func use_antiseptic_bandage() -> bool:
 	else:
 		show_notification("No Antiseptic Bandages available in inventory.")
 	return ok
+
+func reload_flashlight_battery() -> bool:
+	if battery >= max_battery:
+		show_notification("Flashlight battery is already fully charged.")
+		return false
+
+	var inv = InventoryManagerClass.instance
+	if not inv or not inv.has_item("battery_pack", 1):
+		show_notification("No replacement D-Cell batteries in inventory.")
+		return false
+
+	if not inv.remove_item("battery_pack", 1):
+		return false
+
+	battery = max_battery
+	flashlight_battery_changed.emit(battery, max_battery)
+	show_notification("Inserted fresh D-Cell battery (100%).")
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
+	return true
 
 func _on_player_died() -> void:
 	show_notification("CRITICAL INJURY: You collapsed in the freezing fog...")

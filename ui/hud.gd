@@ -28,10 +28,14 @@ func _process(delta: float) -> void:
 		if notif_timer <= 0.0:
 			notification_label.text = ""
 
+var current_flashlight_on: bool = true
+var current_battery: float = 100.0
+
 func setup_player(player: Player) -> void:
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.health_changed.connect(_on_health_changed)
 	player.flashlight_toggled.connect(_on_flashlight_toggled)
+	player.flashlight_battery_changed.connect(_on_flashlight_battery_changed)
 	player.interaction_prompt_changed.connect(_on_interaction_prompt_changed)
 	player.inspection_displayed.connect(_on_inspection_displayed)
 	player.notification_posted.connect(_on_notification_posted)
@@ -58,8 +62,28 @@ func _on_stamina_changed(curr: float, max_val: float) -> void:
 	stamina_bar.modulate.a = 0.3 if curr >= max_val - 0.5 else 0.85
 
 func _on_flashlight_toggled(is_on: bool) -> void:
-	flashlight_label.text = "[F] FLASHLIGHT: ON" if is_on else "[F] FLASHLIGHT: OFF"
-	flashlight_label.modulate = Color(1.0, 0.95, 0.7, 0.9) if is_on else Color(0.5, 0.5, 0.5, 0.5)
+	current_flashlight_on = is_on
+	_update_flashlight_display()
+
+func _on_flashlight_battery_changed(curr: float, _max_val: float) -> void:
+	current_battery = curr
+	_update_flashlight_display()
+
+func _update_flashlight_display() -> void:
+	if not flashlight_label:
+		return
+	if current_battery <= 0.0:
+		flashlight_label.text = "[F] FLASHLIGHT: DEPLETED [R]"
+		flashlight_label.modulate = Color(0.9, 0.25, 0.2, 0.9)
+	elif current_flashlight_on:
+		flashlight_label.text = "[F] FLASHLIGHT: ON (%d%%)" % int(current_battery)
+		if current_battery <= 20.0:
+			flashlight_label.modulate = Color(1.0, 0.5, 0.2, 0.95)
+		else:
+			flashlight_label.modulate = Color(1.0, 0.95, 0.7, 0.9)
+	else:
+		flashlight_label.text = "[F] FLASHLIGHT: OFF (%d%%)" % int(current_battery)
+		flashlight_label.modulate = Color(0.5, 0.5, 0.5, 0.5)
 
 func _on_interaction_prompt_changed(text: String) -> void:
 	prompt_label.text = text

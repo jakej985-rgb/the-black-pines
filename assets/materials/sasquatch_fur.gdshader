@@ -2,45 +2,67 @@ shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
 
 // Photorealistic cryptid pelt & layered fur shader for The Black Pines
-uniform vec4 fur_base_color : source_color = vec4(0.08, 0.065, 0.055, 1.0);
-uniform vec4 fur_highlight_color : source_color = vec4(0.18, 0.14, 0.11, 1.0);
-uniform float roughness_base : hint_range(0.0, 1.0) = 0.84;
-uniform float wetness : hint_range(0.0, 1.0) = 0.65;
-uniform float rim_strength : hint_range(0.0, 5.0) = 2.4;
-uniform vec4 rim_tint : source_color = vec4(0.35, 0.32, 0.28, 1.0);
-uniform float uv_scale : hint_range(0.5, 20.0) = 4.0;
+uniform vec4 fur_base_color : source_color = vec4(0.065, 0.052, 0.042, 1.0);
+uniform vec4 fur_highlight_color : source_color = vec4(0.14, 0.11, 0.08, 1.0);
+uniform float roughness_base : hint_range(0.0, 1.0) = 0.88;
+uniform float wetness : hint_range(0.0, 1.0) = 0.35;
+uniform float rim_strength : hint_range(0.0, 5.0) = 1.6;
+uniform vec4 rim_tint : source_color = vec4(0.28, 0.24, 0.20, 1.0);
+uniform float uv_scale : hint_range(0.5, 20.0) = 6.0;
+
+float hash(vec2 p) {
+	p = fract(p * vec2(123.34, 456.21));
+	p += dot(p, p + 45.32);
+	return fract(p.x * p.y);
+}
+
+float hair_noise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	float a = hash(i);
+	float b = hash(i + vec2(1.0, 0.0));
+	float c = hash(i + vec2(0.0, 1.0));
+	float d = hash(i + vec2(1.0, 1.0));
+	return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
 
 void vertex() {
 	// Subtle breathing and hair wind displacement in freezing Pacific Northwest air
-	float wind = sin(TIME * 2.2 + VERTEX.y * 3.5 + VERTEX.x * 2.5) * 0.0035;
+	float wind = sin(TIME * 2.0 + VERTEX.y * 3.0 + VERTEX.x * 2.0) * 0.003;
 	VERTEX += NORMAL * wind;
 }
 
 void fragment() {
+	// Stretch UVs vertically to emulate natural downward-hanging hair strands and pelt grain
 	vec2 uv = UV * uv_scale;
+	vec2 strand_uv = vec2(uv.x * 18.0, uv.y * 4.5);
 	
-	// Procedural hair strand & clump noise
-	float hair_noise = sin(uv.x * 32.0 + sin(uv.y * 12.0) * 2.0) * 0.5 + 0.5;
-	float matted_clump = sin(uv.y * 8.0 + uv.x * 4.0) * 0.5 + 0.5;
+	float n1 = hair_noise(strand_uv);
+	float n2 = hair_noise(strand_uv * 2.1 + vec2(3.1, 7.4));
+	float strand = n1 * 0.65 + n2 * 0.35;
 
-	vec3 albedo = mix(fur_base_color.rgb, fur_highlight_color.rgb, hair_noise * 0.35 + matted_clump * 0.25);
+	// Deep rich primeval animal pelt coloration
+	vec3 albedo = mix(fur_base_color.rgb, fur_highlight_color.rgb, strand * 0.45);
 
-	// Rain wetness darkening: moisture deepens color saturation in valley fog
-	albedo *= (1.0 - wetness * 0.22);
+	// Subtle rain moisture dampening without synthetic glossy shine
+	albedo *= (1.0 - wetness * 0.18);
 	ALBEDO = albedo;
 
-	// Roughness variation: coarse dry hair is 0.85, rain-dampened clumps drop to 0.45
-	ROUGHNESS = mix(roughness_base, 0.42, wetness * hair_noise);
-	METALLIC = 0.02;
+	// Animal fur is coarse and non-metallic (roughness 0.84 - 0.94)
+	ROUGHNESS = clamp(roughness_base + (strand - 0.5) * 0.08, 0.84, 0.94);
+	METALLIC = 0.0;
+	SPECULAR = 0.22;
 
-	// Clearcoat wet moisture layer: creates sharp specular glints under flashlight beam
-	CLEARCOAT = wetness * 0.85;
-	CLEARCOAT_ROUGHNESS = 0.18;
+	// Zero clearcoat - removes plastic / bowling-ball shine
+	CLEARCOAT = 0.0;
+	CLEARCOAT_ROUGHNESS = 1.0;
 
-	// Translucent backlight scattering through thin hair tips / silhouette edges
-	BACKLIGHT = vec3(0.08, 0.06, 0.05);
+	// Soft backlight scattering through silhouette hair edges
+	BACKLIGHT = fur_base_color.rgb * 1.2;
 
-	// Fresnel rim illumination to carve cryptid silhouette against dark forest
-	RIM = rim_strength * 0.45;
-	RIM_TINT = 0.55;
+	// Gentle Fresnel rim to carve dark cryptid silhouette against foggy backdrop
+	RIM = rim_strength * 0.28;
+	RIM_TINT = 0.6;
 }
+

@@ -15,14 +15,15 @@ var look_at_timer: float = 0.0
 var retreat_timer: float = 0.0
 var eye_mat: StandardMaterial3D = null
 
-@onready var eye_glow_left: OmniLight3D = $Head/EyeLeft
-@onready var eye_glow_right: OmniLight3D = $Head/EyeRight
-@onready var eye_mesh_left: MeshInstance3D = get_node_or_null("Head/EyeMeshLeft")
-@onready var eye_mesh_right: MeshInstance3D = get_node_or_null("Head/EyeMeshRight")
 @onready var head_visual: Node3D = get_node_or_null("Visuals/Torso/Head")
-@onready var head_node: Node3D = $Head
-@onready var visual_root: Node3D = $Visuals
-@onready var anim_player: AnimationPlayer = $AnimationPlayer
+@onready var head_node: Node3D = get_node_or_null("Visuals/Torso/Head")
+@onready var eye_glow_left: OmniLight3D = get_node_or_null("Visuals/Torso/Head/EyeLeft")
+@onready var eye_glow_right: OmniLight3D = get_node_or_null("Visuals/Torso/Head/EyeRight")
+@onready var eye_mesh_left: MeshInstance3D = get_node_or_null("Visuals/Torso/Head/EyeMeshLeft")
+@onready var eye_mesh_right: MeshInstance3D = get_node_or_null("Visuals/Torso/Head/EyeMeshRight")
+@onready var visual_root: Node3D = get_node_or_null("Visuals")
+@onready var anim_player: AnimationPlayer = get_node_or_null("AnimationPlayer")
+
 
 func _ready() -> void:
 	if anim_player:
@@ -60,8 +61,9 @@ func _physics_process(delta: float) -> void:
 			_process_retreating(delta)
 
 func _sync_head_transform() -> void:
-	if head_visual and head_node:
+	if head_visual and head_node and head_node != head_visual:
 		head_node.global_transform = head_visual.global_transform
+
 
 func _process_stalking(delta: float) -> void:
 	# Ensure stalking animation is active

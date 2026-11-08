@@ -829,17 +829,25 @@ def generate_cabin():
             gw = half_w * (1.0 - float(gi) / num_gable_planks)
             mesh.add_box((0.0, gy + gh * 0.5, gz), (gw * 2.0, gh * 0.95, 0.08), rot_y=0.0)
 
-    # 2.2 Heavy Timber Door Frame & Plank Door
-    # Casing header and jambs
+    # 2.2 Heavy Timber Door Frame & Inward-Swung Plank Door
+    # Casing header and side jambs
     mesh.add_box((-0.78, 1.15, half_d + 0.04), (0.12, 2.30, 0.12), rot_y=0.0)
     mesh.add_box(( 0.78, 1.15, half_d + 0.04), (0.12, 2.30, 0.12), rot_y=0.0)
     mesh.add_box(( 0.00, 2.30, half_d + 0.04), (1.68, 0.14, 0.12), rot_y=0.0)
-    # Recessed vertical plank door
-    mesh.add_box((0.0, 1.12, half_d - 0.02), (1.42, 2.22, 0.06), rot_y=0.0)
-    # Diagonal Z-brace battens on door
-    mesh.add_box((0.0, 1.85, half_d + 0.02), (1.30, 0.12, 0.03), rot_y=0.0)
-    mesh.add_box((0.0, 0.38, half_d + 0.02), (1.30, 0.12, 0.03), rot_y=0.0)
-    mesh.add_cylinder((-0.55, 0.38, half_d + 0.02), (0.55, 1.85, half_d + 0.02), 0.04, 0.04, segs=6)
+    # Threshold sill timber
+    mesh.add_box(( 0.00, f_h + 0.02, half_d + 0.02), (1.56, 0.08, 0.16), rot_y=0.0)
+    
+    # Door swung completely open 90 degrees flat along the interior wall
+    door_angle = math.pi * 0.5  # 90 degrees open
+    door_w = 1.35
+    door_cx = -0.74
+    door_cz = (half_d - 0.06) - (door_w * 0.5)
+    mesh.add_box((door_cx, 1.15, door_cz), (0.06, 2.20, door_w), rot_y=0.0)
+    # Diagonal Z-brace battens on open door
+    mesh.add_box((door_cx + 0.04, 1.85, door_cz), (0.04, 0.12, door_w * 0.9), rot_y=0.0)
+    mesh.add_box((door_cx + 0.04, 0.45, door_cz), (0.04, 0.12, door_w * 0.9), rot_y=0.0)
+
+
 
     # 2.3 3D Window Frames, 4-Pane Mullions & Barricade Planks
     for wx in [-half_w, half_w]:
@@ -956,10 +964,52 @@ def generate_cabin():
             fz = -1.6 + f_col * 0.24
             mesh.add_cylinder((-half_w - 0.15, fy, fz), (-half_w - 0.55, fy, fz), 0.08, 0.08, segs=6)
 
+    # 2.8 Walk-in Cabin Interior Timber Architecture & Furnishings
+    # Interior Pine Floorboards (at f_h + 0.02 so it sits above stone foundation)
+    mesh.add_box((0.0, f_h + 0.02, 0.0), (cabin_w - 0.45, 0.06, cabin_d - 0.45), rot_y=0.0)
+
+    # Overhead Heavy Timber Ceiling Rafters spanning cabin width
+    for rz in [-1.8, -0.9, 0.0, 0.9, 1.8]:
+        mesh.add_box((0.0, wall_h - 0.08, rz), (cabin_w - 0.25, 0.16, 0.14), rot_y=0.0)
+
+    # Ranger's Heavy Timber Work Desk (left wall)
+    desk_x = -1.95
+    desk_z = -0.75
+    desk_top_y = f_h + 0.76
+    mesh.add_box((desk_x, desk_top_y, desk_z), (1.65, 0.06, 0.95), rot_y=0.0)
+    for lx in [desk_x - 0.72, desk_x + 0.72]:
+        for lz in [desk_z - 0.38, desk_z + 0.38]:
+            mesh.add_box((lx, f_h + 0.40, lz), (0.09, 0.74, 0.09), rot_y=0.0)
+    # Desk drawer pedestal
+    mesh.add_box((desk_x + 0.52, f_h + 0.40, desk_z), (0.42, 0.68, 0.85), rot_y=0.0)
+    # Timber chair behind desk
+    mesh.add_box((desk_x, f_h + 0.45, desk_z + 0.68), (0.46, 0.05, 0.46), rot_y=0.08)
+    for cx in [desk_x - 0.18, desk_x + 0.18]:
+        for cz in [desk_z + 0.50, desk_z + 0.86]:
+            mesh.add_box((cx, f_h + 0.24, cz), (0.05, 0.44, 0.05), rot_y=0.08)
+    mesh.add_box((desk_x, f_h + 0.78, desk_z + 0.88), (0.46, 0.64, 0.05), rot_y=0.08)
+
+    # Field Cot (back right corner)
+    cot_x = 1.95
+    cot_z = 0.95
+    mesh.add_box((cot_x, f_h + 0.36, cot_z), (0.95, 0.12, 2.15), rot_y=0.0)
+    for clx in [cot_x - 0.42, cot_x + 0.42]:
+        for clz in [cot_z - 0.95, cot_z + 0.95]:
+            mesh.add_box((clx, f_h + 0.18, clz), (0.07, 0.36, 0.07), rot_y=0.0)
+
+    # Wall Shelving Unit (rear wall)
+    shelf_x = 0.0
+    shelf_z = -half_d + 0.28
+    for sy in [f_h + 1.1, f_h + 1.6, f_h + 2.1]:
+        mesh.add_box((shelf_x, sy, shelf_z), (2.2, 0.05, 0.36), rot_y=0.0)
+    mesh.add_box((shelf_x - 1.05, f_h + 1.6, shelf_z), (0.06, 1.1, 0.36), rot_y=0.0)
+    mesh.add_box((shelf_x + 1.05, f_h + 1.6, shelf_z), (0.06, 1.1, 0.36), rot_y=0.0)
+
     # =========================================================================
     # 3. DIMENSIONAL CEDAR SHAKE SHINGLE ROOF & AWNING (usemtl Roof)
     # =========================================================================
     mesh.usemtl("Roof")
+
     r_w = half_w + roof_overhang
     r_d = half_d + roof_overhang
     roof_thick = 0.12
@@ -1098,6 +1148,53 @@ def generate_cabin():
     # 4.3 Wall Lantern Housing & Arm Sconce (enclosing PorchLight at (0, 3.0, 3.4))
     mesh.add_cylinder((0.0, 2.75, half_d + 0.05), (0.0, 2.95, half_d + 0.38), 0.03, 0.03, segs=6)
     mesh.add_box((0.0, 3.0, half_d + 0.38), (0.24, 0.34, 0.24), rot_y=0.0)
+
+    # 4.4 Walk-In Interior Metal Fixtures & Storytelling Props
+    # Vintage Shortwave Radio Receiver on ranger desk (desk_x = -1.95, desk_top_y = f_h + 0.76, desk_z = -0.75)
+    desk_x = -1.95
+    desk_z = -0.75
+    desk_top_y = f_h + 0.76
+    # Metal radio chassis
+    mesh.add_box((desk_x - 0.38, desk_top_y + 0.18, desk_z - 0.05), (0.54, 0.30, 0.34), rot_y=0.05)
+    # Frequency dial & tuner knobs on faceplate
+    mesh.add_box((desk_x - 0.38, desk_top_y + 0.18, desk_z + 0.13), (0.45, 0.20, 0.03), rot_y=0.05)
+    # Telescopic whip antenna
+    mesh.add_cylinder((desk_x - 0.58, desk_top_y + 0.32, desk_z - 0.15), (desk_x - 0.58, desk_top_y + 1.15, desk_z - 0.15), 0.012, 0.005, segs=6)
+    # Microphone handset on cradle
+    mesh.add_box((desk_x - 0.02, desk_top_y + 0.08, desk_z + 0.15), (0.10, 0.12, 0.10), rot_y=0.2)
+
+    # Cast-Iron Potbelly Woodstove (front-right cabin corner)
+    stove_x = 1.95
+    stove_z = -1.1
+    # Heavy hearth base plate
+    mesh.add_box((stove_x, f_h + 0.04, stove_z), (0.90, 0.04, 0.90), rot_y=0.0)
+    # Cylindrical belly
+    mesh.add_cylinder((stove_x, f_h + 0.16, stove_z), (stove_x, f_h + 0.92, stove_z), 0.34, 0.38, segs=12)
+    # Cast-iron fire door with draft vents
+    mesh.add_box((stove_x - 0.28, f_h + 0.55, stove_z), (0.05, 0.32, 0.28), rot_y=0.0)
+    # 4 curved stove feet
+    for sfx in [-0.28, 0.28]:
+        for sfz in [-0.28, 0.28]:
+            mesh.add_cylinder((stove_x + sfx, f_h + 0.04, stove_z + sfz), (stove_x + sfx * 0.7, f_h + 0.16, stove_z + sfz * 0.7), 0.04, 0.05, segs=6)
+    # Interior stovepipe connecting upward through ceiling
+    mesh.add_cylinder((stove_x, f_h + 0.92, stove_z), (stove_x, wall_h - 0.05, stove_z), 0.11, 0.11, segs=10)
+
+    # Center hanging rafter lantern fixture (at (0, 2.2, 0))
+    mesh.add_cylinder((0.0, wall_h - 0.08, 0.0), (0.0, 2.35, 0.0), 0.012, 0.012, segs=4)
+    mesh.add_box((0.0, 2.22, 0.0), (0.22, 0.28, 0.22), rot_y=0.0)
+
+    # Canned food rations and emergency kerosene cans on shelving
+    shelf_z = -half_d + 0.28
+    for cx in [-0.6, -0.3, 0.0, 0.3, 0.6]:
+        mesh.add_cylinder((cx, f_h + 1.13, shelf_z), (cx, f_h + 1.35, shelf_z), 0.065, 0.065, segs=8)
+    mesh.add_box((0.7, f_h + 1.76, shelf_z), (0.24, 0.30, 0.22), rot_y=0.0)
+
+    # 4.5 Wool Blanket on Field Cot (usemtl Stone for rough fabric texture)
+    mesh.usemtl("Stone")
+    cot_x = 1.95
+    cot_z = 0.95
+    mesh.add_box((cot_x, f_h + 0.50, cot_z - 0.55), (0.78, 0.20, 0.85), rot_y=0.0)
+
 
     # =========================================================================
     # 5. WINDOW GLASS PANES (usemtl Glass)
@@ -1967,6 +2064,143 @@ def generate_tree_sapling():
     mesh.save("assets/models/tree_sapling.obj")
 
 
+def generate_document_and_evidence_props():
+    """
+    Generates high-realism 3D props for Phase 2 investigation storytelling:
+    - prop_evacuation_notice.obj: Plywood clipboard with iron spring clip and USFS order.
+    - prop_field_journal.obj: Open leather-bound journal with warden's log and sketches.
+    - prop_topomap.obj: Framed district survey quadrangle map.
+    - prop_plaster_footprint.obj: Plaster forensic cast showing 18.5" cryptid track.
+    - prop_evidence_jar.obj: Glass specimen jar containing coarse cryptid hair clump.
+    - prop_rifle_casings.obj: Ejected brass .30-06 cartridges.
+    """
+    os.makedirs("assets/models", exist_ok=True)
+
+    # 1. USFS Evacuation Notice Clipboard
+    cb = ObjMesh("prop_evacuation_notice")
+    cb.usemtl("Wood")
+    # Plywood backing board (width 0.48, height 0.68, thickness 0.02)
+    cb.add_box((0.0, 0.0, 0.0), (0.48, 0.68, 0.02), rot_y=0.0)
+    # Beveled edges
+    cb.add_box((0.0, 0.34, 0.0), (0.46, 0.015, 0.018), rot_y=0.0)
+    cb.add_box((0.0, -0.34, 0.0), (0.46, 0.015, 0.018), rot_y=0.0)
+
+    cb.usemtl("Metal")
+    # Iron spring clip at top
+    cb.add_box((0.0, 0.28, 0.025), (0.22, 0.065, 0.03), rot_y=0.0)
+    # Clip lever wire & rivet
+    cb.add_cylinder((-0.08, 0.31, 0.035), (0.08, 0.31, 0.035), 0.008, 0.008, segs=6)
+    cb.add_cylinder((0.0, 0.32, 0.015), (0.0, 0.35, 0.015), 0.012, 0.012, segs=6)
+
+    cb.usemtl("Paper")
+    # Paper sheet quad mapped to USFS texture
+    pw, ph = 0.40, 0.58
+    pz = 0.012
+    v1 = cb.add_v(-pw * 0.5, -ph * 0.5, pz)
+    v2 = cb.add_v( pw * 0.5, -ph * 0.5, pz)
+    v3 = cb.add_v( pw * 0.5,  ph * 0.5, pz)
+    v4 = cb.add_v(-pw * 0.5,  ph * 0.5, pz)
+    vn = cb.add_vn(0.0, 0.0, 1.0)
+    vt1 = cb.add_vt(0.0, 0.0)
+    vt2 = cb.add_vt(1.0, 0.0)
+    vt3 = cb.add_vt(1.0, 1.0)
+    vt4 = cb.add_vt(0.0, 1.0)
+    cb.add_face([v1, v2, v3, v4], [vn, vn, vn, vn], [vt1, vt2, vt3, vt4])
+    cb.save("assets/models/prop_evacuation_notice.obj", mat_order=["Wood", "Metal", "Paper"])
+
+    # 2. Open Field Journal
+    fj = ObjMesh("prop_field_journal")
+    fj.usemtl("Wood")
+    # Leather cover backboard
+    fj.add_box((0.0, 0.01, 0.0), (0.52, 0.025, 0.38), rot_y=0.0)
+    # Center spine ridge
+    fj.add_cylinder((0.0, 0.01, -0.19), (0.0, 0.01, 0.19), 0.02, 0.02, segs=6)
+
+    fj.usemtl("Paper")
+    # Left and right pages open
+    jw, jh = 0.48, 0.34
+    jy = 0.024
+    jv1 = fj.add_v(-jw * 0.5, jy,  jh * 0.5)
+    jv2 = fj.add_v( jw * 0.5, jy,  jh * 0.5)
+    jv3 = fj.add_v( jw * 0.5, jy, -jh * 0.5)
+    jv4 = fj.add_v(-jw * 0.5, jy, -jh * 0.5)
+    jvn = fj.add_vn(0.0, 1.0, 0.0)
+    jvt1 = fj.add_vt(0.0, 0.0)
+    jvt2 = fj.add_vt(1.0, 0.0)
+    jvt3 = fj.add_vt(1.0, 1.0)
+    jvt4 = fj.add_vt(0.0, 1.0)
+    fj.add_face([jv1, jv2, jv3, jv4], [jvn, jvn, jvn, jvn], [jvt1, jvt2, jvt3, jvt4])
+    fj.save("assets/models/prop_field_journal.obj", mat_order=["Wood", "Paper"])
+
+    # 3. Framed District Topographic Map
+    tm = ObjMesh("prop_topomap")
+    tm.usemtl("Wood")
+    # Timber frame
+    tm.add_box((0.0, 0.0, 0.0), (1.36, 1.02, 0.04), rot_y=0.0)
+
+    tm.usemtl("Paper")
+    mw, mh = 1.24, 0.90
+    mz = 0.022
+    mv1 = tm.add_v(-mw * 0.5, -mh * 0.5, mz)
+    mv2 = tm.add_v( mw * 0.5, -mh * 0.5, mz)
+    mv3 = tm.add_v( mw * 0.5,  mh * 0.5, mz)
+    mv4 = tm.add_v(-mw * 0.5,  mh * 0.5, mz)
+    mvn = tm.add_vn(0.0, 0.0, 1.0)
+    mvt1 = tm.add_vt(0.0, 0.0)
+    mvt2 = tm.add_vt(1.0, 0.0)
+    mvt3 = tm.add_vt(1.0, 1.0)
+    mvt4 = tm.add_vt(0.0, 1.0)
+    tm.add_face([mv1, mv2, mv3, mv4], [mvn, mvn, mvn, mvn], [mvt1, mvt2, mvt3, mvt4])
+    tm.save("assets/models/prop_topomap.obj", mat_order=["Wood", "Paper"])
+
+
+    # 4. Forensic Plaster Footprint Cast
+    pf = ObjMesh("prop_plaster_footprint")
+    pf.usemtl("Stone")
+    # Heavy rectangular plaster slab
+    pf.add_box((0.0, 0.04, 0.0), (0.58, 0.08, 0.34), rot_y=0.0)
+    # Excavated depression of 18.5" hominid footprint
+    # Sole hollow
+    pf.add_ellipsoid((0.0, 0.065, -0.02), (0.13, 0.025, 0.22), segs_u=12, segs_v=8)
+    pf.add_ellipsoid((0.0, 0.065,  0.09), (0.11, 0.022, 0.09), segs_u=10, segs_v=6)
+    # 5 deep toe impressions
+    for ti in range(5):
+        tx = -0.09 + ti * 0.045
+        tz = -0.11 - abs(ti - 2) * 0.008
+        pf.add_ellipsoid((tx, 0.072, tz), (0.018, 0.016, 0.025), segs_u=8, segs_v=6)
+    pf.save("assets/models/prop_plaster_footprint.obj", mat_order=["Stone"])
+
+    # 5. Cryptid Hair Specimen Jar
+    ej = ObjMesh("prop_evidence_jar")
+    ej.usemtl("Glass")
+    # Cylindrical glass jar
+    ej.add_cylinder((0.0, 0.01, 0.0), (0.0, 0.20, 0.0), 0.075, 0.075, segs=12)
+
+    ej.usemtl("Metal")
+    # Threaded tin screw-on lid
+    ej.add_cylinder((0.0, 0.19, 0.0), (0.0, 0.225, 0.0), 0.08, 0.08, segs=12)
+
+    ej.usemtl("Fur")
+    # Coarse dark clump of hair strands suspended inside
+    ej.add_ellipsoid((0.0, 0.09, 0.0), (0.045, 0.06, 0.045), segs_u=10, segs_v=8)
+    ej.save("assets/models/prop_evidence_jar.obj", mat_order=["Glass", "Metal", "Fur"])
+
+    # 6. Spent Rifle Casings (.30-06)
+    rc = ObjMesh("prop_rifle_casings")
+    rc.usemtl("Metal")
+    casings = [
+        (( 0.00, 0.015,  0.00), ( 0.08, 0.015,  0.03)),
+        ((-0.06, 0.015,  0.05), (-0.02, 0.015,  0.13)),
+        (( 0.05, 0.015, -0.06), ( 0.12, 0.015, -0.02))
+    ]
+    for p1, p2 in casings:
+        rc.add_cylinder(p1, p2, 0.014, 0.014, segs=8)
+        # Extractor groove
+        rc.add_cylinder(p1, (p1[0]*0.9+p2[0]*0.1, p1[1], p1[2]*0.9+p2[2]*0.1), 0.012, 0.012, segs=8)
+    rc.save("assets/models/prop_rifle_casings.obj", mat_order=["Metal"])
+    print("Investigation and storytelling evidence props generated successfully.")
+
+
 if __name__ == "__main__":
     print("Generating photorealistic 3D models for The Black Pines...")
     generate_sasquatch_models()
@@ -1981,4 +2215,6 @@ if __name__ == "__main__":
     generate_tall_pine()
     generate_dead_snag()
     generate_tree_sapling()
+    generate_document_and_evidence_props()
     print("All models generated successfully!")
+

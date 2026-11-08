@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://ranger_station_01"]
+[gd_scene load_steps=23 format=3 uid="uid://ranger_station_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="ArrayMesh" path="res://assets/models/cabin.obj" id="2_cabin_mesh"]
@@ -7,9 +7,28 @@
 [ext_resource type="Material" uid="uid://dkqeeuqq8qlb1" path="res://assets/materials/mat_metal_weathered.tres" id="5_metal_mat"]
 [ext_resource type="Material" uid="uid://cb6kvxyejkn2d" path="res://assets/materials/mat_craggy_rock.tres" id="6_stone_mat"]
 [ext_resource type="Material" uid="uid://mat_cabin_glass_01" path="res://assets/materials/mat_cabin_glass.tres" id="7_glass_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/prop_evacuation_notice.obj" id="8_evac_mesh"]
+[ext_resource type="Material" uid="uid://mat_doc_evac_01" path="res://assets/materials/mat_doc_evacuation_notice.tres" id="9_evac_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/prop_field_journal.obj" id="10_journal_mesh"]
+[ext_resource type="Material" uid="uid://mat_doc_journal_01" path="res://assets/materials/mat_doc_field_journal.tres" id="11_journal_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/prop_topomap.obj" id="12_topomap_mesh"]
+[ext_resource type="Material" uid="uid://mat_doc_topomap_01" path="res://assets/materials/mat_doc_topomap.tres" id="13_topomap_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/prop_plaster_footprint.obj" id="14_plaster_mesh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/prop_evidence_jar.obj" id="15_jar_mesh"]
+[ext_resource type="Material" uid="uid://csvewr5uuy0yc" path="res://assets/materials/mat_beast_fur.tres" id="16_fur_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/prop_rifle_casings.obj" id="17_casings_mesh"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_cabin"]
-size = Vector3(6.5, 4.2, 5.2)
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(6.5, 0.45, 5.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_back"]
+size = Vector3(6.5, 3.2, 0.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_side"]
+size = Vector3(0.4, 3.2, 5.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_front_half"]
+size = Vector3(2.3, 3.2, 0.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_porch"]
 size = Vector3(6.8, 0.38, 2.0)
@@ -17,30 +36,42 @@ size = Vector3(6.8, 0.38, 2.0)
 [sub_resource type="BoxShape3D" id="BoxShape3D_steps"]
 size = Vector3(2.0, 0.26, 0.8)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_door_sign"]
-size = Vector3(0.8, 1.0, 0.3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_notice_paper"]
-albedo_color = Color(0.85, 0.8, 0.65, 1)
-roughness = 0.8
-
-[sub_resource type="BoxMesh" id="BoxMesh_notice_board"]
-material = SubResource("StandardMaterial3D_notice_paper")
-size = Vector3(0.5, 0.7, 0.04)
+[sub_resource type="BoxShape3D" id="BoxShape3D_prop_small"]
+size = Vector3(0.5, 0.7, 0.15)
 
 [node name="RangerStation" type="Node3D"]
 
 [node name="CabinBody" type="StaticBody3D" parent="."]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CabinBody"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
-shape = SubResource("BoxShape3D_cabin")
+[node name="FloorCollision" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 0)
+shape = SubResource("BoxShape3D_floor")
 
-[node name="CollisionShape3D_porch" type="CollisionShape3D" parent="CabinBody"]
+[node name="WallBackCollision" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, -2.6)
+shape = SubResource("BoxShape3D_wall_back")
+
+[node name="WallLeftCollision" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 1.8, 0)
+shape = SubResource("BoxShape3D_wall_side")
+
+[node name="WallRightCollision" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1.8, 0)
+shape = SubResource("BoxShape3D_wall_side")
+
+[node name="WallFrontLeftCollision" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.05, 1.8, 2.6)
+shape = SubResource("BoxShape3D_wall_front_half")
+
+[node name="WallFrontRightCollision" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.05, 1.8, 2.6)
+shape = SubResource("BoxShape3D_wall_front_half")
+
+[node name="PorchCollision" type="CollisionShape3D" parent="CabinBody"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 3.6)
 shape = SubResource("BoxShape3D_porch")
 
-[node name="CollisionShape3D_steps" type="CollisionShape3D" parent="CabinBody"]
+[node name="StepsCollision" type="CollisionShape3D" parent="CabinBody"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 4.95)
 shape = SubResource("BoxShape3D_steps")
 
@@ -53,19 +84,23 @@ surface_material_override/3 = ExtResource("6_stone_mat")
 surface_material_override/4 = ExtResource("7_glass_mat")
 
 [node name="DoorSign" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.6, 2.70)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 1.72, 2.76)
 collision_layer = 1
+
 collision_mask = 0
 script = ExtResource("1_clue")
-prompt_message = "[E] Read Notice Board"
+prompt_message = "[E] Read Evacuation Order"
 inspection_text = "BLACK PINE RANGER STATION #04 - EVACUATED.\n\nNOTICE: District closed indefinitely. All research personnel and game wardens ordered to fall back to Highway 9. Multiple aggressive encounters reported beyond ridge line. Severe carcass mutilation documented.\nDO NOT ENTER THE PINES AFTER DUSK."
 clue_title = "Evacuation Notice"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DoorSign"]
-shape = SubResource("BoxShape3D_door_sign")
+shape = SubResource("BoxShape3D_prop_small")
 
 [node name="NoticeMesh" type="MeshInstance3D" parent="DoorSign"]
-mesh = SubResource("BoxMesh_notice_board")
+mesh = ExtResource("8_evac_mesh")
+surface_material_override/0 = ExtResource("3_wood_mat")
+surface_material_override/1 = ExtResource("5_metal_mat")
+surface_material_override/2 = ExtResource("9_evac_mat")
 
 [node name="PorchLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 3.4)
@@ -74,3 +109,95 @@ light_energy = 2.4
 shadow_enabled = true
 omni_range = 16.0
 omni_attenuation = 1.15
+
+[node name="InteriorLantern" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+light_color = Color(1.0, 0.82, 0.55, 1)
+light_energy = 2.2
+shadow_enabled = true
+omni_range = 10.0
+omni_attenuation = 1.1
+
+[node name="WardenFieldJournal" type="StaticBody3D" parent="."]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -1.75, 1.34, -0.75)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Read Warden's Field Journal"
+inspection_text = "WARDEN'S LOG - FINAL ENTRIES:\n\n'Oct 28: Found full bull elk snapped clean at the spine. Claw gouges 7.8 inches across the flanks.'\n'Oct 29: Imprints in trail bed: 18.5 inches long, deep heel sink indicates weight topping 800 lbs.'\n'Oct 31: Something was looking in through the north eave window tonight. Heavy breath on the glass. Station evacuated.'"
+clue_title = "Warden's Abandoned Journal"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WardenFieldJournal"]
+shape = SubResource("BoxShape3D_prop_small")
+
+[node name="JournalMesh" type="MeshInstance3D" parent="WardenFieldJournal"]
+mesh = ExtResource("10_journal_mesh")
+surface_material_override/0 = ExtResource("3_wood_mat")
+surface_material_override/1 = ExtResource("11_journal_mat")
+
+[node name="DistrictMap" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.95, 1.95, -2.52)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect District Survey Map"
+inspection_text = "USFS QUADRANGLE 1:24,000:\n\nStation 04 is circled in red grease pencil and labeled 'LAST CONTACT'. A red line tracks northwest across the creek to 'CARCASS KILL SITE'. Highway 9 evacuation route marked southeast."
+clue_title = "The Black Pines Survey District"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DistrictMap"]
+shape = SubResource("BoxShape3D_prop_small")
+
+[node name="MapMesh" type="MeshInstance3D" parent="DistrictMap"]
+mesh = ExtResource("12_topomap_mesh")
+surface_material_override/0 = ExtResource("3_wood_mat")
+surface_material_override/1 = ExtResource("13_topomap_mat")
+
+[node name="PlasterFootprintCast" type="StaticBody3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -2.25, 1.34, -0.75)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect Plaster Footprint Cast"
+inspection_text = "A heavy plaster cast labeled 'SPECIMEN #14 - CREEK TRAIL'. The print is 18.5 inches long and over 7 inches broad across the ball. Five distinct splayed toes with deep dermal pressure ridges. No claw marks on the pads—pure massive hominid anatomy."
+clue_title = "Forensic Footprint Cast"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlasterFootprintCast"]
+shape = SubResource("BoxShape3D_prop_small")
+
+[node name="PlasterMesh" type="MeshInstance3D" parent="PlasterFootprintCast"]
+mesh = ExtResource("14_plaster_mesh")
+surface_material_override/0 = ExtResource("6_stone_mat")
+
+[node name="HairSpecimenJar" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.45, 1.34, -0.42)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect Hair Specimen Jar"
+inspection_text = "Glass sample jar containing coarse, thick black-brown fur strands retrieved from the clawed pine bark at 9 feet height. The hair is twice as thick as grizzly pelt, with a distinct sulfurous musk."
+clue_title = "Specimen Jar #09"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HairSpecimenJar"]
+shape = SubResource("BoxShape3D_prop_small")
+
+[node name="JarMesh" type="MeshInstance3D" parent="HairSpecimenJar"]
+mesh = ExtResource("15_jar_mesh")
+surface_material_override/0 = ExtResource("7_glass_mat")
+surface_material_override/1 = ExtResource("5_metal_mat")
+surface_material_override/2 = ExtResource("16_fur_mat")
+
+[node name="SpentRifleCasings" type="StaticBody3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 0.45, 0.40, 3.8)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect Spent Cartridges"
+inspection_text = "Three spent brass .30-06 cartridges stamped 'WINCHESTER 180 GR'. Ejected into the porch floorboards near fresh timber claw gouges. Someone was shooting in panic into the pines."
+clue_title = "Spent .30-06 Casings"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SpentRifleCasings"]
+shape = SubResource("BoxShape3D_prop_small")
+
+[node name="CasingsMesh" type="MeshInstance3D" parent="SpentRifleCasings"]
+mesh = ExtResource("17_casings_mesh")
+surface_material_override/0 = ExtResource("5_metal_mat")

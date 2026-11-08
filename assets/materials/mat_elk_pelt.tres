@@ -15,12 +15,11 @@ bump_strength = 2.2
 [resource]
 resource_name = "mat_elk_pelt"
 albedo_color = Color(0.20, 0.15, 0.10, 1)
-roughness = 0.78
-metallic = 0.02
+roughness = 0.88
+metallic = 0.0
 normal_enabled = true
 normal_scale = 1.6
 normal_texture = SubResource("NoiseTexture2D_pelt_norm")
-clearcoat_enabled = true
-clearcoat = 0.35
-clearcoat_roughness = 0.28
+clearcoat_enabled = false
 uv1_scale = Vector3(4, 4, 4)
+

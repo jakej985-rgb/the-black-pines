@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://mat_doc_topomap_01"]
+
+[ext_resource type="Texture2D" path="res://assets/textures/documents/black_pines_topomap.png" id="1_tex"]
+
+[resource]
+resource_name = "mat_doc_topomap"
+roughness = 0.85
+metallic = 0.0
+albedo_texture = ExtResource("1_tex")
+texture_filter = 5

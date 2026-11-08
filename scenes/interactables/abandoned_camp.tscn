@@ -1,0 +1,70 @@
+[gd_scene load_steps=10 format=3 uid="uid://abandoned_camp_01"]
+
+[ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/flare.tscn" id="2_flare"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tent_col"]
+size = Vector3(3.2, 1.8, 3.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_canvas"]
+albedo_color = Color(0.25, 0.35, 0.28, 1)
+roughness = 0.9
+
+[sub_resource type="PrismMesh" id="PrismMesh_tent"]
+material = SubResource("StandardMaterial3D_canvas")
+left_to_right = 0.4
+size = Vector3(2.8, 1.6, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ash"]
+albedo_color = Color(0.08, 0.08, 0.08, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pit"]
+material = SubResource("StandardMaterial3D_ash")
+top_radius = 0.65
+bottom_radius = 0.7
+height = 0.1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
+size = Vector3(1.2, 0.8, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_paper"]
+albedo_color = Color(0.8, 0.75, 0.6, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_journal"]
+material = SubResource("StandardMaterial3D_paper")
+size = Vector3(0.25, 0.04, 0.35)
+
+[node name="AbandonedCamp" type="Node3D"]
+
+[node name="TentBody" type="StaticBody3D" parent="."]
+transform = Transform3D(0.965926, 0.05, 0.258819, 0, 0.98, -0.198669, -0.258819, 0.191873, 0.946607, 0, 0.8, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TentBody"]
+mesh = SubResource("PrismMesh_tent")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TentBody"]
+shape = SubResource("BoxShape3D_tent_col")
+
+[node name="CampfireAsh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.05, 0.6)
+mesh = SubResource("CylinderMesh_pit")
+
+[node name="RoadFlare" parent="." instance=ExtResource("2_flare")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0.2)
+
+[node name="TornJournal" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0, -0.8)
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Read Torn Journal Entry"
+inspection_text = "HUNTER'S WATERLOGGED JOURNAL:\n\n'Oct 28: It circled the tent three times before dawn. Heavier than any bear. It doesn't walk like a four-legged animal. It throws heavy rocks against the cedar trunks from 30 yards out, testing us. Miller shot his 30-06 into the dark. It didn't scream... it laughed. A low, rolling vibration in your chest. God help us, we are leaving at sunrise.'\n(Spent brass rifle cartridges are scattered everywhere in the dirt)."
+clue_title = "Waterlogged Hunter's Journal"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TornJournal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("BoxShape3D_note")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TornJournal"]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 0, 0.04, 0)
+mesh = SubResource("BoxMesh_journal")

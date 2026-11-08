@@ -1,10 +1,18 @@
-[gd_scene load_steps=12 format=3 uid="uid://forest_world_01"]
+[gd_scene load_steps=19 format=3 uid="uid://forest_world_01"]
 
 [ext_resource type="PackedScene" path="res://scenes/world/pine_tree.tscn" id="1_tree"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/ranger_station.tscn" id="2_cabin"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/clue_footprint.tscn" id="3_clue"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/scrap_metal.tscn" id="4_scrap"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/sticks_bundle.tscn" id="5_sticks"]
+[ext_resource type="PackedScene" path="res://scenes/world/rock_cluster.tscn" id="6_rock"]
+[ext_resource type="PackedScene" path="res://scenes/world/fallen_log.tscn" id="7_log"]
+[ext_resource type="PackedScene" path="res://scenes/world/fence_post.tscn" id="8_fence"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/clue_clawed_tree.tscn" id="9_clawed"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/clue_carcass.tscn" id="10_carcass"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/abandoned_camp.tscn" id="11_camp"]
+[ext_resource type="PackedScene" path="res://scenes/creatures/sasquatch.tscn" id="12_sasquatch"]
+
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
 sky_top_color = Color(0.06, 0.1, 0.16, 1)
@@ -83,7 +91,38 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, 8.5)
 [node name="SticksBundle" parent="." instance=ExtResource("5_sticks")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
 
+[node name="FenceLeft" parent="." instance=ExtResource("8_fence")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -4.5, 0, 7)
+
+[node name="FenceRight" parent="." instance=ExtResource("8_fence")]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 4.5, 0, 7)
+
+[node name="Rock1" parent="." instance=ExtResource("6_rock")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, 1.5)
+
+[node name="Rock2" parent="." instance=ExtResource("6_rock")]
+transform = Transform3D(1.3, 0, 0, 0, 1.2, 0, 0, 0, 1.3, -6, 0, -7)
+
+[node name="Rock3" parent="." instance=ExtResource("6_rock")]
+transform = Transform3D(1.5, 0, 0, 0, 1.4, 0, 0, 0, 1.5, -12, 0, -14)
+
+[node name="FallenLog1" parent="." instance=ExtResource("7_log")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -3.2, 0, -7.5)
+
+[node name="ClueClawedTree" parent="." instance=ExtResource("9_clawed")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 0, -14)
+
+[node name="ClueCarcass" parent="." instance=ExtResource("10_carcass")]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -10.5, 0, -18)
+
+[node name="AbandonedCamp" parent="." instance=ExtResource("11_camp")]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 8.5, 0, -8.5)
+
+[node name="Sasquatch" parent="." instance=ExtResource("12_sasquatch")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, -28)
+
 [node name="Trees" type="Node3D" parent="."]
+
 
 [node name="PineTree_01" parent="Trees" instance=ExtResource("1_tree")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 0, 6)

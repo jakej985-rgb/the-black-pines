@@ -39,6 +39,8 @@ var stamina_timer: float = 0.0
 var bob_phase: float = 0.0
 var default_camera_pos: Vector3 = Vector3.ZERO
 var inventory: Dictionary = {}
+var step_dist_accum: float = 0.0
+var is_flickering: bool = false
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -79,6 +81,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if flashlight:
 			flashlight.visible = not flashlight.visible
 			flashlight_toggled.emit(flashlight.visible)
+			if AudioDirector.instance:
+				AudioDirector.instance.play_click()
 
 	if event.is_action_pressed("interact"):
 		if current_interactable and current_interactable.is_usable:
@@ -127,6 +131,18 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	# Footstep audio
+	var horiz_vel := Vector2(velocity.x, velocity.z).length()
+	if is_on_floor() and horiz_vel > 0.3:
+		step_dist_accum += horiz_vel * delta
+		var threshold: float = 1.6 if is_sprinting else 2.2
+		if step_dist_accum >= threshold:
+			step_dist_accum = 0.0
+			if AudioDirector.instance:
+				AudioDirector.instance.play_footstep(is_sprinting)
+	else:
+		step_dist_accum = 0.0
+
 	# Head bob
 	_process_head_bob(delta, direction.length() > 0.1 and is_on_floor())
 	
@@ -174,6 +190,26 @@ func add_inventory_item(item_name: String, qty: int = 1) -> void:
 	inventory[item_name] += qty
 	show_notification("+%d %s (Total: %d)" % [qty, item_name, inventory[item_name]])
 	inventory_updated.emit(inventory)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_pickup()
+
+func trigger_flashlight_flicker(duration: float = 1.6) -> void:
+	if is_flickering or not flashlight or not flashlight.visible:
+		return
+	is_flickering = true
+	var timer = 0.0
+	while timer < duration:
+		if not is_inside_tree():
+			break
+		flashlight.visible = not flashlight.visible
+		if AudioDirector.instance and randf() > 0.5:
+			AudioDirector.instance.play_click()
+		var wait_time: float = randf_range(0.04, 0.16)
+		timer += wait_time
+		await get_tree().create_timer(wait_time).timeout
+	if flashlight:
+		flashlight.visible = true
+	is_flickering = false
 
 func _ensure_default_input_actions() -> void:
 	var default_actions = {

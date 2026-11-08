@@ -1,0 +1,41 @@
+[gd_scene load_steps=7 format=3 uid="uid://clue_clawed_tree_01"]
+
+[ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
+[ext_resource type="PackedScene" path="res://scenes/world/pine_tree.tscn" id="2_tree"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_claw_trigger"]
+size = Vector3(1.8, 2.5, 1.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sap"]
+albedo_color = Color(0.35, 0.22, 0.08, 1)
+roughness = 0.3
+
+[sub_resource type="BoxMesh" id="BoxMesh_gouge"]
+material = SubResource("StandardMaterial3D_sap")
+size = Vector3(0.08, 1.2, 0.12)
+
+[node name="ClueClawedTree" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect Claw Marks"
+inspection_text = "Violent gouges scored deeply into the trunk 9 feet off the ground. Thick golden sap is still dripping down the shredded bark. No black bear or grizzly could reach this height standing upright. It marked this tree as its territory only moments ago."
+clue_title = "High Territorial Gouges"
+
+[node name="PineTree" parent="." instance=ExtResource("2_tree")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
+shape = SubResource("BoxShape3D_claw_trigger")
+
+[node name="Gouge1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 2.9, 0.36)
+mesh = SubResource("BoxMesh_gouge")
+
+[node name="Gouge2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0.38)
+mesh = SubResource("BoxMesh_gouge")
+
+[node name="Gouge3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 2.85, 0.36)
+mesh = SubResource("BoxMesh_gouge")

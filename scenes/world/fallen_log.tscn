@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://fallen_log_01"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_log"]
+size = Vector3(6.5, 0.7, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_moss_bark"]
+albedo_color = Color(0.16, 0.14, 0.1, 1)
+roughness = 0.95
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_log"]
+material = SubResource("StandardMaterial3D_moss_bark")
+top_radius = 0.32
+bottom_radius = 0.38
+height = 6.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_moss"]
+albedo_color = Color(0.12, 0.22, 0.1, 1)
+roughness = 0.85
+
+[node name="FallenLog" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+shape = SubResource("BoxShape3D_log")
+
+[node name="LogMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.02, -0.9998, 0, 0.9998, 0.02, 0, 0, 0, 1, 0, 0.35, 0)
+mesh = SubResource("CylinderMesh_log")

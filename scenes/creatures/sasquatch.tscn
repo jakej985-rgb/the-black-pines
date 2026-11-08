@@ -1,0 +1,106 @@
+[gd_scene load_steps=11 format=3 uid="uid://sasquatch_entity_01"]
+
+[ext_resource type="Script" path="res://scripts/creatures/sasquatch.gd" id="1_sasquatch"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_creature"]
+radius = 0.65
+height = 2.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fur"]
+albedo_color = Color(0.08, 0.06, 0.05, 1)
+roughness = 0.95
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_torso"]
+material = SubResource("StandardMaterial3D_fur")
+radius = 0.55
+height = 1.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulders"]
+material = SubResource("StandardMaterial3D_fur")
+size = Vector3(1.5, 0.45, 0.7)
+
+[sub_resource type="SphereMesh" id="SphereMesh_head"]
+material = SubResource("StandardMaterial3D_fur")
+radius = 0.32
+height = 0.65
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_limb"]
+material = SubResource("StandardMaterial3D_fur")
+top_radius = 0.18
+bottom_radius = 0.14
+height = 1.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eye_glow"]
+albedo_color = Color(1, 0.85, 0.3, 1)
+emission_enabled = true
+emission = Color(1, 0.8, 0.2, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_eye"]
+material = SubResource("StandardMaterial3D_eye_glow")
+radius = 0.035
+height = 0.07
+
+[node name="Sasquatch" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_sasquatch")
+stalk_distance_trigger = 13.0
+retreat_speed = 8.5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+shape = SubResource("CapsuleShape3D_creature")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Torso" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("CapsuleMesh_torso")
+
+[node name="Shoulders" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0)
+mesh = SubResource("BoxMesh_shoulders")
+
+[node name="HeadMesh" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.38, 0)
+mesh = SubResource("SphereMesh_head")
+
+[node name="ArmLeft" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, -0.78, 1.35, 0.1)
+mesh = SubResource("CylinderMesh_limb")
+
+[node name="ArmRight" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, 0, 1, 0.78, 1.35, 0.1)
+mesh = SubResource("CylinderMesh_limb")
+
+[node name="LegLeft" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 0.7, 0)
+mesh = SubResource("CylinderMesh_limb")
+
+[node name="LegRight" type="MeshInstance3D" parent="Visuals"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.7, 0)
+mesh = SubResource("CylinderMesh_limb")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.38, 0)
+
+[node name="EyeLeft" type="OmniLight3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.05, -0.3)
+light_color = Color(1, 0.8, 0.25, 1)
+light_energy = 0.85
+omni_range = 1.8
+
+[node name="EyeMeshLeft" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.05, -0.3)
+mesh = SubResource("SphereMesh_eye")
+
+[node name="EyeRight" type="OmniLight3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.05, -0.3)
+light_color = Color(1, 0.8, 0.25, 1)
+light_energy = 0.85
+omni_range = 1.8
+
+[node name="EyeMeshRight" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.05, -0.3)
+mesh = SubResource("SphereMesh_eye")

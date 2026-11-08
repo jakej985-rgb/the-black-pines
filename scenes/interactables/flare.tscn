@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://flare_item_01"]
+
+[ext_resource type="Script" path="res://scripts/interaction/collectible_item.gd" id="1_item"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_flare"]
+size = Vector3(0.5, 0.4, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flare_red"]
+albedo_color = Color(0.85, 0.15, 0.1, 1)
+roughness = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_flare"]
+material = SubResource("StandardMaterial3D_flare_red")
+top_radius = 0.04
+bottom_radius = 0.04
+height = 0.35
+
+[node name="RoadFlare" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_item")
+item_name = "Roadside Distress Flare"
+quantity = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+shape = SubResource("BoxShape3D_flare")
+
+[node name="FlareMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.258819, 0, 0.965926, 0.965926, 0, -0.258819, 0, 1, 0, 0, 0.05, 0)
+mesh = SubResource("CylinderMesh_flare")

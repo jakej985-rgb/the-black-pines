@@ -1,0 +1,63 @@
+[gd_scene load_steps=8 format=3 uid="uid://clue_carcass_01"]
+
+[ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_carcass"]
+size = Vector3(2.4, 0.8, 2.0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fur"]
+albedo_color = Color(0.28, 0.18, 0.12, 1)
+roughness = 0.9
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("StandardMaterial3D_fur")
+radius = 0.35
+height = 1.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bone"]
+albedo_color = Color(0.75, 0.72, 0.65, 1)
+roughness = 0.6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bone"]
+material = SubResource("StandardMaterial3D_bone")
+top_radius = 0.05
+bottom_radius = 0.06
+height = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blood"]
+albedo_color = Color(0.25, 0.04, 0.04, 1)
+roughness = 0.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pool"]
+material = SubResource("StandardMaterial3D_blood")
+top_radius = 0.9
+bottom_radius = 1.1
+height = 0.02
+
+[node name="ClueCarcass" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect Animal Remains"
+inspection_text = "A full-grown bull elk carcass, completely broken. The spine was snapped clean backward with tremendous brute force. The ribcage was pried open by large hands with claws. It wasn't hunted for meat—the skull and femur were cracked open solely for bone marrow. The body is still warm."
+clue_title = "Mutilated Bull Elk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+shape = SubResource("BoxShape3D_carcass")
+
+[node name="BloodPool" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+mesh = SubResource("CylinderMesh_pool")
+
+[node name="Torso" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, 0, 0.28, 0)
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="BrokenBone1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, 0.3, 0.45, 0.2)
+mesh = SubResource("CylinderMesh_bone")
+
+[node name="BrokenBone2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0, 1, -0.4, 0.38, -0.2)
+mesh = SubResource("CylinderMesh_bone")

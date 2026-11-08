@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://grass_tuft_01"]
+
+[ext_resource type="Shader" path="res://assets/materials/foliage_wind.gdshader" id="1_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_grass"]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/albedo = Color(0.12, 0.16, 0.08, 1)
+shader_parameter/roughness = 0.85
+shader_parameter/wind_speed = 1.8
+shader_parameter/wind_strength = 0.09
+shader_parameter/gust_frequency = 0.7
+
+[sub_resource type="PrismMesh" id="PrismMesh_blade"]
+material = SubResource("ShaderMaterial_grass")
+left_to_right = 0.5
+size = Vector3(0.08, 0.55, 0.02)
+
+[node name="GrassTuft" type="Node3D"]
+
+[node name="Blade1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, 0.05, 0.25, 0)
+mesh = SubResource("PrismMesh_blade")
+
+[node name="Blade2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.866025, -0.5, 0, 0.5, 0.866025, 0, 0, 0, 1, -0.06, 0.22, 0.04)
+mesh = SubResource("PrismMesh_blade")
+
+[node name="Blade3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0, 0.26, -0.05)
+mesh = SubResource("PrismMesh_blade")
+
+[node name="Blade4" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0.1, -0.866025, 0, 0.99, 0.11, 0.866025, -0.05, 0.5, -0.04, 0.2, -0.02)
+mesh = SubResource("PrismMesh_blade")

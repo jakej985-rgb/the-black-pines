@@ -41,6 +41,10 @@ var default_camera_pos: Vector3 = Vector3.ZERO
 var inventory: Dictionary = {}
 var step_dist_accum: float = 0.0
 var is_flickering: bool = false
+var was_on_floor: bool = true
+var landing_offset: float = 0.0
+var breathing_time: float = 0.0
+var current_strafe: float = 0.0
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -143,7 +147,20 @@ func _physics_process(delta: float) -> void:
 	else:
 		step_dist_accum = 0.0
 
-	# Head bob
+	# Landing impact
+	if not was_on_floor and is_on_floor():
+		landing_offset = -0.075
+		if AudioDirector.instance:
+			AudioDirector.instance.play_footstep(false)
+	was_on_floor = is_on_floor()
+	landing_offset = lerp(landing_offset, 0.0, delta * 9.0)
+
+	# Camera strafe banking
+	current_strafe = lerp(current_strafe, input_dir.x, delta * 8.0)
+	if camera:
+		camera.rotation.z = -current_strafe * deg_to_rad(1.6)
+
+	# Head bob & breathing
 	_process_head_bob(delta, direction.length() > 0.1 and is_on_floor())
 	
 	# Check interactables
@@ -153,15 +170,21 @@ func _process_head_bob(delta: float, is_moving: bool) -> void:
 	if not camera:
 		return
 	if is_moving:
+		breathing_time = 0.0
 		var speed_factor: float = 1.4 if is_sprinting else 1.0
 		bob_phase += delta * bob_frequency * speed_factor * TAU
-		var target_y: float = default_camera_pos.y + sin(bob_phase) * bob_amplitude
+		var target_y: float = default_camera_pos.y + sin(bob_phase) * bob_amplitude + landing_offset
 		var target_x: float = default_camera_pos.x + cos(bob_phase * 0.5) * (bob_amplitude * 0.5)
 		camera.position.y = lerp(camera.position.y, target_y, delta * 10.0)
 		camera.position.x = lerp(camera.position.x, target_x, delta * 10.0)
 	else:
 		bob_phase = 0.0
-		camera.position = camera.position.lerp(default_camera_pos, delta * 8.0)
+		breathing_time += delta
+		var breath_sway_y: float = sin(breathing_time * 1.3) * 0.007
+		var breath_sway_x: float = cos(breathing_time * 0.65) * 0.004
+		var rest_pos = default_camera_pos + Vector3(breath_sway_x, breath_sway_y + landing_offset, 0)
+		camera.position = camera.position.lerp(rest_pos, delta * 6.0)
+
 
 func _process_interaction() -> void:
 	if not interact_ray:

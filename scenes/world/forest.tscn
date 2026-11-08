@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://forest_world_01"]
+[gd_scene load_steps=25 format=3 uid="uid://forest_world_01"]
 
 [ext_resource type="PackedScene" path="res://scenes/world/pine_tree.tscn" id="1_tree"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/ranger_station.tscn" id="2_cabin"]
@@ -13,6 +13,13 @@
 [ext_resource type="PackedScene" path="res://scenes/interactables/abandoned_camp.tscn" id="11_camp"]
 [ext_resource type="PackedScene" path="res://scenes/creatures/sasquatch.tscn" id="12_sasquatch"]
 [ext_resource type="Material" path="res://assets/materials/mat_forest_ground.tres" id="13_ground_mat"]
+[ext_resource type="PackedScene" path="res://scenes/world/fern_cluster.tscn" id="14_fern"]
+[ext_resource type="PackedScene" path="res://scenes/world/grass_tuft.tscn" id="15_grass"]
+[ext_resource type="PackedScene" path="res://scenes/world/ground_debris.tscn" id="16_debris"]
+[ext_resource type="PackedScene" path="res://scenes/world/firewood_stack.tscn" id="17_firewood"]
+[ext_resource type="PackedScene" path="res://scenes/world/cabin_generator.tscn" id="18_generator"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/trail_marker.tscn" id="19_trail_marker"]
+
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
 sky_top_color = Color(0.06, 0.1, 0.16, 1)
@@ -128,7 +135,70 @@ transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 
 [node name="Sasquatch" parent="." instance=ExtResource("12_sasquatch")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, 0, -28)
 
+[node name="Firewood" parent="." instance=ExtResource("17_firewood")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 3.4, 0, 10.8)
+
+[node name="Generator" parent="." instance=ExtResource("18_generator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 14.5)
+
+[node name="TrailMarker04" parent="." instance=ExtResource("19_trail_marker")]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -2.8, 0, 4.2)
+
+[node name="Undergrowth" type="Node3D" parent="."]
+
+[node name="Fern1" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(1.1, 0, 0, 0, 1, 0, 0, 0, 1.1, -3.2, 0, 2)
+
+[node name="Fern2" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(0.9, 0, 0.4, 0, 1, 0, -0.4, 0, 0.9, 3.5, 0, 3)
+
+[node name="Fern3" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(1.2, 0, 0, 0, 1.1, 0, 0, 0, 1.2, -5, 0, -2)
+
+[node name="Fern4" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -8)
+
+[node name="Fern5" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(1.1, 0, -0.3, 0, 1, 0, 0.3, 0, 1.1, 6.5, 0, -5)
+
+[node name="Fern6" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(1.3, 0, 0, 0, 1.2, 0, 0, 0, 1.3, -6.5, 0, -15)
+
+[node name="Fern7" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(1.15, 0, 0.2, 0, 1, 0, -0.2, 0, 1.15, 7, 0, -12)
+
+[node name="Grass1" parent="Undergrowth" instance=ExtResource("15_grass")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 1)
+
+[node name="Grass2" parent="Undergrowth" instance=ExtResource("15_grass")]
+transform = Transform3D(1.2, 0, 0, 0, 1.1, 0, 0, 0, 1.2, 2, 0, 0)
+
+[node name="Grass3" parent="Undergrowth" instance=ExtResource("15_grass")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -5)
+
+[node name="Grass4" parent="Undergrowth" instance=ExtResource("15_grass")]
+transform = Transform3D(1.3, 0, 0, 0, 1.2, 0, 0, 0, 1.3, 4, 0, -8)
+
+[node name="Grass5" parent="Undergrowth" instance=ExtResource("15_grass")]
+transform = Transform3D(1.1, 0, 0, 0, 1, 0, 0, 0, 1.1, -9, 0, -11)
+
+[node name="Grass6" parent="Undergrowth" instance=ExtResource("15_grass")]
+transform = Transform3D(1.2, 0, 0, 0, 1.15, 0, 0, 0, 1.2, 9, 0, -14)
+
+[node name="Debris1" parent="Undergrowth" instance=ExtResource("16_debris")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 5)
+
+[node name="Debris2" parent="Undergrowth" instance=ExtResource("16_debris")]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -6, 0, -4)
+
+[node name="Debris3" parent="Undergrowth" instance=ExtResource("16_debris")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -13)
+
+[node name="Debris4" parent="Undergrowth" instance=ExtResource("16_debris")]
+transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 7, 0, -7)
+
 [node name="Trees" type="Node3D" parent="."]
+
 
 
 [node name="PineTree_01" parent="Trees" instance=ExtResource("1_tree")]

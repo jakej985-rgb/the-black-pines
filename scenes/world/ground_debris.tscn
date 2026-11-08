@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://ground_debris_01"]
+
+[ext_resource type="Material" path="res://assets/materials/mat_pine_bark.tres" id="1_bark_mat"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_cone"]
+material = ExtResource("1_bark_mat")
+radius = 0.06
+height = 0.16
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_twig"]
+material = ExtResource("1_bark_mat")
+top_radius = 0.015
+bottom_radius = 0.02
+height = 0.45
+
+[node name="GroundDebris" type="Node3D"]
+
+[node name="PineCone1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, 0.15, 0.04, 0.1)
+mesh = SubResource("SphereMesh_cone")
+
+[node name="PineCone2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -0.2, 0.04, -0.15)
+mesh = SubResource("SphereMesh_cone")
+
+[node name="Twig1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.258819, 0, 0.965926, 0.965926, 0, -0.258819, 0, 1, 0, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_twig")
+
+[node name="Twig2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0.258819, 0, 0.965926, 0, 1, 0, -0.05, 0.02, 0.2)
+mesh = SubResource("CylinderMesh_twig")

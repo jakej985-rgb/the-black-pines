@@ -14,8 +14,11 @@
 [ext_resource type="ArrayMesh" path="res://assets/models/camp_cooler.obj" id="12_cooler_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/camp_lantern.obj" id="13_lantern_mesh"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_camp_col"]
-size = Vector3(5.5, 2.2, 5.5)
+[sub_resource type="BoxShape3D" id="BoxShape3D_tent"]
+size = Vector3(2.5, 1.8, 3.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cooler"]
+size = Vector3(0.85, 0.5, 0.55)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_note"]
 size = Vector3(1.2, 0.8, 1.2)
@@ -30,11 +33,11 @@ size = Vector3(0.28, 0.03, 0.38)
 
 [node name="AbandonedCamp" type="Node3D"]
 
-[node name="CampArea" type="StaticBody3D" parent="."]
+[node name="TentBody" type="StaticBody3D" parent="."]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -0.4, 0.9, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CampArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
-shape = SubResource("BoxShape3D_camp_col")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TentBody"]
+shape = SubResource("BoxShape3D_tent")
 
 [node name="TentMesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -0.4, 0, 0)
@@ -61,6 +64,12 @@ transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -1.8, 0, 1
 mesh = ExtResource("12_cooler_mesh")
 surface_material_override/0 = ExtResource("9_cooler_mat")
 surface_material_override/1 = ExtResource("6_metal_mat")
+
+[node name="CoolerBody" type="StaticBody3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -1.8, 0.25, 1.2)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CoolerBody"]
+shape = SubResource("BoxShape3D_cooler")
 
 [node name="CampLantern" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 1.4, 0, 1.5)

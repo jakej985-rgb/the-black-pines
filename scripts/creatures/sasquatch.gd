@@ -13,15 +13,28 @@ var current_state: State = State.STALKING
 var player_ref: Player = null
 var look_at_timer: float = 0.0
 var retreat_timer: float = 0.0
+var eye_mat: StandardMaterial3D = null
 
 @onready var eye_glow_left: OmniLight3D = $Head/EyeLeft
 @onready var eye_glow_right: OmniLight3D = $Head/EyeRight
+@onready var eye_mesh_left: MeshInstance3D = get_node_or_null("Head/EyeMeshLeft")
+@onready var eye_mesh_right: MeshInstance3D = get_node_or_null("Head/EyeMeshRight")
+@onready var head_visual: Node3D = get_node_or_null("Visuals/Torso/Head")
+@onready var head_node: Node3D = $Head
 @onready var visual_root: Node3D = $Visuals
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 
 func _ready() -> void:
 	if anim_player:
 		anim_player.play("stalking")
+
+	if eye_mesh_left and eye_mesh_left.mesh and eye_mesh_left.mesh.material:
+		eye_mat = eye_mesh_left.mesh.material.duplicate() as StandardMaterial3D
+		eye_mesh_left.material_override = eye_mat
+		if eye_mesh_right:
+			eye_mesh_right.material_override = eye_mat
+
+	_sync_head_transform()
 
 	# Find player in scene tree
 	await get_tree().process_frame
@@ -33,6 +46,8 @@ func _ready() -> void:
 			player_ref = main.get_node("Player")
 
 func _physics_process(delta: float) -> void:
+	_sync_head_transform()
+
 	if not player_ref:
 		return
 
@@ -44,16 +59,21 @@ func _physics_process(delta: float) -> void:
 		State.RETREATING:
 			_process_retreating(delta)
 
+func _sync_head_transform() -> void:
+	if head_visual and head_node:
+		head_node.global_transform = head_visual.global_transform
+
 func _process_stalking(delta: float) -> void:
 	# Ensure stalking animation is active
 	if anim_player and anim_player.current_animation != "stalking":
 		anim_player.play("stalking")
 
 	# Slowly orient towards the player
-	var target_pos: Vector3 = player_ref.global_position
-	target_pos.y = global_position.y
-	var target_basis = Basis.looking_at(target_pos - global_position, Vector3.UP)
-	global_basis = global_basis.slerp(target_basis, delta * 2.0)
+	var diff = player_ref.global_position - global_position
+	diff.y = 0.0
+	if diff.length_squared() > 0.05:
+		var target_basis = Basis.looking_at(diff, Vector3.UP)
+		global_basis = global_basis.slerp(target_basis, delta * 2.0)
 
 	var dist_to_player: float = global_position.distance_to(player_ref.global_position)
 
@@ -62,11 +82,12 @@ func _process_stalking(delta: float) -> void:
 		_trigger_encounter()
 		return
 
-	# Check if player is looking directly at creature with flashlight on
+	# Check if player is looking directly at creature's head/eyes with flashlight on
 	if player_ref.flashlight and player_ref.flashlight.visible:
 		var cam = player_ref.camera
 		if cam:
-			var to_creature = (global_position + Vector3(0, 1.8, 0)) - cam.global_position
+			var target_point: Vector3 = head_node.global_position if head_node else (global_position + Vector3(0, 1.8, 0))
+			var to_creature = target_point - cam.global_position
 			var forward = -cam.global_transform.basis.z
 			var dot = forward.dot(to_creature.normalized())
 			if dot > 0.94 and dist_to_player < 36.0:
@@ -106,19 +127,26 @@ func _process_retreating(delta: float) -> void:
 		anim_player.play("retreat")
 
 	retreat_timer -= delta
-	# Move backward away from player
+	# Move backward away from player while keeping eerie eye gaze facing the player
 	if player_ref:
-		var away_dir = (global_position - player_ref.global_position).normalized()
-		away_dir.y = 0.0
+		var diff = player_ref.global_position - global_position
+		diff.y = 0.0
+		if diff.length_squared() > 0.05:
+			var target_basis = Basis.looking_at(diff, Vector3.UP)
+			global_basis = global_basis.slerp(target_basis, delta * 3.0)
+
+		var away_dir = -diff.normalized()
 		velocity = away_dir * retreat_speed
 		move_and_slide()
 
-	# Fade eye glow and vanish into fog
+	# Fade eye glow and eye mesh emission into fog
 	var alpha = clamp(retreat_timer / 1.5, 0.0, 1.0)
 	if eye_glow_left:
 		eye_glow_left.light_energy = alpha * 0.8
 	if eye_glow_right:
 		eye_glow_right.light_energy = alpha * 0.8
+	if eye_mat:
+		eye_mat.emission_energy_multiplier = alpha * 4.5
 
 	if retreat_timer <= 0.0:
 		current_state = State.GONE

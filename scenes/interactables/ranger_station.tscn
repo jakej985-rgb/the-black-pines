@@ -9,10 +9,16 @@
 [ext_resource type="Material" uid="uid://mat_cabin_glass_01" path="res://assets/materials/mat_cabin_glass.tres" id="7_glass_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cabin"]
-size = Vector3(6.8, 4.2, 7.2)
+size = Vector3(6.5, 4.2, 5.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_porch"]
+size = Vector3(6.8, 0.38, 2.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_steps"]
+size = Vector3(2.0, 0.26, 0.8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door_sign"]
-size = Vector3(1.4, 2.0, 0.4)
+size = Vector3(0.8, 1.0, 0.3)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_notice_paper"]
 albedo_color = Color(0.85, 0.8, 0.65, 1)
@@ -27,8 +33,16 @@ size = Vector3(0.5, 0.7, 0.04)
 [node name="CabinBody" type="StaticBody3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CabinBody"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
 shape = SubResource("BoxShape3D_cabin")
+
+[node name="CollisionShape3D_porch" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 3.6)
+shape = SubResource("BoxShape3D_porch")
+
+[node name="CollisionShape3D_steps" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 4.95)
+shape = SubResource("BoxShape3D_steps")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CabinBody"]
 mesh = ExtResource("2_cabin_mesh")
@@ -39,7 +53,7 @@ surface_material_override/3 = ExtResource("6_stone_mat")
 surface_material_override/4 = ExtResource("7_glass_mat")
 
 [node name="DoorSign" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.5, 2.45)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1.6, 2.70)
 collision_layer = 1
 collision_mask = 0
 script = ExtResource("1_clue")

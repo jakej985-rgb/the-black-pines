@@ -24,10 +24,40 @@ uniform float dirt_amount : hint_range(0.0, 1.0) = 0.25;
 uniform vec4 dirt_color : source_color = vec4(0.12, 0.09, 0.07, 1.0);
 uniform float dirt_roughness : hint_range(0.7, 1.0) = 0.85;
 
+// Trunk Wind Sway (Active when trunk_wind_sway > 0.0, e.g. for living pine tree trunks)
+uniform float trunk_wind_sway : hint_range(0.0, 1.0) = 0.0;
+uniform vec2 wind_direction = vec2(0.85, 0.52);
+uniform float wind_speed : hint_range(0.0, 5.0) = 1.1;
+uniform float wind_strength : hint_range(0.0, 1.0) = 0.14;
+uniform float gust_frequency : hint_range(0.0, 3.0) = 0.35;
+uniform float gust_strength : hint_range(0.0, 1.0) = 0.09;
+uniform float canopy_height_reference : hint_range(1.0, 25.0) = 14.0;
+
 varying vec3 v_world_pos;
 varying vec3 v_world_normal;
 
 void vertex() {
+	if (trunk_wind_sway > 0.001) {
+		vec3 world_pos_init = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		vec2 wind_dir = normalize(wind_direction);
+		vec2 wind_perp = vec2(-wind_dir.y, wind_dir.x);
+		
+		float h = clamp(VERTEX.y / canopy_height_reference, 0.0, 1.3);
+		float trunk_flex = pow(h, 1.6);
+		
+		float primary_wave = sin(TIME * wind_speed + world_pos_init.x * 0.12 + world_pos_init.z * 0.15);
+		float secondary_wave = cos(TIME * (wind_speed * 0.7) + world_pos_init.x * 0.08 - world_pos_init.z * 0.1);
+		float gust = max(0.0, sin(TIME * gust_frequency + primary_wave * 0.5 + world_pos_init.x * 0.05 + world_pos_init.z * 0.06));
+		
+		float main_sway = (primary_wave * 0.7 + secondary_wave * 0.3) * wind_strength + (gust * gust_strength);
+		float total_displacement = main_sway * trunk_flex * trunk_wind_sway;
+		
+		float lateral_cross = sin(TIME * (wind_speed * 0.85) + world_pos_init.x * 0.2) * 0.18 * total_displacement;
+		
+		VERTEX.x += wind_dir.x * total_displacement + wind_perp.x * lateral_cross;
+		VERTEX.z += wind_dir.y * total_displacement + wind_perp.y * lateral_cross;
+		VERTEX.y -= total_displacement * total_displacement * 0.04;
+	}
 	v_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	v_world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 }

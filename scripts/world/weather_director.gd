@@ -34,6 +34,7 @@ var weather_cycle_time: float = 0.0
 var target_rain_ratio: float = 0.35
 
 var player_node: Node3D = null
+var foliage_materials: Array[ShaderMaterial] = []
 
 @onready var mist_particles: GPUParticles3D = get_node_or_null("MistParticles")
 @onready var rain_particles: GPUParticles3D = get_node_or_null("RainParticles")
@@ -44,6 +45,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	current_wind_speed = base_wind_speed
 	current_wind_strength = base_wind_strength
+	_init_foliage_materials()
 	_find_player()
 	
 	if mist_particles:
@@ -51,6 +53,20 @@ func _ready() -> void:
 	if rain_particles:
 		rain_particles.emitting = rain_enabled
 		rain_particles.amount_ratio = base_rain_intensity
+
+func _init_foliage_materials() -> void:
+	var needle_mat = load("res://assets/materials/mat_pine_needles.tres")
+	if needle_mat is ShaderMaterial and not foliage_materials.has(needle_mat):
+		foliage_materials.append(needle_mat)
+	var bark_mat = load("res://assets/materials/mat_pine_bark.tres")
+	if bark_mat is ShaderMaterial and not foliage_materials.has(bark_mat):
+		foliage_materials.append(bark_mat)
+
+func register_foliage_material(mat: ShaderMaterial) -> void:
+	if mat and not foliage_materials.has(mat):
+		foliage_materials.append(mat)
+		mat.set_shader_parameter("wind_speed", current_wind_speed)
+		mat.set_shader_parameter("wind_strength", current_wind_strength)
 
 func _process(delta: float) -> void:
 	time_accum += delta
@@ -70,19 +86,25 @@ func _update_player_tracking(delta: float) -> void:
 		_find_player()
 		return
 	
-	# Follow player horizontally without snapping
+	# Follow player horizontally
 	global_position.x = player_node.global_position.x
 	global_position.z = player_node.global_position.z
-	global_position.y = lerp(global_position.y, player_node.global_position.y, delta * 3.5)
+	if abs(global_position.y - player_node.global_position.y) > 6.0:
+		global_position.y = player_node.global_position.y
+	else:
+		global_position.y = lerp(global_position.y, player_node.global_position.y, delta * 5.0)
 
 func _find_player() -> void:
 	var players = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		player_node = players[0] as Node3D
 	else:
-		var cam = get_viewport().get_camera_3d()
+		var cam = get_viewport().get_camera_3d() if get_viewport() else null
 		if cam:
 			player_node = cam
+	
+	if player_node and is_instance_valid(player_node):
+		global_position = player_node.global_position
 
 func _process_wind_gusts(delta: float) -> void:
 	if not is_gusting:
@@ -104,6 +126,27 @@ func _process_wind_gusts(delta: float) -> void:
 	var speed_boost: float = gust_intensity * (gust_peak_multiplier - 1.0)
 	current_wind_speed = base_wind_speed * (1.0 + speed_boost)
 	current_wind_strength = base_wind_strength * (1.0 + gust_intensity * 1.5)
+	
+	# Synchronize active foliage wind shaders
+	for mat in foliage_materials:
+		if mat:
+			mat.set_shader_parameter("wind_speed", current_wind_speed)
+			mat.set_shader_parameter("wind_strength", current_wind_strength)
+	
+	# Accelerate drifting mist during gusts
+	if mist_particles and mist_particles.process_material is ParticleProcessMaterial:
+		var mist_mat = mist_particles.process_material as ParticleProcessMaterial
+		mist_mat.initial_velocity_min = 0.5 * (1.0 + gust_intensity * 1.5)
+		mist_mat.initial_velocity_max = 1.4 * (1.0 + gust_intensity * 1.5)
+	
+	# Tilt and speed up falling rain with wind gusts
+	if rain_particles and rain_particles.process_material is ParticleProcessMaterial:
+		var rain_mat = rain_particles.process_material as ParticleProcessMaterial
+		var slant_x = wind_direction.x * (0.28 + gust_intensity * 0.35)
+		var slant_z = wind_direction.y * (0.18 + gust_intensity * 0.35)
+		rain_mat.direction = Vector3(slant_x, -1.0, slant_z).normalized()
+		rain_mat.initial_velocity_min = 18.0 * (1.0 + gust_intensity * 0.35)
+		rain_mat.initial_velocity_max = 24.0 * (1.0 + gust_intensity * 0.35)
 	
 	# Modulate AudioDirector wind if active
 	if AudioDirector.instance and AudioDirector.instance.wind_player:

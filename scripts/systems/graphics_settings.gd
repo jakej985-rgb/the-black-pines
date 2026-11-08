@@ -37,19 +37,19 @@ var screen_space_aa: Viewport.ScreenSpaceAA = Viewport.SCREEN_SPACE_AA_FXAA
 
 var shadow_atlas_size: int = 4096
 var shadow_filter_quality: RenderingServer.ShadowQuality = RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM
-var directional_shadow_distance: float = 60.0
+var directional_shadow_distance: float = 75.0
 
 var volumetric_fog_enabled: bool = true
-var volumetric_fog_density: float = 0.012
-var volumetric_fog_length: float = 60.0
+var volumetric_fog_density: float = 0.016
+var volumetric_fog_length: float = 72.0
 
 var ssao_enabled: bool = true
-var ssao_radius: float = 2.2
-var ssao_intensity: float = 2.6
+var ssao_radius: float = 2.0
+var ssao_intensity: float = 2.2
 
 var ssil_enabled: bool = true
-var ssil_radius: float = 4.0
-var ssil_intensity: float = 0.8
+var ssil_radius: float = 3.5
+var ssil_intensity: float = 0.5
 
 var glow_enabled: bool = true
 
@@ -74,10 +74,10 @@ func apply_preset(preset: Preset, save_to_disk: bool = true) -> void:
 			screen_space_aa = Viewport.SCREEN_SPACE_AA_DISABLED
 			shadow_atlas_size = 1024
 			shadow_filter_quality = RenderingServer.SHADOW_QUALITY_HARD
-			directional_shadow_distance = 35.0
+			directional_shadow_distance = 40.0
 			volumetric_fog_enabled = false
-			volumetric_fog_density = 0.005
-			volumetric_fog_length = 35.0
+			volumetric_fog_density = 0.008
+			volumetric_fog_length = 40.0
 			ssao_enabled = false
 			ssil_enabled = false
 			glow_enabled = true
@@ -88,13 +88,13 @@ func apply_preset(preset: Preset, save_to_disk: bool = true) -> void:
 			screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
 			shadow_atlas_size = 2048
 			shadow_filter_quality = RenderingServer.SHADOW_QUALITY_SOFT_LOW
-			directional_shadow_distance = 45.0
+			directional_shadow_distance = 55.0
 			volumetric_fog_enabled = true
-			volumetric_fog_density = 0.009
-			volumetric_fog_length = 45.0
+			volumetric_fog_density = 0.014
+			volumetric_fog_length = 55.0
 			ssao_enabled = true
 			ssao_radius = 1.8
-			ssao_intensity = 2.0
+			ssao_intensity = 1.8
 			ssil_enabled = false
 			glow_enabled = true
 		Preset.HIGH:
@@ -104,16 +104,16 @@ func apply_preset(preset: Preset, save_to_disk: bool = true) -> void:
 			screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
 			shadow_atlas_size = 4096
 			shadow_filter_quality = RenderingServer.SHADOW_QUALITY_SOFT_MEDIUM
-			directional_shadow_distance = 60.0
+			directional_shadow_distance = 75.0
 			volumetric_fog_enabled = true
-			volumetric_fog_density = 0.012
-			volumetric_fog_length = 60.0
+			volumetric_fog_density = 0.016
+			volumetric_fog_length = 72.0
 			ssao_enabled = true
-			ssao_radius = 2.2
-			ssao_intensity = 2.6
+			ssao_radius = 2.0
+			ssao_intensity = 2.2
 			ssil_enabled = true
-			ssil_radius = 4.0
-			ssil_intensity = 0.8
+			ssil_radius = 3.5
+			ssil_intensity = 0.5
 			glow_enabled = true
 		Preset.ULTRA:
 			render_scale = 1.00
@@ -122,16 +122,16 @@ func apply_preset(preset: Preset, save_to_disk: bool = true) -> void:
 			screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA
 			shadow_atlas_size = 8192
 			shadow_filter_quality = RenderingServer.SHADOW_QUALITY_SOFT_ULTRA
-			directional_shadow_distance = 80.0
+			directional_shadow_distance = 85.0
 			volumetric_fog_enabled = true
-			volumetric_fog_density = 0.015
-			volumetric_fog_length = 75.0
+			volumetric_fog_density = 0.018
+			volumetric_fog_length = 80.0
 			ssao_enabled = true
-			ssao_radius = 2.6
-			ssao_intensity = 3.0
+			ssao_radius = 2.2
+			ssao_intensity = 2.4
 			ssil_enabled = true
-			ssil_radius = 5.0
-			ssil_intensity = 1.0
+			ssil_radius = 4.0
+			ssil_intensity = 0.6
 			glow_enabled = true
 		Preset.CUSTOM:
 			pass

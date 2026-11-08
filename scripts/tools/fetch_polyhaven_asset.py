@@ -92,7 +92,7 @@ def generate_godot_material(asset_id: str, texture_paths: dict, material_path: P
     ext_resources = []
     mat_props = [
         "roughness = 0.85",
-        "texture_filter = 5  # Linear Mipmap Anisotropic"
+        "texture_filter = 5"
     ]
 
     if diffuse_res:

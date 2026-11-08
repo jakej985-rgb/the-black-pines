@@ -1,24 +1,23 @@
-[gd_scene load_steps=7 format=3 uid="uid://pine_tree_01"]
+[gd_scene load_steps=5 format=3 uid="uid://pine_tree_01"]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/pine_tree_trunk.obj" id="1_trunk_mesh"]
-[ext_resource type="ArrayMesh" path="res://assets/models/pine_tree_foliage.obj" id="2_foliage_mesh"]
-[ext_resource type="Material" path="res://assets/materials/mat_pine_bark.tres" id="3_bark"]
-[ext_resource type="Material" path="res://assets/materials/mat_pine_needles.tres" id="4_needles"]
+[ext_resource type="PackedScene" path="res://assets/models/tree_pine_tall_v2.glb" id="1_glb"]
+[ext_resource type="Material" path="res://assets/materials/polyhaven/mat_knotted_pine_bark.tres" id="2_bark"]
+[ext_resource type="Material" path="res://assets/materials/mat_pine_needles.tres" id="3_needles"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]
-height = 12.0
-radius = 0.55
+height = 18.0
+radius = 0.45
 
 [node name="PineTree" type="StaticBody3D"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.0, 0)
 shape = SubResource("CylinderShape3D_trunk")
 
-[node name="TrunkMesh" type="MeshInstance3D" parent="."]
-mesh = ExtResource("1_trunk_mesh")
-surface_material_override/0 = ExtResource("3_bark")
+[node name="tree_pine_tall_v2" parent="." instance=ExtResource("1_glb")]
 
-[node name="FoliageMesh" type="MeshInstance3D" parent="."]
-mesh = ExtResource("2_foliage_mesh")
-surface_material_override/0 = ExtResource("4_needles")
+[node name="Pine_Trunk" parent="tree_pine_tall_v2" index="0"]
+surface_material_override/0 = ExtResource("2_bark")
+
+[node name="Pine_Foliage" parent="tree_pine_tall_v2" index="1"]
+surface_material_override/0 = ExtResource("3_needles")

@@ -2,31 +2,31 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_soil"]
 noise_type = 0
-frequency = 0.05
-fractal_octaves = 4
+frequency = 0.025
+fractal_octaves = 3
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_soil_norm"]
-width = 1024
-height = 1024
+width = 512
+height = 512
 as_normal_map = true
-bump_strength = 2.8
+bump_strength = 0.85
 noise = SubResource("FastNoiseLite_soil")
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_puddles"]
 noise_type = 1
-frequency = 0.02
+frequency = 0.015
 fractal_octaves = 2
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_puddle_rough"]
-width = 1024
-height = 1024
+width = 512
+height = 512
 noise = SubResource("FastNoiseLite_puddles")
 
 [resource]
-albedo_color = Color(0.14, 0.12, 0.1, 1)
-roughness = 0.75
+albedo_color = Color(0.12, 0.1, 0.08, 1)
+roughness = 0.88
 roughness_texture = SubResource("NoiseTexture2D_puddle_rough")
 normal_enabled = true
-normal_scale = 1.8
+normal_scale = 0.9
 normal_texture = SubResource("NoiseTexture2D_soil_norm")
-uv1_scale = Vector3(25, 25, 25)
+uv1_scale = Vector3(10, 10, 10)

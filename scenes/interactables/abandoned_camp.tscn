@@ -1,53 +1,144 @@
-[gd_scene load_steps=10 format=3 uid="uid://abandoned_camp_01"]
+[gd_scene load_steps=12 format=3 uid="uid://abandoned_camp_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/flare.tscn" id="2_flare"]
+[ext_resource type="Material" path="res://assets/materials/mat_craggy_rock.tres" id="3_rock_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_pine_bark.tres" id="4_wood_mat"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_tent_col"]
-size = Vector3(3.2, 1.8, 3.2)
+[sub_resource type="BoxShape3D" id="BoxShape3D_camp_col"]
+size = Vector3(4.5, 2.2, 4.5)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_canvas"]
-albedo_color = Color(0.25, 0.35, 0.28, 1)
-roughness = 0.9
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tent_canvas"]
+albedo_color = Color(0.18, 0.22, 0.16, 1)
+roughness = 0.88
 
-[sub_resource type="PrismMesh" id="PrismMesh_tent"]
-material = SubResource("StandardMaterial3D_canvas")
-left_to_right = 0.4
-size = Vector3(2.8, 1.6, 2.6)
+[sub_resource type="PrismMesh" id="PrismMesh_roof_sag"]
+material = SubResource("StandardMaterial3D_tent_canvas")
+left_to_right = 0.35
+size = Vector3(2.6, 1.3, 2.8)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ash"]
-albedo_color = Color(0.08, 0.08, 0.08, 1)
+[sub_resource type="BoxMesh" id="BoxMesh_tent_base"]
+material = SubResource("StandardMaterial3D_tent_canvas")
+size = Vector3(2.6, 0.4, 2.8)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_pit"]
-material = SubResource("StandardMaterial3D_ash")
-top_radius = 0.65
-bottom_radius = 0.7
-height = 0.1
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tent_pole"]
+albedo_color = Color(0.3, 0.32, 0.35, 1)
+metallic = 0.85
+roughness = 0.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pole"]
+material = SubResource("StandardMaterial3D_tent_pole")
+top_radius = 0.02
+bottom_radius = 0.02
+height = 2.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_charcoal"]
+albedo_color = Color(0.06, 0.06, 0.06, 1)
+roughness = 0.95
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_fire_log"]
+material = SubResource("StandardMaterial3D_charcoal")
+top_radius = 0.06
+bottom_radius = 0.08
+height = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_stone_ring"]
+material = ExtResource("3_rock_mat")
+size = Vector3(0.25, 0.18, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sleeping_bag"]
+albedo_color = Color(0.12, 0.14, 0.18, 1)
+roughness = 0.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_bag"]
+material = SubResource("StandardMaterial3D_sleeping_bag")
+radius = 0.22
+height = 1.3
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_note"]
 size = Vector3(1.2, 0.8, 1.2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_paper"]
-albedo_color = Color(0.8, 0.75, 0.6, 1)
+albedo_color = Color(0.82, 0.78, 0.62, 1)
+roughness = 0.8
 
 [sub_resource type="BoxMesh" id="BoxMesh_journal"]
 material = SubResource("StandardMaterial3D_paper")
-size = Vector3(0.25, 0.04, 0.35)
+size = Vector3(0.28, 0.03, 0.38)
 
 [node name="AbandonedCamp" type="Node3D"]
 
-[node name="TentBody" type="StaticBody3D" parent="."]
-transform = Transform3D(0.965926, 0.05, 0.258819, 0, 0.98, -0.198669, -0.258819, 0.191873, 0.946607, 0, 0.8, 0)
+[node name="CampArea" type="StaticBody3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TentBody"]
-mesh = SubResource("PrismMesh_tent")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CampArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+shape = SubResource("BoxShape3D_camp_col")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TentBody"]
-shape = SubResource("BoxShape3D_tent_col")
+[node name="Tent" type="Node3D" parent="."]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -0.5, 0, -0.2)
 
-[node name="CampfireAsh" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.05, 0.6)
-mesh = SubResource("CylinderMesh_pit")
+[node name="Base" type="MeshInstance3D" parent="Tent"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("BoxMesh_tent_base")
+
+[node name="SaggingRoof" type="MeshInstance3D" parent="Tent"]
+transform = Transform3D(1, 0, 0, 0, 0.965926, -0.05, 0, 0.05, 0.965926, 0, 1.0, 0)
+mesh = SubResource("PrismMesh_roof_sag")
+
+[node name="PoleArc1" type="MeshInstance3D" parent="Tent"]
+transform = Transform3D(0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0, 1, 0, 0.9, -1.2)
+mesh = SubResource("CylinderMesh_pole")
+
+[node name="PoleArc2" type="MeshInstance3D" parent="Tent"]
+transform = Transform3D(-0.707107, -0.707107, 0, 0.707107, -0.707107, 0, 0, 0, 1, 0, 0.9, 1.2)
+mesh = SubResource("CylinderMesh_pole")
+
+[node name="SleepingBag" type="MeshInstance3D" parent="Tent"]
+transform = Transform3D(1, 0, 0, 0, 0.1, 0.994987, 0, -0.994987, 0.1, 0.2, 0.15, 0)
+mesh = SubResource("CapsuleMesh_bag")
+
+[node name="FirepitRing" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, 0.5)
+
+[node name="Stone1" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.08, 0)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone2" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0.4, 0.08, 0.4)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone3" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0.55)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone4" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -0.4, 0.08, 0.4)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone5" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.08, 0)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone6" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -0.4, 0.08, -0.4)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone7" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.55)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="Stone8" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 0.4, 0.08, -0.4)
+mesh = SubResource("BoxMesh_stone_ring")
+
+[node name="CharredLog1" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(0.866025, 0, 0.5, 0.5, 0, -0.866025, 0, 1, 0, 0, 0.08, 0)
+mesh = SubResource("CylinderMesh_fire_log")
+
+[node name="CharredLog2" type="MeshInstance3D" parent="FirepitRing"]
+transform = Transform3D(0.5, 0, -0.866025, -0.866025, 0, -0.5, 0, 1, 0, 0.05, 0.1, 0)
+mesh = SubResource("CylinderMesh_fire_log")
 
 [node name="RoadFlare" parent="." instance=ExtResource("2_flare")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0.2)

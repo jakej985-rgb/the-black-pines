@@ -34,11 +34,11 @@ var targets = [
     {
         "name": "07_cabin_desk_investigation",
         "cam_pos": Vector3(-1.3, 1.6, 10.3),
-        "look_at": Vector3(-1.95, 1.25, 9.25)
+        "look_at": Vector3(-1.95, 1.05, 9.25)
     },
     {
         "name": "08_document_evacuation_notice",
-        "cam_pos": Vector3(0.95, 1.72, 13.45),
+        "cam_pos": Vector3(0.95, 1.72, 13.50),
         "look_at": Vector3(0.95, 1.72, 12.76)
     }
 ]
@@ -68,9 +68,9 @@ func _init():
     # Add a player-style flashlight attached to the camera for illuminated beauty shots
     var spot = SpotLight3D.new()
     spot.spot_range = 35.0
-    spot.spot_angle = 34.0
-    spot.spot_attenuation = 1.2
-    spot.light_energy = 2.2
+    spot.spot_angle = 36.0
+    spot.spot_attenuation = 1.0
+    spot.light_energy = 3.2
     spot.light_color = Color(0.98, 0.95, 0.88)
     spot.shadow_enabled = true
     cam.add_child(spot)

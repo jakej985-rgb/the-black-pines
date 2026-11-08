@@ -489,9 +489,9 @@ def generate_sasquatch_models():
     head.add_ellipsoid(( 0.07, -0.06, -0.43), (0.05, 0.04, 0.05), segs_u=8, segs_v=6)
     head.add_box((0.0, -0.03, -0.40), (0.08, 0.06, 0.06), rot_y=0.0)
 
-    # Deep cavernous eye orbits (recessed cavities for eye glow spheres at +/-0.13, 0.04, -0.28)
-    head.add_ellipsoid((-0.13, 0.04, -0.28), (0.075, 0.065, 0.07), segs_u=10, segs_v=6)
-    head.add_ellipsoid(( 0.13, 0.04, -0.28), (0.075, 0.065, 0.07), segs_u=10, segs_v=6)
+    # Deep cavernous eye orbits (recessed back cavity behind eye glow spheres)
+    head.add_ellipsoid((-0.13, 0.04, -0.21), (0.06, 0.05, 0.04), segs_u=8, segs_v=6)
+    head.add_ellipsoid(( 0.13, 0.04, -0.21), (0.06, 0.05, 0.04), segs_u=8, segs_v=6)
 
     # Lower Jaw / Mandible pulled into an aggressive snarling display
     jaw_pts = [
@@ -803,31 +803,30 @@ def generate_cabin():
 
     for i in range(num_logs):
         y = log_r + i * log_h_step
+        y_side = log_r + (i + 0.5) * log_h_step
 
         # Front & Back walls (running along X axis)
-        if i % 2 == 0:
-            # Back wall full continuous log
-            mesh.add_cylinder((-half_w - overhang, y, -half_d), (half_w + overhang, y, -half_d), log_r, log_r, segs=10)
-            # Front wall with door opening in center (-0.75m to 0.75m)
-            if i >= 11:
-                # Header logs over the door
-                mesh.add_cylinder((-half_w - overhang, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=10)
-            else:
-                mesh.add_cylinder((-half_w - overhang, y, half_d), (-0.75, y, half_d), log_r, log_r, segs=8)
-                mesh.add_cylinder((0.75, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=8)
-
-        # Left & Right walls (running along Z axis)
+        # Back wall full continuous log
+        mesh.add_cylinder((-half_w - overhang, y, -half_d), (half_w + overhang, y, -half_d), log_r, log_r, segs=10)
+        # Front wall with door opening in center (-0.75m to 0.75m)
+        if i >= 13:
+            # Header logs spanning over the door
+            mesh.add_cylinder((-half_w - overhang, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=10)
         else:
-            # Window openings left and right (logs 5 to 10)
-            if 5 <= i <= 10:
-                mesh.add_cylinder((-half_w, y, -half_d - overhang), (-half_w, y, -0.65), log_r, log_r, segs=8)
-                mesh.add_cylinder((-half_w, y, 0.65), (-half_w, y, half_d + overhang), log_r, log_r, segs=8)
+            mesh.add_cylinder((-half_w - overhang, y, half_d), (-0.75, y, half_d), log_r, log_r, segs=8)
+            mesh.add_cylinder((0.75, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=8)
 
-                mesh.add_cylinder((half_w, y, -half_d - overhang), (half_w, y, -0.65), log_r, log_r, segs=8)
-                mesh.add_cylinder((half_w, y, 0.65), (half_w, y, half_d + overhang), log_r, log_r, segs=8)
-            else:
-                mesh.add_cylinder((-half_w, y, -half_d - overhang), (-half_w, y, half_d + overhang), log_r, log_r, segs=10)
-                mesh.add_cylinder((half_w, y, -half_d - overhang), (half_w, y, half_d + overhang), log_r, log_r, segs=10)
+        # Left & Right walls (running along Z axis, offset by half a course for saddle notches)
+        if 6 <= i <= 12:
+            # Window openings left and right
+            mesh.add_cylinder((-half_w, y_side, -half_d - overhang), (-half_w, y_side, -0.68), log_r, log_r, segs=8)
+            mesh.add_cylinder((-half_w, y_side,  0.68), (-half_w, y_side, half_d + overhang), log_r, log_r, segs=8)
+
+            mesh.add_cylinder((half_w, y_side, -half_d - overhang), (half_w, y_side, -0.68), log_r, log_r, segs=8)
+            mesh.add_cylinder((half_w, y_side,  0.68), (half_w, y_side, half_d + overhang), log_r, log_r, segs=8)
+        else:
+            mesh.add_cylinder((-half_w, y_side, -half_d - overhang), (-half_w, y_side, half_d + overhang), log_r, log_r, segs=10)
+            mesh.add_cylinder((half_w, y_side, -half_d - overhang), (half_w, y_side, half_d + overhang), log_r, log_r, segs=10)
 
     # 2.05 Weather-Tight Interior Wall Chinking & Backer Planks (Prevents gaps between round logs)
     # Rear Wall Backer

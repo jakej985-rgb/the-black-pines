@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/creatures/sasquatch.gd" id="1_sasquatch"]
 [ext_resource type="Material" uid="uid://csvewr5uuy0yc" path="res://assets/materials/mat_beast_fur.tres" id="2_fur_mat"]
-[ext_resource type="Material" uid="uid://mat_creature_claw_01" path="res://assets/materials/mat_creature_claw.tres" id="3_claw_mat"]
+[ext_resource type="Material" uid="uid://bc4iu27v4o0lk" path="res://assets/materials/mat_creature_claw.tres" id="3_claw_mat"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_torso.obj" id="4_torso_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_head.obj" id="5_head_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_arm_upper.obj" id="6_arm_up_mesh"]

@@ -15,7 +15,7 @@ script = ExtResource("5_audio")
 [node name="Forest" parent="." instance=ExtResource("2_forest")]
 
 [node name="Player" parent="." instance=ExtResource("3_player")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 4)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.4, 4)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 

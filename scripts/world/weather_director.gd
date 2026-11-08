@@ -108,6 +108,7 @@ func _find_player() -> void:
 		global_position = player_node.global_position
 
 func _process_wind_gusts(delta: float) -> void:
+	var was_gusting = is_gusting
 	if not is_gusting:
 		next_gust_timer -= delta
 		if next_gust_timer <= 0.0:
@@ -123,31 +124,32 @@ func _process_wind_gusts(delta: float) -> void:
 			# Smooth sinusoidal bell curve envelope for gust
 			gust_intensity = sin(progress * PI)
 	
-	# Composite wind parameters
-	var speed_boost: float = gust_intensity * (gust_peak_multiplier - 1.0)
-	current_wind_speed = base_wind_speed * (1.0 + speed_boost)
-	current_wind_strength = base_wind_strength * (1.0 + gust_intensity * 1.5)
-	
-	# Synchronize active foliage wind shaders
-	for mat in foliage_materials:
-		if mat:
-			mat.set_shader_parameter("wind_speed", current_wind_speed)
-			mat.set_shader_parameter("wind_strength", current_wind_strength)
-	
-	# Accelerate drifting mist during gusts
-	if mist_particles and mist_particles.process_material is ParticleProcessMaterial:
-		var mist_mat = mist_particles.process_material as ParticleProcessMaterial
-		mist_mat.initial_velocity_min = 0.5 * (1.0 + gust_intensity * 1.5)
-		mist_mat.initial_velocity_max = 1.4 * (1.0 + gust_intensity * 1.5)
-	
-	# Tilt and speed up falling rain with wind gusts
-	if rain_particles and rain_particles.process_material is ParticleProcessMaterial:
-		var rain_mat = rain_particles.process_material as ParticleProcessMaterial
-		var slant_x = wind_direction.x * (0.28 + gust_intensity * 0.35)
-		var slant_z = wind_direction.y * (0.18 + gust_intensity * 0.35)
-		rain_mat.direction = Vector3(slant_x, -1.0, slant_z).normalized()
-		rain_mat.initial_velocity_min = 18.0 * (1.0 + gust_intensity * 0.35)
-		rain_mat.initial_velocity_max = 24.0 * (1.0 + gust_intensity * 0.35)
+	# Only update shaders and particle materials when gusting or when gust just ended
+	if is_gusting or was_gusting:
+		var speed_boost: float = gust_intensity * (gust_peak_multiplier - 1.0)
+		current_wind_speed = base_wind_speed * (1.0 + speed_boost)
+		current_wind_strength = base_wind_strength * (1.0 + gust_intensity * 1.5)
+		
+		# Synchronize active foliage wind shaders
+		for mat in foliage_materials:
+			if mat:
+				mat.set_shader_parameter("wind_speed", current_wind_speed)
+				mat.set_shader_parameter("wind_strength", current_wind_strength)
+		
+		# Accelerate drifting mist during gusts
+		if mist_particles and mist_particles.process_material is ParticleProcessMaterial:
+			var mist_mat = mist_particles.process_material as ParticleProcessMaterial
+			mist_mat.initial_velocity_min = 0.5 * (1.0 + gust_intensity * 1.5)
+			mist_mat.initial_velocity_max = 1.4 * (1.0 + gust_intensity * 1.5)
+		
+		# Tilt and speed up falling rain with wind gusts
+		if rain_particles and rain_particles.process_material is ParticleProcessMaterial:
+			var rain_mat = rain_particles.process_material as ParticleProcessMaterial
+			var slant_x = wind_direction.x * (0.28 + gust_intensity * 0.35)
+			var slant_z = wind_direction.y * (0.18 + gust_intensity * 0.35)
+			rain_mat.direction = Vector3(slant_x, -1.0, slant_z).normalized()
+			rain_mat.initial_velocity_min = 18.0 * (1.0 + gust_intensity * 0.35)
+			rain_mat.initial_velocity_max = 24.0 * (1.0 + gust_intensity * 0.35)
 	
 	# Modulate AudioDirector wind if active
 	if AudioDirector.instance and AudioDirector.instance.wind_player:
@@ -174,7 +176,8 @@ func _process_weather_cycles(delta: float) -> void:
 	if gust_intensity > 0.1:
 		target_rain_ratio = min(1.0, target_rain_ratio + gust_intensity * 0.25)
 	
-	rain_particles.amount_ratio = lerp(rain_particles.amount_ratio, target_rain_ratio, delta * 0.8)
+	if abs(rain_particles.amount_ratio - target_rain_ratio) > 0.03:
+		rain_particles.amount_ratio = lerp(rain_particles.amount_ratio, target_rain_ratio, delta * 0.8)
 
 func trigger_gust(multiplier: float = 2.5, duration: float = 8.0) -> void:
 	gust_peak_multiplier = multiplier

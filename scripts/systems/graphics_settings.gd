@@ -223,6 +223,8 @@ func _find_nodes_of_type(parent: Node, type_name: String) -> Array:
 	var results: Array = []
 	if parent.is_class(type_name):
 		results.append(parent)
+	if parent.name in ["Trees", "Undergrowth", "Roots"]:
+		return results
 	for child in parent.get_children():
 		results.append_array(_find_nodes_of_type(child, type_name))
 	return results

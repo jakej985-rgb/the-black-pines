@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="ArrayMesh" path="res://assets/models/clawed_tree.obj" id="2_trunk_mesh"]
 [ext_resource type="Material" uid="uid://cdlfjrr1tkw00" path="res://assets/materials/mat_pine_bark.tres" id="3_bark_mat"]
-[ext_resource type="Material" uid="uid://mat_exposed_wood_01" path="res://assets/materials/mat_exposed_wood.tres" id="4_wood_mat"]
+[ext_resource type="Material" uid="uid://bhvdvnvxdetu7" path="res://assets/materials/mat_exposed_wood.tres" id="4_wood_mat"]
 [ext_resource type="Material" uid="uid://mat_resin_amber_01" path="res://assets/materials/mat_resin_amber.tres" id="5_resin_mat"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]

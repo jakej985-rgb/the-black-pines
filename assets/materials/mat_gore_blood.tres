@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://gore_blood_01"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://duv0k5w0xj7g5"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_blood"]
 noise_type = 2
@@ -15,14 +15,13 @@ bump_strength = 2.4
 
 [resource]
 albedo_color = Color(0.13, 0.012, 0.015, 1)
-roughness = 0.04
 metallic = 0.04
-clearcoat_enabled = true
-clearcoat = 1.0
-clearcoat_roughness = 0.03
-subsurf_scatter_enabled = true
-subsurf_scatter_strength = 0.45
+roughness = 0.04
 normal_enabled = true
 normal_scale = 1.4
 normal_texture = SubResource("NoiseTexture2D_blood_norm")
+clearcoat_enabled = true
+clearcoat_roughness = 0.03
+subsurf_scatter_enabled = true
+subsurf_scatter_strength = 0.45
 uv1_scale = Vector3(4, 4, 4)

@@ -4,7 +4,7 @@
 [ext_resource type="ArrayMesh" path="res://assets/models/cabin.obj" id="2_cabin_mesh"]
 [ext_resource type="Material" uid="uid://ddf4n7stmuk1j" path="res://assets/materials/mat_cabin_wood.tres" id="3_wood_mat"]
 [ext_resource type="Material" uid="uid://cabin_roof_01" path="res://assets/materials/mat_cabin_roof.tres" id="4_roof_mat"]
-[ext_resource type="Material" uid="uid://mat_metal_weathered_01" path="res://assets/materials/mat_metal_weathered.tres" id="5_metal_mat"]
+[ext_resource type="Material" uid="uid://dkqeeuqq8qlb1" path="res://assets/materials/mat_metal_weathered.tres" id="5_metal_mat"]
 [ext_resource type="Material" uid="uid://cb6kvxyejkn2d" path="res://assets/materials/mat_craggy_rock.tres" id="6_stone_mat"]
 [ext_resource type="Material" uid="uid://mat_cabin_glass_01" path="res://assets/materials/mat_cabin_glass.tres" id="7_glass_mat"]
 

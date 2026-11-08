@@ -162,9 +162,9 @@ def generate_terrain_obj():
                 v2 = iz * stride + (ix + 1) + 1
                 v3 = (iz + 1) * stride + (ix + 1) + 1
                 v4 = (iz + 1) * stride + ix + 1
-                # Write as 2 triangles for optimal rendering & collision
-                f.write(f"f {v1}/{v1}/{v1} {v2}/{v2}/{v2} {v3}/{v3}/{v3}\n")
-                f.write(f"f {v1}/{v1}/{v1} {v3}/{v3}/{v3} {v4}/{v4}/{v4}\n")
+                # Write as 2 triangles with CCW front-facing winding (normals pointing UP +Y)
+                f.write(f"f {v1}/{v1}/{v1} {v3}/{v3}/{v3} {v2}/{v2}/{v2}\n")
+                f.write(f"f {v1}/{v1}/{v1} {v4}/{v4}/{v4} {v3}/{v3}/{v3}\n")
 
     num_verts = (GRID_RES + 1) ** 2
     num_faces = GRID_RES * GRID_RES * 2

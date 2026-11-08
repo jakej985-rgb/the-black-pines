@@ -4,7 +4,7 @@
 [ext_resource type="ArrayMesh" path="res://assets/models/elk_carcass.obj" id="2_carcass_mesh"]
 [ext_resource type="Material" uid="uid://drxe78yrxuio6" path="res://assets/materials/mat_weathered_bone.tres" id="3_bone_mat"]
 [ext_resource type="ArrayMesh" path="res://assets/models/carcass_gore_pool.obj" id="4_gore_mesh"]
-[ext_resource type="Material" uid="uid://gore_blood_01" path="res://assets/materials/mat_gore_blood.tres" id="5_blood_mat"]
+[ext_resource type="Material" uid="uid://duv0k5w0xj7g5" path="res://assets/materials/mat_gore_blood.tres" id="5_blood_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_carcass_col"]
 size = Vector3(3.2, 1.2, 2.2)

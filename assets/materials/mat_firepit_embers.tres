@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://mat_firepit_embers_01"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dsx6rx4hhksam"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ember"]
 noise_type = 2
@@ -8,15 +8,15 @@ fractal_octaves = 3
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ember_norm"]
 width = 256
 height = 256
+noise = SubResource("FastNoiseLite_ember")
 as_normal_map = true
 bump_strength = 2.2
-noise = SubResource("FastNoiseLite_ember")
 
 [resource]
-albedo_color = Color(0.10, 0.07, 0.06, 1)
+albedo_color = Color(0.1, 0.07, 0.06, 1)
 roughness = 0.92
 emission_enabled = true
-emission = Color(1.0, 0.28, 0.04, 1)
+emission = Color(1, 0.28, 0.04, 1)
 emission_energy_multiplier = 2.8
 normal_enabled = true
 normal_scale = 1.4

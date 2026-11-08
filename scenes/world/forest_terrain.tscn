@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://forest_terrain_scene_01"]
+[gd_scene load_steps=6 format=3 uid="uid://forest_terrain_scene_01"]
 
 [ext_resource type="Script" path="res://scripts/world/forest_terrain.gd" id="1_script"]
 [ext_resource type="ArrayMesh" path="res://assets/models/forest_terrain.obj" id="2_terrain_mesh"]
@@ -7,6 +7,9 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_fallback"]
 size = Vector3(140, 2, 140)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_bedrock"]
+size = Vector3(160, 2, 160)
+
 [node name="ForestTerrain" type="StaticBody3D"]
 collision_layer = 1
 collision_mask = 1
@@ -14,6 +17,10 @@ script = ExtResource("1_script")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_fallback")
+
+[node name="BedrockCollider" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+shape = SubResource("BoxShape3D_bedrock")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = ExtResource("2_terrain_mesh")

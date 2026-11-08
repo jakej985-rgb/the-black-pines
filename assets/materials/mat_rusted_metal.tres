@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" load_steps=3 format=3 uid="uid://mat_rusted_metal_01"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b2o3348v705ha"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_rust"]
 noise_type = 2

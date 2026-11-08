@@ -145,8 +145,10 @@ func _process_stalking(delta: float) -> void:
 	var diff = player_ref.global_position - global_position
 	diff.y = 0.0
 	if diff.length_squared() > 0.05:
-		var target_basis = Basis.looking_at(diff, Vector3.UP)
-		global_basis = global_basis.slerp(target_basis, delta * 2.0)
+		var target_basis = Basis.looking_at(diff.normalized(), Vector3.UP)
+		var q_curr = global_basis.get_rotation_quaternion()
+		var q_target = target_basis.get_rotation_quaternion()
+		global_basis = Basis(q_curr.slerp(q_target, delta * 2.0).normalized())
 
 	var dist_to_player: float = global_position.distance_to(player_ref.global_position)
 
@@ -272,8 +274,10 @@ func _process_retreating(delta: float) -> void:
 		var diff = player_ref.global_position - global_position
 		diff.y = 0.0
 		if diff.length_squared() > 0.05:
-			var target_basis = Basis.looking_at(diff, Vector3.UP)
-			global_basis = global_basis.slerp(target_basis, delta * 3.0)
+			var target_basis = Basis.looking_at(diff.normalized(), Vector3.UP)
+			var q_curr = global_basis.get_rotation_quaternion()
+			var q_target = target_basis.get_rotation_quaternion()
+			global_basis = Basis(q_curr.slerp(q_target, delta * 3.0).normalized())
 
 		var away_dir = -diff.normalized()
 		velocity = away_dir * retreat_speed

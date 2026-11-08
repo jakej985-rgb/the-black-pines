@@ -1,0 +1,71 @@
+{
+	"godot_version": "4.7.2-stable (official)",
+	"memory_leak_check": {
+		"delta_bytes": 3718004,
+		"final_memory_bytes": 30115947,
+		"initial_memory_bytes": 26397943,
+		"passed": true
+	},
+	"overall_passed": true,
+	"presets": {
+		"High": {
+			"avg_draw_calls": 0.0,
+			"avg_frame_time_ms": 6.9,
+			"estimated_fps": 145.0,
+			"max_frame_time_ms": 7.49,
+			"memory_used_mb": 99.8,
+			"min_frame_time_ms": 6.35,
+			"render_scale": 1.0,
+			"shadow_atlas_size": 4096,
+			"ssao_enabled": true,
+			"ssil_enabled": true,
+			"volumetric_fog": true
+		},
+		"Low": {
+			"avg_draw_calls": 0.0,
+			"avg_frame_time_ms": 6.9,
+			"estimated_fps": 145.0,
+			"max_frame_time_ms": 7.47,
+			"memory_used_mb": 99.5,
+			"min_frame_time_ms": 6.32,
+			"render_scale": 0.65,
+			"shadow_atlas_size": 1024,
+			"ssao_enabled": false,
+			"ssil_enabled": false,
+			"volumetric_fog": false
+		},
+		"Medium": {
+			"avg_draw_calls": 0.0,
+			"avg_frame_time_ms": 6.89,
+			"estimated_fps": 145.0,
+			"max_frame_time_ms": 7.47,
+			"memory_used_mb": 99.7,
+			"min_frame_time_ms": 6.33,
+			"render_scale": 0.8,
+			"shadow_atlas_size": 2048,
+			"ssao_enabled": true,
+			"ssil_enabled": false,
+			"volumetric_fog": true
+		},
+		"Ultra": {
+			"avg_draw_calls": 0.0,
+			"avg_frame_time_ms": 6.89,
+			"estimated_fps": 145.1,
+			"max_frame_time_ms": 7.64,
+			"memory_used_mb": 99.8,
+			"min_frame_time_ms": 6.13,
+			"render_scale": 1.0,
+			"shadow_atlas_size": 8192,
+			"ssao_enabled": true,
+			"ssil_enabled": true,
+			"volumetric_fog": true
+		}
+	},
+	"resource_audit": {
+		"broken_resources": [],
+		"failed": 0,
+		"passed": 35,
+		"total_checked": 35
+	},
+	"timestamp": "2026-11-08T00:02:51"
+}

@@ -1,13 +1,23 @@
-[gd_scene load_steps=7 format=3 uid="uid://clue_carcass_01"]
+[gd_scene load_steps=10 format=3 uid="uid://clue_carcass_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="ArrayMesh" path="res://assets/models/elk_carcass.obj" id="2_carcass_mesh"]
-[ext_resource type="Material" path="res://assets/materials/mat_weathered_bone.tres" id="3_bone_mat"]
+[ext_resource type="Material" uid="uid://drxe78yrxuio6" path="res://assets/materials/mat_weathered_bone.tres" id="3_bone_mat"]
 [ext_resource type="ArrayMesh" path="res://assets/models/carcass_gore_pool.obj" id="4_gore_mesh"]
-[ext_resource type="Material" path="res://assets/materials/mat_gore_blood.tres" id="5_blood_mat"]
+[ext_resource type="Material" uid="uid://gore_blood_01" path="res://assets/materials/mat_gore_blood.tres" id="5_blood_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_carcass_col"]
 size = Vector3(3.2, 1.2, 2.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_steam"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.92, 0.88, 0.85, 0.08)
+
+[sub_resource type="SphereMesh" id="SphereMesh_steam"]
+material = SubResource("StandardMaterial3D_steam")
+radius = 0.15
+height = 0.3
 
 [node name="ClueCarcass" type="StaticBody3D"]
 collision_layer = 1
@@ -30,3 +40,19 @@ surface_material_override/0 = ExtResource("5_blood_mat")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
 mesh = ExtResource("2_carcass_mesh")
 surface_material_override/0 = ExtResource("3_bone_mat")
+surface_material_override/1 = ExtResource("5_blood_mat")
+
+[node name="WarmVapor" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
+amount = 10
+lifetime = 2.4
+emission_shape = 3
+emission_box_extents = Vector3(1.1, 0.1, 0.5)
+direction = Vector3(0, 1, 0)
+spread = 22.0
+gravity = Vector3(0, 0.22, 0)
+initial_velocity_min = 0.1
+initial_velocity_max = 0.28
+scale_amount_min = 0.8
+scale_amount_max = 2.0
+mesh = SubResource("SphereMesh_steam")

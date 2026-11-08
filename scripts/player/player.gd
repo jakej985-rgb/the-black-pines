@@ -30,7 +30,8 @@ signal notification_posted(message: String)
 @export var bob_amplitude: float = 0.045
 
 @export_group("Flashlight")
-@export var flashlight_sway_speed: float = 12.0
+@export var flashlight_sway_speed: float = 10.0
+@export var flashlight_sway_amount: float = 0.04
 
 var stamina: float = 100.0
 var health: float = 100.0
@@ -45,6 +46,8 @@ var was_on_floor: bool = true
 var landing_offset: float = 0.0
 var breathing_time: float = 0.0
 var current_strafe: float = 0.0
+var flashlight_sway: Vector2 = Vector2.ZERO
+var flashlight_sway_target: Vector2 = Vector2.ZERO
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -71,6 +74,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		head.rotate_x(-event.relative.y * mouse_sensitivity)
 		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
+		flashlight_sway_target.x = clamp(flashlight_sway_target.x + event.relative.x * 0.0006, -flashlight_sway_amount, flashlight_sway_amount)
+		flashlight_sway_target.y = clamp(flashlight_sway_target.y + event.relative.y * 0.0006, -flashlight_sway_amount, flashlight_sway_amount)
 	
 	if event.is_action_pressed("toggle_pause"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -166,6 +171,13 @@ func _physics_process(delta: float) -> void:
 
 	# Head bob & breathing
 	_process_head_bob(delta, direction.length() > 0.1 and is_on_floor())
+	
+	# Flashlight inertial sway
+	if flashlight:
+		flashlight_sway = flashlight_sway.lerp(flashlight_sway_target, delta * flashlight_sway_speed)
+		flashlight_sway_target = flashlight_sway_target.lerp(Vector2.ZERO, delta * 5.0)
+		flashlight.rotation.y = flashlight_sway.x
+		flashlight.rotation.x = flashlight_sway.y
 	
 	# Check interactables
 	_process_interaction()

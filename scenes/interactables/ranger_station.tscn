@@ -1,8 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://ranger_station_01"]
+[gd_scene load_steps=12 format=3 uid="uid://ranger_station_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="ArrayMesh" path="res://assets/models/cabin.obj" id="2_cabin_mesh"]
-[ext_resource type="Material" path="res://assets/materials/mat_cabin_wood.tres" id="3_wood_mat"]
+[ext_resource type="Material" uid="uid://ddf4n7stmuk1j" path="res://assets/materials/mat_cabin_wood.tres" id="3_wood_mat"]
+[ext_resource type="Material" uid="uid://cabin_roof_01" path="res://assets/materials/mat_cabin_roof.tres" id="4_roof_mat"]
+[ext_resource type="Material" uid="uid://mat_metal_weathered_01" path="res://assets/materials/mat_metal_weathered.tres" id="5_metal_mat"]
+[ext_resource type="Material" uid="uid://cb6kvxyejkn2d" path="res://assets/materials/mat_craggy_rock.tres" id="6_stone_mat"]
+[ext_resource type="Material" uid="uid://mat_cabin_glass_01" path="res://assets/materials/mat_cabin_glass.tres" id="7_glass_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cabin"]
 size = Vector3(6.8, 4.2, 7.2)
@@ -29,6 +33,10 @@ shape = SubResource("BoxShape3D_cabin")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CabinBody"]
 mesh = ExtResource("2_cabin_mesh")
 surface_material_override/0 = ExtResource("3_wood_mat")
+surface_material_override/1 = ExtResource("4_roof_mat")
+surface_material_override/2 = ExtResource("5_metal_mat")
+surface_material_override/3 = ExtResource("6_stone_mat")
+surface_material_override/4 = ExtResource("7_glass_mat")
 
 [node name="DoorSign" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.5, 2.45)

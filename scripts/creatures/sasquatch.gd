@@ -17,8 +17,12 @@ var retreat_timer: float = 0.0
 @onready var eye_glow_left: OmniLight3D = $Head/EyeLeft
 @onready var eye_glow_right: OmniLight3D = $Head/EyeRight
 @onready var visual_root: Node3D = $Visuals
+@onready var anim_player: AnimationPlayer = $AnimationPlayer
 
 func _ready() -> void:
+	if anim_player:
+		anim_player.play("stalking")
+
 	# Find player in scene tree
 	await get_tree().process_frame
 	player_ref = get_tree().get_first_node_in_group("player")
@@ -41,6 +45,10 @@ func _physics_process(delta: float) -> void:
 			_process_retreating(delta)
 
 func _process_stalking(delta: float) -> void:
+	# Ensure stalking animation is active
+	if anim_player and anim_player.current_animation != "stalking":
+		anim_player.play("stalking")
+
 	# Slowly orient towards the player
 	var target_pos: Vector3 = player_ref.global_position
 	target_pos.y = global_position.y
@@ -73,6 +81,9 @@ func _trigger_encounter() -> void:
 		return
 	current_state = State.ALERTED
 
+	if anim_player:
+		anim_player.play("charge")
+
 	# Creature roar
 	if AudioDirector.instance:
 		AudioDirector.instance.play_cryptid_roar(global_position)
@@ -91,6 +102,9 @@ func _process_alerted(_delta: float) -> void:
 	pass
 
 func _process_retreating(delta: float) -> void:
+	if anim_player and anim_player.current_animation != "retreat":
+		anim_player.play("retreat")
+
 	retreat_timer -= delta
 	# Move backward away from player
 	if player_ref:

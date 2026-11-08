@@ -5,6 +5,7 @@ size = Vector3(2.2, 1.6, 1.8)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_concrete"]
 albedo_color = Color(0.25, 0.26, 0.25, 1)
+metallic = 0.0
 roughness = 0.9
 
 [sub_resource type="BoxMesh" id="BoxMesh_pad"]
@@ -13,8 +14,8 @@ size = Vector3(2.2, 0.15, 1.8)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gen_metal"]
 albedo_color = Color(0.18, 0.28, 0.22, 1)
-metallic = 0.7
-roughness = 0.55
+metallic = 0.88
+roughness = 0.42
 
 [sub_resource type="BoxMesh" id="BoxMesh_body"]
 material = SubResource("StandardMaterial3D_gen_metal")
@@ -22,8 +23,8 @@ size = Vector3(1.5, 1.1, 1.1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_exhaust"]
 albedo_color = Color(0.3, 0.2, 0.15, 1)
-metallic = 0.8
-roughness = 0.6
+metallic = 0.85
+roughness = 0.48
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_pipe"]
 material = SubResource("StandardMaterial3D_exhaust")

@@ -14,3 +14,7 @@ func _ready() -> void:
 			if player:
 				player.show_notification("Mission: Investigate the sightings around Ranger Station #04")
 		)
+	
+	# Apply active graphics scalability settings to world
+	if GraphicsSettingsManager.instance:
+		GraphicsSettingsManager.instance.apply_all(self)

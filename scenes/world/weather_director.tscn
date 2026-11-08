@@ -1,0 +1,82 @@
+[gd_scene load_steps=10 format=3 uid="uid://weather_director_01"]
+
+[ext_resource type="Script" path="res://scripts/world/weather_director.gd" id="1_weather"]
+[ext_resource type="Texture2D" uid="uid://cw3uln7abwesc" path="res://assets/textures/mist_particle.png" id="2_mist_tex"]
+[ext_resource type="Texture2D" uid="uid://cq2yx3q76i1mi" path="res://assets/textures/raindrop_streak.png" id="3_rain_tex"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mist"]
+emission_shape = 3
+emission_box_extents = Vector3(28.0, 1.5, 28.0)
+direction = Vector3(0.85, 0.0, 0.52)
+spread = 25.0
+initial_velocity_min = 0.5
+initial_velocity_max = 1.4
+gravity = Vector3(0, -0.01, 0)
+scale_min = 4.0
+scale_max = 7.5
+color = Color(0.82, 0.88, 0.95, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mist"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.82, 0.88, 0.95, 0.12)
+albedo_texture = ExtResource("2_mist_tex")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+proximity_fade_enabled = true
+proximity_fade_distance = 1.6
+
+[sub_resource type="QuadMesh" id="QuadMesh_mist"]
+material = SubResource("StandardMaterial3D_mist")
+size = Vector2(4.5, 3.5)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_rain"]
+emission_shape = 3
+emission_box_extents = Vector3(18.0, 0.5, 18.0)
+direction = Vector3(0.28, -1.0, 0.18)
+spread = 4.0
+initial_velocity_min = 18.0
+initial_velocity_max = 24.0
+gravity = Vector3(0, -2.0, 0)
+color = Color(0.88, 0.93, 1.0, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rain"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.88, 0.93, 1.0, 0.32)
+albedo_texture = ExtResource("3_rain_tex")
+billboard_mode = 2
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_rain"]
+material = SubResource("StandardMaterial3D_rain")
+size = Vector2(0.018, 0.35)
+
+[node name="WeatherDirector" type="Node3D"]
+script = ExtResource("1_weather")
+
+[node name="MistParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+amount = 64
+lifetime = 8.0
+preprocess = 4.0
+visibility_aabb = AABB(-35, -2, -35, 70, 8, 70)
+process_material = SubResource("ParticleProcessMaterial_mist")
+draw_pass_1 = SubResource("QuadMesh_mist")
+
+[node name="RainParticles" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.0, 0)
+amount = 180
+lifetime = 0.9
+preprocess = 0.5
+visibility_aabb = AABB(-22, -15, -22, 44, 20, 44)
+process_material = SubResource("ParticleProcessMaterial_rain")
+draw_pass_1 = SubResource("QuadMesh_rain")

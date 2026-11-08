@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bk36haqk868ys"
+path="res://.godot/imported/sasquatch_full.obj-1b0b15d43d02eef4f96be1066f1de535.mesh"
+
+[deps]
+
+files=["res://.godot/imported/sasquatch_full.obj-1b0b15d43d02eef4f96be1066f1de535.mesh"]
+
+source_file="res://assets/models/sasquatch_full.obj"
+dest_files=["res://.godot/imported/sasquatch_full.obj-1b0b15d43d02eef4f96be1066f1de535.mesh", "res://.godot/imported/sasquatch_full.obj-1b0b15d43d02eef4f96be1066f1de535.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

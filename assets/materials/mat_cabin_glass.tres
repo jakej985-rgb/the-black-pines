@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://mat_cabin_glass_01"]
+
+[resource]
+transparency = 1
+albedo_color = Color(0.18, 0.22, 0.20, 0.65)
+roughness = 0.18
+metallic = 0.1
+clearcoat_enabled = true
+clearcoat = 1.0
+clearcoat_roughness = 0.05
+refraction_enabled = true
+refraction_scale = 0.02

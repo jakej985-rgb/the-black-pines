@@ -1,18 +1,28 @@
-[gd_resource type="StandardMaterial3D" load_steps=5 format=3 uid="uid://cabin_roof_01"]
+[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://cabin_roof_01"]
 
+[ext_resource type="Shader" path="res://assets/materials/wood_weathered.gdshader" id="1_shader"]
 [ext_resource type="Texture2D" path="res://assets/textures/roof_planks/roof_planks_diffuse_1k.jpg" id="1_diff"]
 [ext_resource type="Texture2D" path="res://assets/textures/roof_planks/roof_planks_nor_gl_1k.jpg" id="2_norm"]
 [ext_resource type="Texture2D" path="res://assets/textures/roof_planks/roof_planks_rough_1k.jpg" id="3_rough"]
 [ext_resource type="Texture2D" path="res://assets/textures/roof_planks/roof_planks_ao_1k.jpg" id="4_ao"]
 
 [resource]
-albedo_color = Color(0.7, 0.65, 0.6, 1)
-albedo_texture = ExtResource("1_diff")
-roughness = 0.85
-roughness_texture = ExtResource("3_rough")
-normal_enabled = true
-normal_scale = 1.8
-normal_texture = ExtResource("2_norm")
-ao_enabled = true
-ao_texture = ExtResource("4_ao")
-uv1_scale = Vector3(3, 3, 3)
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/albedo_tint = Color(0.72, 0.68, 0.63, 1)
+shader_parameter/uv_scale = Vector3(3, 3, 3)
+shader_parameter/normal_scale = 1.7
+shader_parameter/roughness_min = 0.78
+shader_parameter/roughness_max = 0.88
+shader_parameter/metallic = 0.0
+shader_parameter/dampness = 0.60
+shader_parameter/moss_amount = 0.40
+shader_parameter/moss_color = Color(0.18, 0.28, 0.12, 1)
+shader_parameter/moss_roughness = 0.88
+shader_parameter/dirt_amount = 0.30
+shader_parameter/dirt_color = Color(0.12, 0.09, 0.07, 1)
+shader_parameter/dirt_roughness = 0.85
+shader_parameter/texture_albedo = ExtResource("1_diff")
+shader_parameter/texture_normal = ExtResource("2_norm")
+shader_parameter/texture_roughness = ExtResource("3_rough")
+shader_parameter/texture_ao = ExtResource("4_ao")

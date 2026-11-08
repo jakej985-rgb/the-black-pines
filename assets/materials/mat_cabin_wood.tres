@@ -1,18 +1,28 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://ddf4n7stmuk1j"]
+[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://ddf4n7stmuk1j"]
 
+[ext_resource type="Shader" path="res://assets/materials/wood_weathered.gdshader" id="1_shader"]
 [ext_resource type="Texture2D" uid="uid://boy0rba1v12f6" path="res://assets/textures/weathered_brown_planks/weathered_brown_planks_diffuse_1k.jpg" id="1_diff"]
 [ext_resource type="Texture2D" uid="uid://dl6g83yotuprv" path="res://assets/textures/weathered_brown_planks/weathered_brown_planks_nor_gl_1k.jpg" id="2_norm"]
 [ext_resource type="Texture2D" uid="uid://cil3xm6lk85yn" path="res://assets/textures/weathered_brown_planks/weathered_brown_planks_rough_1k.jpg" id="3_rough"]
 [ext_resource type="Texture2D" uid="uid://djlxvte4tplv8" path="res://assets/textures/weathered_brown_planks/weathered_brown_planks_ao_1k.jpg" id="4_ao"]
 
 [resource]
-albedo_color = Color(0.85, 0.8, 0.75, 1)
-albedo_texture = ExtResource("1_diff")
-roughness = 0.9
-roughness_texture = ExtResource("3_rough")
-normal_enabled = true
-normal_scale = 1.6
-normal_texture = ExtResource("2_norm")
-ao_enabled = true
-ao_texture = ExtResource("4_ao")
-uv1_scale = Vector3(2, 2, 2)
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/albedo_tint = Color(0.85, 0.8, 0.75, 1)
+shader_parameter/uv_scale = Vector3(2, 2, 2)
+shader_parameter/normal_scale = 1.6
+shader_parameter/roughness_min = 0.78
+shader_parameter/roughness_max = 0.88
+shader_parameter/metallic = 0.0
+shader_parameter/dampness = 0.50
+shader_parameter/moss_amount = 0.28
+shader_parameter/moss_color = Color(0.2, 0.3, 0.13, 1)
+shader_parameter/moss_roughness = 0.88
+shader_parameter/dirt_amount = 0.35
+shader_parameter/dirt_color = Color(0.12, 0.09, 0.07, 1)
+shader_parameter/dirt_roughness = 0.85
+shader_parameter/texture_albedo = ExtResource("1_diff")
+shader_parameter/texture_normal = ExtResource("2_norm")
+shader_parameter/texture_roughness = ExtResource("3_rough")
+shader_parameter/texture_ao = ExtResource("4_ao")

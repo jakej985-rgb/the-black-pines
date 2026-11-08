@@ -1,31 +1,21 @@
-[gd_scene load_steps=10 format=3 uid="uid://abandoned_camp_01"]
+[gd_scene load_steps=15 format=3 uid="uid://abandoned_camp_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="ArrayMesh" path="res://assets/models/tent.obj" id="2_tent_mesh"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/flare.tscn" id="3_flare"]
-[ext_resource type="Material" path="res://assets/materials/mat_craggy_rock.tres" id="4_rock_mat"]
-[ext_resource type="Material" path="res://assets/materials/mat_tent_canvas.tres" id="5_tent_mat"]
+[ext_resource type="Material" uid="uid://cb6kvxyejkn2d" path="res://assets/materials/mat_craggy_rock.tres" id="4_rock_mat"]
+[ext_resource type="Material" uid="uid://tent_canvas_01" path="res://assets/materials/mat_tent_canvas.tres" id="5_tent_mat"]
+[ext_resource type="Material" uid="uid://mat_metal_weathered_01" path="res://assets/materials/mat_metal_weathered.tres" id="6_metal_mat"]
+[ext_resource type="Material" uid="uid://ddf4n7stmuk1j" path="res://assets/materials/mat_cabin_wood.tres" id="7_wood_mat"]
+[ext_resource type="Material" uid="uid://mat_firepit_embers_01" path="res://assets/materials/mat_firepit_embers.tres" id="8_embers_mat"]
+[ext_resource type="Material" uid="uid://mat_camp_cooler_01" path="res://assets/materials/mat_camp_cooler.tres" id="9_cooler_mat"]
+[ext_resource type="Material" uid="uid://mat_cabin_glass_01" path="res://assets/materials/mat_cabin_glass.tres" id="10_glass_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/camp_firepit.obj" id="11_firepit_mesh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/camp_cooler.obj" id="12_cooler_mesh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/camp_lantern.obj" id="13_lantern_mesh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_camp_col"]
-size = Vector3(4.5, 2.2, 4.5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tent_canvas"]
-albedo_color = Color(0.2, 0.24, 0.18, 1)
-roughness = 0.88
-
-[sub_resource type="BoxMesh" id="BoxMesh_stone_ring"]
-material = ExtResource("4_rock_mat")
-size = Vector3(0.25, 0.18, 0.22)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_charcoal"]
-albedo_color = Color(0.06, 0.06, 0.06, 1)
-roughness = 0.95
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_fire_log"]
-material = SubResource("StandardMaterial3D_charcoal")
-top_radius = 0.06
-bottom_radius = 0.08
-height = 0.7
+size = Vector3(5.5, 2.2, 5.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_note"]
 size = Vector3(1.2, 0.8, 1.2)
@@ -50,49 +40,33 @@ shape = SubResource("BoxShape3D_camp_col")
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -0.4, 0, 0)
 mesh = ExtResource("2_tent_mesh")
 surface_material_override/0 = ExtResource("5_tent_mat")
+surface_material_override/1 = ExtResource("6_metal_mat")
 
-[node name="FirepitRing" type="Node3D" parent="."]
+[node name="Firepit" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, 0.5)
+mesh = ExtResource("11_firepit_mesh")
+surface_material_override/0 = ExtResource("4_rock_mat")
+surface_material_override/1 = ExtResource("7_wood_mat")
+surface_material_override/2 = ExtResource("8_embers_mat")
 
-[node name="Stone1" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.55, 0.08, 0)
-mesh = SubResource("BoxMesh_stone_ring")
+[node name="EmberGlow" type="OmniLight3D" parent="Firepit"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+light_color = Color(1, 0.35, 0.08, 1)
+light_energy = 0.65
+omni_range = 3.5
+omni_attenuation = 1.4
 
-[node name="Stone2" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0.4, 0.08, 0.4)
-mesh = SubResource("BoxMesh_stone_ring")
+[node name="Cooler" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -1.8, 0, 1.2)
+mesh = ExtResource("12_cooler_mesh")
+surface_material_override/0 = ExtResource("9_cooler_mat")
+surface_material_override/1 = ExtResource("6_metal_mat")
 
-[node name="Stone3" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0.55)
-mesh = SubResource("BoxMesh_stone_ring")
-
-[node name="Stone4" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -0.4, 0.08, 0.4)
-mesh = SubResource("BoxMesh_stone_ring")
-
-[node name="Stone5" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.08, 0)
-mesh = SubResource("BoxMesh_stone_ring")
-
-[node name="Stone6" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -0.4, 0.08, -0.4)
-mesh = SubResource("BoxMesh_stone_ring")
-
-[node name="Stone7" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -0.55)
-mesh = SubResource("BoxMesh_stone_ring")
-
-[node name="Stone8" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 0.4, 0.08, -0.4)
-mesh = SubResource("BoxMesh_stone_ring")
-
-[node name="CharredLog1" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(0.866025, 0, 0.5, 0.5, 0, -0.866025, 0, 1, 0, 0, 0.08, 0)
-mesh = SubResource("CylinderMesh_fire_log")
-
-[node name="CharredLog2" type="MeshInstance3D" parent="FirepitRing"]
-transform = Transform3D(0.5, 0, -0.866025, -0.866025, 0, -0.5, 0, 1, 0, 0.05, 0.1, 0)
-mesh = SubResource("CylinderMesh_fire_log")
+[node name="CampLantern" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 1.4, 0, 1.5)
+mesh = ExtResource("13_lantern_mesh")
+surface_material_override/0 = ExtResource("6_metal_mat")
+surface_material_override/1 = ExtResource("10_glass_mat")
 
 [node name="RoadFlare" parent="." instance=ExtResource("3_flare")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0.2)

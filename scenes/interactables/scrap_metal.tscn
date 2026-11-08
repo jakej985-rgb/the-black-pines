@@ -1,17 +1,13 @@
 [gd_scene load_steps=5 format=3 uid="uid://scrap_metal_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/collectible_item.gd" id="1_item"]
+[ext_resource type="Material" path="res://assets/materials/mat_rusted_metal.tres" id="2_metal_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_scrap"]
 size = Vector3(0.6, 0.4, 0.6)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rust"]
-albedo_color = Color(0.42, 0.22, 0.14, 1)
-metallic = 0.8
-roughness = 0.7
-
 [sub_resource type="BoxMesh" id="BoxMesh_scrap"]
-material = SubResource("StandardMaterial3D_rust")
+material = ExtResource("2_metal_mat")
 size = Vector3(0.4, 0.1, 0.3)
 
 [node name="ScrapMetal" type="StaticBody3D"]

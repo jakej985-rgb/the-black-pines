@@ -1,32 +1,33 @@
 [gd_scene load_steps=5 format=3 uid="uid://rock_cluster_01"]
 
+[ext_resource type="Material" path="res://assets/materials/mat_craggy_rock.tres" id="1_rock_mat"]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_rock"]
-size = Vector3(2.6, 1.4, 2.2)
+size = Vector3(2.8, 1.6, 2.4)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
-albedo_color = Color(0.2, 0.22, 0.2, 1)
-roughness = 0.9
+[sub_resource type="PrismMesh" id="PrismMesh_facet1"]
+material = ExtResource("1_rock_mat")
+left_to_right = 0.3
+size = Vector3(1.8, 1.4, 1.6)
 
-[sub_resource type="SphereMesh" id="SphereMesh_rock1"]
-material = SubResource("StandardMaterial3D_rock")
-radius = 0.8
-height = 1.2
-
-[sub_resource type="SphereMesh" id="SphereMesh_rock2"]
-material = SubResource("StandardMaterial3D_rock")
-radius = 0.55
-height = 0.9
+[sub_resource type="BoxMesh" id="BoxMesh_facet2"]
+material = ExtResource("1_rock_mat")
+size = Vector3(1.5, 1.1, 1.3)
 
 [node name="RockCluster" type="StaticBody3D"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 shape = SubResource("BoxShape3D_rock")
 
-[node name="BoulderMain" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.4, 0, 0, 0, 1.1, 0, 0, 0, 1.3, -0.2, 0.5, 0)
-mesh = SubResource("SphereMesh_rock1")
+[node name="FracturedRock1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.939693, 0.173648, 0.296198, -0.173648, 0.984808, 0, -0.291702, -0.0514603, 0.955122, -0.3, 0.65, 0)
+mesh = SubResource("PrismMesh_facet1")
 
-[node name="BoulderSmall" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.1, 0, 0, 0, 0.9, 0, 0, 0, 1, 0.8, 0.35, 0.4)
-mesh = SubResource("SphereMesh_rock2")
+[node name="FracturedRock2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 0.7, 0.5, 0.3)
+mesh = SubResource("BoxMesh_facet2")
+
+[node name="FracturedRock3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.866025, -0.258819, 0.428, 0.258819, 0.965926, 0.06, -0.428, 0.06, 0.902, 0.2, 0.4, -0.6)
+mesh = SubResource("PrismMesh_facet1")

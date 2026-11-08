@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/interactables/clue_carcass.tscn" id="10_carcass"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/abandoned_camp.tscn" id="11_camp"]
 [ext_resource type="PackedScene" path="res://scenes/creatures/sasquatch.tscn" id="12_sasquatch"]
-
+[ext_resource type="Material" path="res://assets/materials/mat_forest_ground.tres" id="13_ground_mat"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
 sky_top_color = Color(0.06, 0.1, 0.16, 1)
@@ -30,6 +30,16 @@ ambient_light_source = 2
 ambient_light_color = Color(0.15, 0.2, 0.28, 1)
 ambient_light_energy = 0.85
 tonemap_mode = 3
+ssao_enabled = true
+ssao_radius = 2.2
+ssao_intensity = 2.6
+ssao_power = 1.6
+ssil_enabled = true
+ssil_radius = 4.0
+ssil_intensity = 0.8
+glow_enabled = true
+glow_intensity = 0.5
+glow_bloom = 0.12
 fog_enabled = true
 fog_light_color = Color(0.1, 0.14, 0.19, 1)
 fog_density = 0.008
@@ -42,13 +52,10 @@ volumetric_fog_length = 60.0
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(140, 2, 140)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dirt"]
-albedo_color = Color(0.16, 0.14, 0.12, 1)
-roughness = 0.95
-
 [sub_resource type="BoxMesh" id="BoxMesh_ground"]
-material = SubResource("StandardMaterial3D_dirt")
+material = ExtResource("13_ground_mat")
 size = Vector3(140, 2, 140)
+
 
 [node name="Forest" type="Node3D"]
 

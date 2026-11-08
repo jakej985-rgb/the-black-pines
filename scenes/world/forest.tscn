@@ -144,6 +144,12 @@ transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -13.5, -0.
 [node name="RockCraggy1" parent="." instance=ExtResource("21_rock_craggy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.595, 1.5)
 
+[node name="RockClusterMossy1" parent="." instance=ExtResource("6_rock")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -17.4, -0.05, -4.8)
+
+[node name="PineRoots_HeroTree" parent="." instance=ExtResource("28_roots")]
+transform = Transform3D(1.1, 0, 0.3, 0, 1.1, 0, -0.3, 0, 1.1, -19.18, -0.06, -6.31)
+
 [node name="RockCraggy2" parent="." instance=ExtResource("21_rock_craggy")]
 transform = Transform3D(1.2, 0, 0, 0, 1.1, 0, 0, 0, 1.2, -6.2, 0.289, -6.8)
 

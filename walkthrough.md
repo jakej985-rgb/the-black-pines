@@ -17,7 +17,8 @@ All 8 child issues and the **Graphics Realism Overhaul Master Plan ([Issue #1](h
 
 ### [Issue #3](https://github.com/jakej985-rgb/the-black-pines/issues/3): Terrain Variation & Forest-Floor Realism (P0)
 - **Undulating 140×140m Terrain**: Replaced the flat ground box with `forest_terrain.obj` (120×120 quads, 14,641 vertices, 28,800 triangles). Features rolling knolls, drainage swales, depressed trail ruts (-0.22m), preserved flat landmark clearings at $Y = 0.0\,\text{m}$, and rising perimeter ridges ($+2.5\,\text{m}$).
-- **Trimesh Collision (`ConcavePolygonShape3D`)**: Generated dynamically in `scripts/world/forest_terrain.gd` from the mesh geometry in <2ms, guaranteeing millimetric collision accuracy with zero player snagging or falling through.
+- **Counter-Clockwise (CCW) Face Winding**: Corrected triangle winding in `generate_terrain.py` so all 28,800 face normals point upwards (+Y). Set `cull_disabled` on `terrain_ground.gdshader` to permanently prevent backface culling issues.
+- **Trimesh Collision (`ConcavePolygonShape3D`) + Bedrock Collider**: Generated dynamically in `scripts/world/forest_terrain.gd` with upward collision normals for solid footing (`is_on_floor: true`), reinforced with a subterranean safety `BedrockCollider` box (160×160m at $Y = -2\,\text{m}$) preventing falling through crevices.
 - **Multi-Scale PBR Puddle Shader**: Detects low-elevation depressions and upward surface normals to render wet mud puddles with darkened albedo, reduced roughness (0.08), and sharp specular reflections of the moonlight.
 - **Scanned 3D Pine Roots**: 22 natural root clusters (`scenes/world/pine_roots.tscn`) surrounding mature Douglas Firs.
 

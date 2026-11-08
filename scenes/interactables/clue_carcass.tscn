@@ -2,9 +2,11 @@
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
 [ext_resource type="ArrayMesh" path="res://assets/models/elk_carcass.obj" id="2_carcass_mesh"]
-[ext_resource type="Material" uid="uid://drxe78yrxuio6" path="res://assets/materials/mat_weathered_bone.tres" id="3_bone_mat"]
-[ext_resource type="ArrayMesh" path="res://assets/models/carcass_gore_pool.obj" id="4_gore_mesh"]
-[ext_resource type="Material" uid="uid://duv0k5w0xj7g5" path="res://assets/materials/mat_gore_blood.tres" id="5_blood_mat"]
+[ext_resource type="Material" uid="uid://elk_pelt_mat_01" path="res://assets/materials/mat_elk_pelt.tres" id="3_pelt_mat"]
+[ext_resource type="Material" uid="uid://carcass_flesh_01" path="res://assets/materials/mat_carcass_flesh.tres" id="4_flesh_mat"]
+[ext_resource type="Material" uid="uid://drxe78yrxuio6" path="res://assets/materials/mat_weathered_bone.tres" id="5_bone_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/carcass_gore_pool.obj" id="6_gore_mesh"]
+[ext_resource type="Material" uid="uid://duv0k5w0xj7g5" path="res://assets/materials/mat_gore_blood.tres" id="7_blood_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_carcass_col"]
 size = Vector3(3.2, 1.2, 2.2)
@@ -33,14 +35,16 @@ shape = SubResource("BoxShape3D_carcass_col")
 
 [node name="BloodPool" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.005, 0)
-mesh = ExtResource("4_gore_mesh")
-surface_material_override/0 = ExtResource("5_blood_mat")
+mesh = ExtResource("6_gore_mesh")
+surface_material_override/0 = ExtResource("7_blood_mat")
 
 [node name="CarcassMesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
 mesh = ExtResource("2_carcass_mesh")
-surface_material_override/0 = ExtResource("3_bone_mat")
-surface_material_override/1 = ExtResource("5_blood_mat")
+surface_material_override/0 = ExtResource("3_pelt_mat")
+surface_material_override/1 = ExtResource("4_flesh_mat")
+surface_material_override/2 = ExtResource("5_bone_mat")
+surface_material_override/3 = ExtResource("7_blood_mat")
 
 [node name="WarmVapor" type="CPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)

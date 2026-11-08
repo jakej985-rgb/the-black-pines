@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://sasquatch_entity_01"]
+[gd_scene load_steps=23 format=3 uid="uid://sasquatch_entity_01"]
 
 [ext_resource type="Script" path="res://scripts/creatures/sasquatch.gd" id="1_sasquatch"]
 [ext_resource type="Material" uid="uid://csvewr5uuy0yc" path="res://assets/materials/mat_beast_fur.tres" id="2_fur_mat"]
@@ -12,6 +12,7 @@
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_leg_lower.obj" id="10_leg_low_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_foot.obj" id="11_foot_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_fur_cards.obj" id="12_fur_cards_mesh"]
+[ext_resource type="Material" uid="uid://drxe78yrxuio6" path="res://assets/materials/mat_weathered_bone.tres" id="13_bone_mat"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_creature"]
 radius = 0.72
@@ -310,7 +311,7 @@ surface_material_override/0 = ExtResource("2_fur_mat")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -0.1)
 mesh = ExtResource("5_head_mesh")
 surface_material_override/0 = ExtResource("2_fur_mat")
-surface_material_override/1 = ExtResource("3_claw_mat")
+surface_material_override/1 = ExtResource("13_bone_mat")
 
 [node name="ShoulderLeft" type="Node3D" parent="Visuals/Torso"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62, 0.5, 0.05)

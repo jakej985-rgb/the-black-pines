@@ -284,6 +284,59 @@ class ObjMesh:
         pts = [(base_p, base_r), (mid_p, mid_r), (tip_p, 0.003)]
         self.add_tapered_tube(pts, segs=segs, u_scale=1.0, v_scale=1.0)
 
+    def add_quad(self, p1, p2, p3, p4, uv=None, normal=None):
+        v1 = self.add_v(*p1)
+        v2 = self.add_v(*p2)
+        v3 = self.add_v(*p3)
+        v4 = self.add_v(*p4)
+        if normal is None:
+            ax, ay, az = p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]
+            bx, by, bz = p3[0]-p1[0], p3[1]-p1[1], p3[2]-p1[2]
+            nx = ay*bz - az*by
+            ny = az*bx - ax*bz
+            nz = ax*by - ay*bx
+            nl = math.sqrt(nx*nx + ny*ny + nz*nz)
+            if nl > 0.0001:
+                nx, ny, nz = nx/nl, ny/nl, nz/nl
+            else:
+                nx, ny, nz = 0.0, 1.0, 0.0
+            n_idx = self.add_vn(nx, ny, nz)
+            n_list = [n_idx]*4
+        else:
+            n_idx = self.add_vn(*normal)
+            n_list = [n_idx]*4
+        if uv is None:
+            vt_list = [self.add_vt(0, 0), self.add_vt(1, 0), self.add_vt(1, 1), self.add_vt(0, 1)]
+        else:
+            vt_list = [self.add_vt(*u) for u in uv]
+        self.add_face([v1, v2, v3, v4], n_list, vt_list)
+
+    def add_tri(self, p1, p2, p3, uv=None, normal=None):
+        v1 = self.add_v(*p1)
+        v2 = self.add_v(*p2)
+        v3 = self.add_v(*p3)
+        if normal is None:
+            ax, ay, az = p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]
+            bx, by, bz = p3[0]-p1[0], p3[1]-p1[1], p3[2]-p1[2]
+            nx = ay*bz - az*by
+            ny = az*bx - ax*bz
+            nz = ax*by - ay*bx
+            nl = math.sqrt(nx*nx + ny*ny + nz*nz)
+            if nl > 0.0001:
+                nx, ny, nz = nx/nl, ny/nl, nz/nl
+            else:
+                nx, ny, nz = 0.0, 1.0, 0.0
+            n_idx = self.add_vn(nx, ny, nz)
+            n_list = [n_idx]*3
+        else:
+            n_idx = self.add_vn(*normal)
+            n_list = [n_idx]*3
+        if uv is None:
+            vt_list = [self.add_vt(0, 0), self.add_vt(1, 0), self.add_vt(0.5, 1)]
+        else:
+            vt_list = [self.add_vt(*u) for u in uv]
+        self.add_face([v1, v2, v3], n_list, vt_list)
+
     def save(self, filepath, mat_order=None):
         with open(filepath, "w") as f:
             f.write(f"# Wavefront OBJ: {self.name}\n")
@@ -339,12 +392,19 @@ class ObjMesh:
 def generate_sasquatch_models():
     """
     Generates high-fidelity anatomical models for the Sasquatch cryptid:
-    Modular limb segments for articulated animation rig + complete single-mesh.
+    - Modular limb segments for articulated animation rig + complete single-mesh.
+    - Anatomical Proportions: 8.5-foot hulking frame, massive trapezius and dorsal hump
+      burying the neck into the shoulder girdle (iconic Patterson-Gimlin silhouette).
+    - Menacing Facial Sculpt: Heavy supraorbital brow, cavernous sunken eye orbits,
+      wrinkled black snout, snarling canines and incisors, peaked sagittal crest.
+    - Corded Forearms & Claws: Heavy vascular forearms, broad ape palms, and razor talons.
+    - Bowed Muscular Legs & Plantigrade Feet: Bulging calves, broad 5-toed clawed feet.
+    - Volumetric Fur Cards: Multi-tiered silhouette breakup cards along spine, mantle, arms.
     """
     os.makedirs("assets/models", exist_ok=True)
 
     # --------------------------------------------------------------------------
-    # 1.1 Torso: Deep chest, hunched spine, muscular traps, lats, and dorsal hump
+    # 1.1 Torso: Deep chest, hunched spine, colossal traps, lats, and dorsal hump
     # Center relative to Torso node (y = 0 is mid-torso, around y=1.65 in world)
     # --------------------------------------------------------------------------
     torso = ObjMesh("sasquatch_torso")
@@ -352,25 +412,35 @@ def generate_sasquatch_models():
     
     # Thoracic spine and ribcage spine sweep
     torso_spine = [
-        ((0.0, -0.45,  0.02), (0.42, 0.38)),  # Pelvis / Lower abdomen
-        ((0.0, -0.20,  0.05), (0.50, 0.44)),  # Mid waist
-        ((0.0,  0.10,  0.10), (0.64, 0.54)),  # Lower chest & lats
-        ((0.0,  0.35,  0.14), (0.68, 0.56)),  # Broad pectoral chest
-        ((0.0,  0.55,  0.18), (0.62, 0.52)),  # Shoulder girdle / upper back
-        ((0.0,  0.72,  0.10), (0.42, 0.38))   # Cervical base
+        ((0.0, -0.48,  0.02), (0.44, 0.40)),  # Pelvis / Lower abdomen
+        ((0.0, -0.22,  0.06), (0.52, 0.46)),  # Mid waist
+        ((0.0,  0.08,  0.10), (0.66, 0.56)),  # Lower chest & lats
+        ((0.0,  0.34,  0.15), (0.72, 0.60)),  # Broad pectoral chest
+        ((0.0,  0.56,  0.18), (0.68, 0.56)),  # Shoulder girdle / upper back
+        ((0.0,  0.74,  0.12), (0.48, 0.42))   # Cervical base
     ]
     torso.add_tapered_tube(torso_spine, segs=16, u_scale=2.0, v_scale=2.0)
 
-    # Muscular Dorsal Hump (characteristic cryptid silhouette behind neck)
-    torso.add_ellipsoid((0.0, 0.52, 0.32), (0.46, 0.28, 0.32), segs_u=12, segs_v=8)
+    # Massive Muscular Dorsal Hump (characteristic cryptid silhouette behind neck)
+    torso.add_ellipsoid((0.0, 0.54, 0.34), (0.50, 0.32, 0.36), segs_u=14, segs_v=10)
+    torso.add_ellipsoid((0.0, 0.32, 0.38), (0.44, 0.28, 0.30), segs_u=12, segs_v=8)
     
-    # Pectoral muscle slabs (left and right)
-    torso.add_ellipsoid((-0.24, 0.28, -0.32), (0.24, 0.18, 0.16), segs_u=10, segs_v=6)
-    torso.add_ellipsoid(( 0.24, 0.28, -0.32), (0.24, 0.18, 0.16), segs_u=10, segs_v=6)
+    # Pectoral muscle slabs (left and right with defined lower boundary)
+    torso.add_ellipsoid((-0.26, 0.28, -0.32), (0.26, 0.20, 0.18), segs_u=12, segs_v=8)
+    torso.add_ellipsoid(( 0.26, 0.28, -0.32), (0.26, 0.20, 0.18), segs_u=12, segs_v=8)
 
-    # Flared Trapezius muscles
-    torso.add_ellipsoid((-0.34, 0.54, 0.08), (0.22, 0.20, 0.26), segs_u=10, segs_v=6)
-    torso.add_ellipsoid(( 0.34, 0.54, 0.08), (0.22, 0.20, 0.26), segs_u=10, segs_v=6)
+    # Abdominal muscle definition under pelt
+    for ay in [0.06, -0.12]:
+        torso.add_ellipsoid((-0.15, ay, -0.30), (0.14, 0.08, 0.10), segs_u=8, segs_v=6)
+        torso.add_ellipsoid(( 0.15, ay, -0.30), (0.14, 0.08, 0.10), segs_u=8, segs_v=6)
+
+    # Colossal Trapezius muscles burying neck into shoulder tips
+    torso.add_ellipsoid((-0.36, 0.56, 0.10), (0.26, 0.24, 0.30), segs_u=12, segs_v=8)
+    torso.add_ellipsoid(( 0.36, 0.56, 0.10), (0.26, 0.24, 0.30), segs_u=12, segs_v=8)
+
+    # Flared Latissimus Dorsi curves
+    torso.add_ellipsoid((-0.46, 0.12, 0.12), (0.22, 0.30, 0.24), segs_u=10, segs_v=6)
+    torso.add_ellipsoid(( 0.46, 0.12, 0.12), (0.22, 0.30, 0.24), segs_u=10, segs_v=6)
 
     torso.save("assets/models/sasquatch_torso.obj")
 
@@ -381,82 +451,93 @@ def generate_sasquatch_models():
     head.usemtl("Fur")
 
     # Braincase / Cranium with sloping forehead
-    head.add_ellipsoid((0.0, 0.05, 0.02), (0.30, 0.28, 0.34), segs_u=14, segs_v=10)
+    head.add_ellipsoid((0.0, 0.05, 0.02), (0.32, 0.30, 0.36), segs_u=16, segs_v=12)
     
-    # Sagittal crest (raised bony ridge along top of skull)
+    # Peaked Sagittal crest (raised bony blade along top and back of skull)
     crest_pts = [
-        ((0.0,  0.18, -0.10), (0.04, 0.08)),
-        ((0.0,  0.28,  0.02), (0.05, 0.12)),
-        ((0.0,  0.26,  0.16), (0.04, 0.10)),
-        ((0.0,  0.12,  0.25), (0.03, 0.06))
+        ((0.0,  0.18, -0.12), (0.05, 0.09)),
+        ((0.0,  0.30,  0.02), (0.06, 0.14)),
+        ((0.0,  0.28,  0.18), (0.05, 0.12)),
+        ((0.0,  0.14,  0.28), (0.04, 0.08))
     ]
-    head.add_tapered_tube(crest_pts, segs=8)
+    head.add_tapered_tube(crest_pts, segs=10)
 
     # Heavy ape-man supraorbital brow ridge projecting forward over eyes
     brow_pts = [
-        ((-0.26, 0.08, -0.22), 0.05),
-        ((-0.13, 0.11, -0.28), 0.07),
-        (( 0.00, 0.12, -0.30), 0.08),
-        (( 0.13, 0.11, -0.28), 0.07),
-        (( 0.26, 0.08, -0.22), 0.05)
+        ((-0.28, 0.07, -0.22), 0.06),
+        ((-0.14, 0.11, -0.28), 0.08),
+        (( 0.00, 0.12, -0.31), 0.09),
+        (( 0.14, 0.11, -0.28), 0.08),
+        (( 0.28, 0.07, -0.22), 0.06)
     ]
-    head.add_tapered_tube(brow_pts, segs=8)
+    head.add_tapered_tube(brow_pts, segs=10)
+
+    # Flared Zygomatic arches (cheekbones)
+    head.add_ellipsoid((-0.24, -0.02, -0.20), (0.12, 0.09, 0.14), segs_u=10, segs_v=6)
+    head.add_ellipsoid(( 0.24, -0.02, -0.20), (0.12, 0.09, 0.14), segs_u=10, segs_v=6)
 
     # Pronounced ape muzzle / snout extending forward
     muzzle_pts = [
-        ((0.0,  0.02, -0.15), (0.24, 0.20)),
-        ((0.0, -0.06, -0.32), (0.20, 0.18)),
-        ((0.0, -0.12, -0.42), (0.16, 0.14))
+        ((0.0,  0.02, -0.16), (0.25, 0.21)),
+        ((0.0, -0.06, -0.33), (0.21, 0.19)),
+        ((0.0, -0.12, -0.43), (0.17, 0.15))
     ]
-    head.add_tapered_tube(muzzle_pts, segs=10)
+    head.add_tapered_tube(muzzle_pts, segs=12)
 
-    # Flared nostrils
-    head.add_ellipsoid((-0.07, -0.05, -0.42), (0.045, 0.035, 0.05), segs_u=8, segs_v=6)
-    head.add_ellipsoid(( 0.07, -0.05, -0.42), (0.045, 0.035, 0.05), segs_u=8, segs_v=6)
+    # Black wrinkled leathery nasal bridge & flared predatory nostrils
+    head.add_ellipsoid((-0.07, -0.06, -0.43), (0.05, 0.04, 0.05), segs_u=8, segs_v=6)
+    head.add_ellipsoid(( 0.07, -0.06, -0.43), (0.05, 0.04, 0.05), segs_u=8, segs_v=6)
+    head.add_box((0.0, -0.03, -0.40), (0.08, 0.06, 0.06), rot_y=0.0)
 
-    # Deep recessed eye orbits (cavities for the eye glow spheres at +/-0.12, 0.04, -0.28)
-    head.add_ellipsoid((-0.13, 0.04, -0.28), (0.07, 0.06, 0.06), segs_u=8, segs_v=6)
-    head.add_ellipsoid(( 0.13, 0.04, -0.28), (0.07, 0.06, 0.06), segs_u=8, segs_v=6)
+    # Deep cavernous eye orbits (recessed cavities for eye glow spheres at +/-0.13, 0.04, -0.28)
+    head.add_ellipsoid((-0.13, 0.04, -0.28), (0.075, 0.065, 0.07), segs_u=10, segs_v=6)
+    head.add_ellipsoid(( 0.13, 0.04, -0.28), (0.075, 0.065, 0.07), segs_u=10, segs_v=6)
 
-    # Lower Jaw / Mandible pulled into an aggressive snarl
+    # Lower Jaw / Mandible pulled into an aggressive snarling display
     jaw_pts = [
-        ((0.0, -0.14, -0.12), (0.22, 0.12)),
-        ((0.0, -0.20, -0.28), (0.18, 0.10)),
-        ((0.0, -0.22, -0.38), (0.14, 0.08))
+        ((0.0, -0.14, -0.14), (0.24, 0.14)),
+        ((0.0, -0.21, -0.29), (0.20, 0.12)),
+        ((0.0, -0.23, -0.39), (0.15, 0.09))
     ]
-    head.add_tapered_tube(jaw_pts, segs=10)
+    head.add_tapered_tube(jaw_pts, segs=12)
 
-    # Snarling Carnivorous Fangs & Teeth
+    # Flared Ape Ears (tucked flat against sides of skull)
+    head.add_ellipsoid((-0.30, 0.02, 0.02), (0.04, 0.12, 0.08), segs_u=8, segs_v=6)
+    head.add_ellipsoid(( 0.30, 0.02, 0.02), (0.04, 0.12, 0.08), segs_u=8, segs_v=6)
+
+    # Lethal Predatory Bone Dentition (Snarling Fangs & Incisors)
     head.usemtl("Bone")
-    # Upper canines (protruding downward from muzzle)
-    head.add_claw((-0.11, -0.10, -0.38), (-0.11, -0.17, -0.39), (-0.10, -0.22, -0.39), base_r=0.022, mid_r=0.015, segs=6)
-    head.add_claw(( 0.11, -0.10, -0.38), ( 0.11, -0.17, -0.39), ( 0.10, -0.22, -0.39), base_r=0.022, mid_r=0.015, segs=6)
-    # Lower canines (protruding upward from mandible)
-    head.add_claw((-0.09, -0.19, -0.36), (-0.09, -0.14, -0.37), (-0.08, -0.10, -0.37), base_r=0.018, mid_r=0.012, segs=6)
-    head.add_claw(( 0.09, -0.19, -0.36), ( 0.09, -0.14, -0.37), ( 0.08, -0.10, -0.37), base_r=0.018, mid_r=0.012, segs=6)
+    # Upper canines (sabre-curved fangs protruding downward from muzzle)
+    head.add_claw((-0.11, -0.09, -0.38), (-0.11, -0.17, -0.40), (-0.10, -0.24, -0.39), base_r=0.024, mid_r=0.016, segs=6)
+    head.add_claw(( 0.11, -0.09, -0.38), ( 0.11, -0.17, -0.40), ( 0.10, -0.24, -0.39), base_r=0.024, mid_r=0.016, segs=6)
+    # Lower canines (protruding upward from mandible into canine diastema)
+    head.add_claw((-0.09, -0.20, -0.36), (-0.09, -0.13, -0.38), (-0.08, -0.08, -0.37), base_r=0.020, mid_r=0.013, segs=6)
+    head.add_claw(( 0.09, -0.20, -0.36), ( 0.09, -0.13, -0.38), ( 0.08, -0.08, -0.37), base_r=0.020, mid_r=0.013, segs=6)
 
-    # Incisors / Row of sharp front teeth
+    # Sharp serrated incisors & shearing premolars
     for tx in [-0.06, -0.02, 0.02, 0.06]:
-        head.add_cylinder((tx, -0.11, -0.39), (tx, -0.14, -0.39), 0.010, 0.007, segs=4)
-        head.add_cylinder((tx, -0.19, -0.37), (tx, -0.16, -0.37), 0.009, 0.006, segs=4)
+        head.add_cylinder((tx, -0.10, -0.40), (tx, -0.14, -0.40), 0.011, 0.008, segs=4)
+        head.add_cylinder((tx, -0.20, -0.38), (tx, -0.16, -0.38), 0.010, 0.007, segs=4)
 
-    head.save("assets/models/sasquatch_head.obj")
+    head.save("assets/models/sasquatch_head.obj", mat_order=["Fur", "Bone"])
 
     # --------------------------------------------------------------------------
-    # 1.3 Upper Arm: Deltoid cap, bicep/tricep body (extends from shoulder down)
+    # 1.3 Upper Arm: Deltoid cap, bulging bicep/tricep (extends from shoulder down)
     # --------------------------------------------------------------------------
     arm_upper = ObjMesh("sasquatch_arm_upper")
     arm_upper.usemtl("Fur")
-    # Rounded deltoid cap
-    arm_upper.add_ellipsoid((0.0, 0.0, 0.0), (0.24, 0.22, 0.22), segs_u=12, segs_v=8)
+    # Massive rounded deltoid cap wrapping over the shoulder socket
+    arm_upper.add_ellipsoid((0.0, 0.0, 0.0), (0.26, 0.24, 0.24), segs_u=14, segs_v=10)
     # Bicep / Tricep arm cylinder tapering to elbow at y = -0.60
     arm_pts = [
-        ((0.0,  0.00, 0.00), 0.21),
-        ((0.0, -0.20, 0.00), 0.22),  # Peak of bicep
-        ((0.0, -0.42, 0.01), 0.18),
-        ((0.0, -0.60, 0.01), 0.16)   # Elbow joint
+        ((0.0,  0.00, 0.00), 0.23),
+        ((0.0, -0.20, 0.01), 0.25),  # Peak of bulging bicep
+        ((0.0, -0.42, 0.01), 0.20),
+        ((0.0, -0.60, 0.01), 0.17)   # Elbow joint
     ]
-    arm_upper.add_tapered_tube(arm_pts, segs=12)
+    arm_upper.add_tapered_tube(arm_pts, segs=14)
+    # Posterior tricep muscle mass
+    arm_upper.add_ellipsoid((0.0, -0.22, 0.10), (0.16, 0.20, 0.12), segs_u=10, segs_v=6)
     arm_upper.save("assets/models/sasquatch_arm_upper.obj")
 
     # --------------------------------------------------------------------------
@@ -465,48 +546,48 @@ def generate_sasquatch_models():
     arm_lower = ObjMesh("sasquatch_arm_lower")
     arm_lower.usemtl("Fur")
     # Elbow joint ball
-    arm_lower.add_ellipsoid((0.0, 0.0, 0.0), (0.17, 0.15, 0.16), segs_u=10, segs_v=6)
-    # Forearm muscular sweep
+    arm_lower.add_ellipsoid((0.0, 0.0, 0.0), (0.18, 0.16, 0.17), segs_u=12, segs_v=8)
+    # Powerful brachioradialis & forearm muscular sweep
     forearm_pts = [
-        ((0.0,  0.00, 0.00), 0.17),
-        ((0.0, -0.18, 0.02), 0.18),  # Muscular belly of forearm
-        ((0.0, -0.38, 0.01), 0.15),
-        ((0.0, -0.56, 0.00), 0.13)   # Heavy wrist
+        ((0.0,  0.00, 0.00), 0.18),
+        ((0.0, -0.18, 0.03), 0.20),  # Muscular belly of forearm
+        ((0.0, -0.38, 0.02), 0.16),
+        ((0.0, -0.56, 0.00), 0.14)   # Heavy wrist
     ]
-    arm_lower.add_tapered_tube(forearm_pts, segs=12)
+    arm_lower.add_tapered_tube(forearm_pts, segs=14)
+    # Vascular ridge along forearm
+    arm_lower.add_cylinder((0.0, -0.10, -0.12), (0.0, -0.48, -0.08), 0.02, 0.015, segs=6)
     arm_lower.save("assets/models/sasquatch_arm_lower.obj")
 
     # --------------------------------------------------------------------------
-    # 1.5 Hand: Broad ape palm, 5 digits with long curved predator claw talons
+    # 1.5 Hand: Broad ape palm, 5 digits with razor curved predator claw talons
     # --------------------------------------------------------------------------
     hand = ObjMesh("sasquatch_hand")
     hand.usemtl("Fur")
-    # Thick ape palm
-    hand.add_box((0.0, -0.10, 0.0), (0.24, 0.18, 0.12), rot_y=0.0)
+    # Thick leathery ape palm with thenar eminence
+    hand.add_box((0.0, -0.10, 0.0), (0.26, 0.19, 0.13), rot_y=0.0)
 
     # 5 Digits with sharp predatory claw talons
-    # Fingers layout: Thumb at angle, index, middle, ring, pinky
     finger_configs = [
-        (-0.11, -0.06,  0.04, 0.35,  -0.12, 0.04),   # Opposable Thumb
-        (-0.08, -0.19, -0.02, 0.05,  -0.16, 0.06),   # Index
-        (-0.02, -0.20, -0.02, 0.00,  -0.18, 0.06),   # Middle (longest)
-        ( 0.04, -0.19, -0.02, -0.05, -0.16, 0.06),   # Ring
-        ( 0.09, -0.17, -0.01, -0.10, -0.14, 0.05)    # Pinky
+        (-0.12, -0.06,  0.04, 0.35,  -0.13, 0.05),   # Opposable Thumb
+        (-0.09, -0.19, -0.02, 0.05,  -0.17, 0.07),   # Index
+        (-0.02, -0.21, -0.02, 0.00,  -0.19, 0.08),   # Middle (longest)
+        ( 0.04, -0.20, -0.02, -0.05, -0.17, 0.07),   # Ring
+        ( 0.10, -0.18, -0.01, -0.10, -0.15, 0.06)    # Pinky
     ]
     for fx, fy, fz, ang_x, f_len, c_len in finger_configs:
         # Finger proximal segment (fur/leather)
         hand.usemtl("Fur")
         p_base = (fx, fy, fz)
-        p_mid = (fx + math.sin(ang_x)*0.03, fy + f_len * 0.55, fz + 0.02)
         p_knuckle = (fx + math.sin(ang_x)*0.05, fy + f_len, fz + 0.04)
-        hand.add_cylinder(p_base, p_knuckle, 0.026, 0.020, segs=6)
+        hand.add_cylinder(p_base, p_knuckle, 0.028, 0.022, segs=8)
 
         # Curved Keratin Talon Claw Tip
         hand.usemtl("Claw")
-        p_tip = (p_knuckle[0] + math.sin(ang_x)*0.03, p_knuckle[1] + c_len * 0.75, p_knuckle[2] + c_len)
-        hand.add_claw(p_knuckle, (p_knuckle[0], p_knuckle[1] - 0.02, p_knuckle[2] + c_len*0.6), p_tip, base_r=0.018, mid_r=0.011, segs=6)
+        p_tip = (p_knuckle[0] + math.sin(ang_x)*0.04, p_knuckle[1] + c_len * 0.85, p_knuckle[2] + c_len * 1.1)
+        hand.add_claw(p_knuckle, (p_knuckle[0], p_knuckle[1] - 0.02, p_knuckle[2] + c_len*0.6), p_tip, base_r=0.020, mid_r=0.012, segs=8)
 
-    hand.save("assets/models/sasquatch_hand.obj")
+    hand.save("assets/models/sasquatch_hand.obj", mat_order=["Fur", "Claw"])
 
     # --------------------------------------------------------------------------
     # 1.6 Upper Leg / Thigh: Bowed muscular quadriceps and knee (y = 0 to -0.62)
@@ -514,15 +595,17 @@ def generate_sasquatch_models():
     leg_upper = ObjMesh("sasquatch_leg_upper")
     leg_upper.usemtl("Fur")
     # Hip joint socket
-    leg_upper.add_ellipsoid((0.0, 0.0, 0.0), (0.25, 0.22, 0.24), segs_u=10, segs_v=6)
-    # Bowed thigh sweep
+    leg_upper.add_ellipsoid((0.0, 0.0, 0.0), (0.27, 0.24, 0.26), segs_u=12, segs_v=8)
+    # Bowed muscular thigh sweep (vastus lateralis & rectus femoris)
     thigh_pts = [
-        ((0.0,  0.00, 0.00), 0.24),
-        ((0.02, -0.22, 0.02), 0.25),  # Bulging quadricep
-        ((0.01, -0.44, 0.01), 0.21),
-        ((0.00, -0.62, 0.00), 0.18)   # Heavy knee
+        ((0.0,  0.00, 0.00), 0.26),
+        ((0.03, -0.22, 0.02), 0.28),  # Bulging quadricep
+        ((0.02, -0.44, 0.01), 0.23),
+        ((0.00, -0.62, 0.00), 0.19)   # Heavy knee
     ]
-    leg_upper.add_tapered_tube(thigh_pts, segs=12)
+    leg_upper.add_tapered_tube(thigh_pts, segs=14)
+    # Posterior hamstring bulge
+    leg_upper.add_ellipsoid((0.0, -0.25, 0.10), (0.18, 0.22, 0.14), segs_u=10, segs_v=6)
     leg_upper.save("assets/models/sasquatch_leg_upper.obj")
 
     # --------------------------------------------------------------------------
@@ -530,16 +613,16 @@ def generate_sasquatch_models():
     # --------------------------------------------------------------------------
     leg_lower = ObjMesh("sasquatch_leg_lower")
     leg_lower.usemtl("Fur")
-    # Knee joint
-    leg_lower.add_ellipsoid((0.0, 0.0, 0.0), (0.19, 0.16, 0.18), segs_u=10, segs_v=6)
+    # Knee joint ball
+    leg_lower.add_ellipsoid((0.0, 0.0, 0.0), (0.20, 0.17, 0.19), segs_u=12, segs_v=8)
     # Bulging calf and tapering shin
     shin_pts = [
-        ((0.0,  0.00, 0.00), 0.18),
-        ((0.0, -0.16, 0.04), 0.22),  # Heavy calf muscle belly (posterior)
-        ((0.0, -0.36, 0.02), 0.17),
-        ((0.0, -0.52, 0.00), 0.15)   # Ankle joint
+        ((0.0,  0.00, 0.00), 0.19),
+        ((0.0, -0.16, 0.05), 0.24),  # Bulging posterior calf belly
+        ((0.0, -0.36, 0.03), 0.18),
+        ((0.0, -0.52, 0.00), 0.16)   # Heavy ankle joint
     ]
-    leg_lower.add_tapered_tube(shin_pts, segs=12)
+    leg_lower.add_tapered_tube(shin_pts, segs=14)
     leg_lower.save("assets/models/sasquatch_leg_lower.obj")
 
     # --------------------------------------------------------------------------
@@ -547,25 +630,25 @@ def generate_sasquatch_models():
     # --------------------------------------------------------------------------
     foot = ObjMesh("sasquatch_foot")
     foot.usemtl("Fur")
-    # Broad heel and midfoot pad resting flat on ground
-    foot.add_box((0.0, 0.06, 0.02), (0.24, 0.12, 0.38), rot_y=0.0)
+    # Broad heel and metatarsal foot pad resting flat on ground
+    foot.add_box((0.0, 0.06, 0.02), (0.26, 0.12, 0.42), rot_y=0.0)
 
     # 5 Splayed plantigrade toes with heavy claw tips
-    toe_xs = [-0.09, -0.05, 0.0, 0.05, 0.09]
-    toe_lens = [0.14, 0.16, 0.17, 0.15, 0.12]
+    toe_xs = [-0.10, -0.05, 0.0, 0.05, 0.10]
+    toe_lens = [0.15, 0.17, 0.18, 0.16, 0.13]
     for tx, tl in zip(toe_xs, toe_lens):
         foot.usemtl("Fur")
         # Toe base
-        p_t_base = (tx, 0.05, -0.16)
-        p_t_mid = (tx * 1.1, 0.04, -0.16 - tl * 0.7)
-        foot.add_cylinder(p_t_base, p_t_mid, 0.024, 0.018, segs=6)
+        p_t_base = (tx, 0.05, -0.18)
+        p_t_mid = (tx * 1.1, 0.04, -0.18 - tl * 0.7)
+        foot.add_cylinder(p_t_base, p_t_mid, 0.026, 0.020, segs=8)
 
         # Toe claw tip digging into the earth
         foot.usemtl("Claw")
-        p_claw_tip = (tx * 1.15, 0.01, -0.16 - tl - 0.04)
-        foot.add_claw(p_t_mid, (p_t_mid[0], 0.03, p_t_mid[2] - 0.02), p_claw_tip, base_r=0.016, mid_r=0.010, segs=6)
+        p_claw_tip = (tx * 1.15, 0.01, -0.18 - tl - 0.05)
+        foot.add_claw(p_t_mid, (p_t_mid[0], 0.03, p_t_mid[2] - 0.02), p_claw_tip, base_r=0.018, mid_r=0.011, segs=8)
 
-    foot.save("assets/models/sasquatch_foot.obj")
+    foot.save("assets/models/sasquatch_foot.obj", mat_order=["Fur", "Claw"])
 
     # --------------------------------------------------------------------------
     # 1.9 Shaggy Fur Silhouette Fringe Cards (shoulders, dorsal hump, forearms)
@@ -574,20 +657,28 @@ def generate_sasquatch_models():
     fur_cards = ObjMesh("sasquatch_fur_cards")
     fur_cards.usemtl("Fur")
     
-    # Shoulder mantle fringe tufts
+    # Expanded volumetric fur tuft positions across entire torso & limbs
     mantle_positions = [
-        ((-0.45, 0.55,  0.15), (-0.72, 0.35,  0.18)),
-        (( 0.45, 0.55,  0.15), ( 0.72, 0.35,  0.18)),
-        ((-0.38, 0.45,  0.28), (-0.60, 0.25,  0.32)),
-        (( 0.38, 0.45,  0.28), ( 0.60, 0.25,  0.32)),
-        (( 0.00, 0.68,  0.35), ( 0.00, 0.42,  0.52)),  # Nape/crest spine fringe
-        (( 0.00, 0.45,  0.42), ( 0.00, 0.22,  0.55)),  # Mid-back fringe
-        ((-0.18, 0.58,  0.38), (-0.28, 0.36,  0.50)),
-        (( 0.18, 0.58,  0.38), ( 0.28, 0.36,  0.50))
+        # Shoulder mantle & trapezius overhang
+        ((-0.48, 0.58,  0.15), (-0.78, 0.35,  0.18)),
+        (( 0.48, 0.58,  0.15), ( 0.78, 0.35,  0.18)),
+        ((-0.42, 0.46,  0.28), (-0.68, 0.25,  0.34)),
+        (( 0.42, 0.46,  0.28), ( 0.68, 0.25,  0.34)),
+        # Sagittal crest & nape ridge tufts
+        (( 0.00, 0.72,  0.32), ( 0.00, 0.45,  0.55)),
+        (( 0.00, 0.48,  0.44), ( 0.00, 0.24,  0.60)),
+        (( 0.00, 0.25,  0.42), ( 0.00, 0.04,  0.56)),
+        # Dorsal spinal crest sides
+        ((-0.20, 0.60,  0.38), (-0.32, 0.38,  0.52)),
+        (( 0.20, 0.60,  0.38), ( 0.32, 0.38,  0.52)),
+        ((-0.18, 0.38,  0.42), (-0.28, 0.18,  0.54)),
+        (( 0.18, 0.38,  0.42), ( 0.28, 0.18,  0.54)),
+        # Flank & Latissimus fringe
+        ((-0.52, 0.15,  0.10), (-0.75, 0.02,  0.14)),
+        (( 0.52, 0.15,  0.10), ( 0.75, 0.02,  0.14))
     ]
     for p1, p2 in mantle_positions:
-        # Generate triangular fur tuft
-        fur_cards.add_cylinder(p1, p2, 0.14, 0.02, segs=4)
+        fur_cards.add_cylinder(p1, p2, 0.16, 0.02, segs=6)
 
     fur_cards.save("assets/models/sasquatch_fur_cards.obj")
 
@@ -598,34 +689,34 @@ def generate_sasquatch_models():
     full.usemtl("Fur")
     # Full torso
     full.add_tapered_tube([((p[0], p[1] + 1.65, p[2]), r) for p, r in torso_spine], segs=16)
-    full.add_ellipsoid((0.0, 2.17, 0.32), (0.46, 0.28, 0.32), segs_u=12, segs_v=8)
-    full.add_ellipsoid((-0.24, 1.93, -0.32), (0.24, 0.18, 0.16), segs_u=10, segs_v=6)
-    full.add_ellipsoid(( 0.24, 1.93, -0.32), (0.24, 0.18, 0.16), segs_u=10, segs_v=6)
+    full.add_ellipsoid((0.0, 2.19, 0.34), (0.50, 0.32, 0.36), segs_u=14, segs_v=10)
+    full.add_ellipsoid((-0.26, 1.93, -0.32), (0.26, 0.20, 0.18), segs_u=12, segs_v=8)
+    full.add_ellipsoid(( 0.26, 1.93, -0.32), (0.26, 0.20, 0.18), segs_u=12, segs_v=8)
     # Head at y = 2.45
-    full.add_ellipsoid((0.0, 2.50, -0.10), (0.30, 0.28, 0.34), segs_u=14, segs_v=10)
-    full.add_tapered_tube([((p[0], p[1] + 2.45, p[2] - 0.12), r) for p, r in crest_pts], segs=8)
-    full.add_tapered_tube([((p[0], p[1] + 2.45, p[2] - 0.12), r) for p, r in muzzle_pts], segs=10)
+    full.add_ellipsoid((0.0, 2.50, -0.10), (0.32, 0.30, 0.36), segs_u=16, segs_v=12)
+    full.add_tapered_tube([((p[0], p[1] + 2.45, p[2] - 0.12), r) for p, r in crest_pts], segs=10)
+    full.add_tapered_tube([((p[0], p[1] + 2.45, p[2] - 0.12), r) for p, r in muzzle_pts], segs=12)
     # Limbs
     for side in [-1.0, 1.0]:
         # Arm: Shoulder -> Elbow -> Wrist
-        p_sh = (side * 0.68, 2.05, 0.05)
-        p_elb = (side * 0.82, 1.45, 0.08)
-        p_wr = (side * 0.86, 0.88, 0.10)
-        p_hnd = (side * 0.88, 0.68, 0.12)
-        full.add_ellipsoid(p_sh, (0.24, 0.22, 0.22), segs_u=10, segs_v=6)
-        full.add_cylinder(p_sh, p_elb, 0.22, 0.16, segs=10)
-        full.add_cylinder(p_elb, p_wr, 0.17, 0.13, segs=10)
-        full.add_box(p_hnd, (0.22, 0.16, 0.10), rot_y=0.0)
+        p_sh = (side * 0.70, 2.05, 0.05)
+        p_elb = (side * 0.84, 1.45, 0.08)
+        p_wr = (side * 0.88, 0.88, 0.10)
+        p_hnd = (side * 0.90, 0.68, 0.12)
+        full.add_ellipsoid(p_sh, (0.26, 0.24, 0.24), segs_u=12, segs_v=8)
+        full.add_cylinder(p_sh, p_elb, 0.24, 0.18, segs=12)
+        full.add_cylinder(p_elb, p_wr, 0.18, 0.14, segs=12)
+        full.add_box(p_hnd, (0.24, 0.18, 0.12), rot_y=0.0)
 
         # Leg: Hip -> Knee -> Ankle -> Foot
         p_hip = (side * 0.36, 1.25, 0.02)
         p_knee = (side * 0.38, 0.65, 0.04)
         p_ank = (side * 0.38, 0.14, 0.00)
         p_ft = (side * 0.38, 0.05, -0.10)
-        full.add_ellipsoid(p_hip, (0.25, 0.22, 0.24), segs_u=10, segs_v=6)
-        full.add_cylinder(p_hip, p_knee, 0.24, 0.18, segs=10)
-        full.add_cylinder(p_knee, p_ank, 0.18, 0.15, segs=10)
-        full.add_box(p_ft, (0.24, 0.10, 0.38), rot_y=0.0)
+        full.add_ellipsoid(p_hip, (0.27, 0.24, 0.26), segs_u=12, segs_v=8)
+        full.add_cylinder(p_hip, p_knee, 0.26, 0.19, segs=12)
+        full.add_cylinder(p_knee, p_ank, 0.19, 0.16, segs=12)
+        full.add_box(p_ft, (0.26, 0.12, 0.42), rot_y=0.0)
 
     full.save("assets/models/sasquatch_full.obj")
 
@@ -636,12 +727,18 @@ def generate_sasquatch_models():
 
 def generate_cabin():
     """
-    Upgraded Ranger Station Cabin with multi-material surfaces:
-    - Wood: Interlocking notched cedar logs, plank door, porch deck, posts, railing, steps
-    - Roof: Weathered cedar shake shingles with overhanging eaves and moss
-    - Metal: Cast-iron stovepipe chimney with rain cap, forged door hinges and latch
-    - Stone: Fieldstone foundation piers grounding the cabin to the terrain
-    - Glass: Boarded windows with interior glass reflections
+    Overhauled Ranger Station Cabin with high-fidelity architecture:
+    - Foundation: Continuous rough-hewn fieldstone masonry perimeter skirting
+    - Walls: 16 courses of interlocking saddle-notched cedar logs with rough overhangs
+    - Gables: Board-and-batten siding and horizontal logs filling gable triangles
+    - Windows: 3D timber casings, 4-pane cross mullions, boarded weathered planks, glass
+    - Door: Recessed vertical plank door with diagonal Z-brace, iron strap hinges and latch
+    - Roof: Thick dimensional 0.75m overhanging eaves, fascia barge boards, exposed
+      rafter tails, 3D stepped cedar shake shingle courses, and interlocking ridge cap
+    - Porch: Sloping timber awning roof over deck, 4 heavy 8x8 posts with 45° knee
+      brackets, X-brace balustrades, plank flooring with timber rim joists, and 3-tread steps
+    - Storytelling Props: USFS carved station sign, stacked split firewood cord under eave,
+      cast-iron stovepipe with flashing collar, guy wires, and wall lantern sconce
     """
     mesh = ObjMesh("cabin")
     cabin_w = 6.4
@@ -649,154 +746,365 @@ def generate_cabin():
     wall_h = 3.2
     half_w = cabin_w * 0.5
     half_d = cabin_d * 0.5
+    roof_peak_h = wall_h + 1.65
+    roof_overhang = 0.75
 
-    # --- 2.1 Fieldstone Foundation Piers (grounding cabin into undulating terrain) ---
+    # =========================================================================
+    # 1. FIELDSTONE MASONRY FOUNDATION & PIERS (usemtl Stone)
+    # =========================================================================
     mesh.usemtl("Stone")
-    pier_locs = [
-        (-half_w, -half_d), (0.0, -half_d), (half_w, -half_d),
-        (-half_w,  half_d), (0.0,  half_d), (half_w,  half_d),
-        (-half_w,  half_d + 1.8), (half_w,  half_d + 1.8)
-    ]
-    for px, pz in pier_locs:
-        # Masonry stone pier extending -0.4m into soil to prevent floating
-        mesh.add_box((px, -0.20, pz), (0.55, 0.45, 0.55), rot_y=0.05)
+    f_thick = 0.42
+    f_h = 0.55
+    f_y = 0.05
 
-    # --- 2.2 Interlocking Cedar Log Walls ---
+    # Continuous stone perimeter foundation under all walls
+    # Front foundation (recessed under sill log)
+    mesh.add_box((0.0, f_y, half_d), (cabin_w + 0.3, f_h, f_thick), rot_y=0.0)
+    # Back foundation
+    mesh.add_box((0.0, f_y, -half_d), (cabin_w + 0.3, f_h, f_thick), rot_y=0.0)
+    # Left foundation
+    mesh.add_box((-half_w, f_y, 0.0), (f_thick, f_h, cabin_d + 0.3), rot_y=0.0)
+    # Right foundation
+    mesh.add_box(( half_w, f_y, 0.0), (f_thick, f_h, cabin_d + 0.3), rot_y=0.0)
+
+    # Foundation piers supporting the front porch corners and steps
+    for px in [-half_w, -half_w * 0.35, half_w * 0.35, half_w]:
+        mesh.add_box((px, f_y, half_d + 2.0), (0.45, f_h, 0.45), rot_y=0.05)
+
+    # Irregular protruding masonry boulders around perimeter
+    stone_bumps = [
+        (-half_w - 0.15, 0.12, -1.2, 0.28, 0.22, 0.25),
+        (-half_w - 0.12, 0.08,  1.4, 0.32, 0.20, 0.26),
+        ( half_w + 0.14, 0.10, -0.8, 0.30, 0.24, 0.28),
+        ( half_w + 0.12, 0.09,  1.1, 0.26, 0.22, 0.24),
+        (-1.8, 0.08, -half_d - 0.12, 0.34, 0.20, 0.26),
+        ( 1.6, 0.10, -half_d - 0.14, 0.30, 0.24, 0.28)
+    ]
+    for bx, by, bz, sx, sy, sz in stone_bumps:
+        mesh.add_box((bx, by, bz), (sx, sy, sz), rot_y=0.15)
+
+    # =========================================================================
+    # 2. INTERLOCKING CEDAR LOG WALLS & TIMBER FRAMING (usemtl Wood)
+    # =========================================================================
     mesh.usemtl("Wood")
-    num_logs = 14
-    log_r = wall_h / (num_logs * 1.8)
-    overhang = 0.38
+    num_logs = 16
+    log_h_step = wall_h / num_logs
+    log_r = log_h_step * 0.58
+    overhang = 0.42
 
     for i in range(num_logs):
-        y = log_r + i * (log_r * 1.8)
+        y = log_r + i * log_h_step
 
         # Front & Back walls (running along X axis)
         if i % 2 == 0:
-            # Back wall full log
-            mesh.add_cylinder((-half_w - overhang, y, -half_d), (half_w + overhang, y, -half_d), log_r, log_r, segs=8)
+            # Back wall full continuous log
+            mesh.add_cylinder((-half_w - overhang, y, -half_d), (half_w + overhang, y, -half_d), log_r, log_r, segs=10)
             # Front wall with door opening in center (-0.75m to 0.75m)
-            if i > 9:
-                mesh.add_cylinder((-half_w - overhang, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=8)
+            if i >= 11:
+                # Header logs over the door
+                mesh.add_cylinder((-half_w - overhang, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=10)
             else:
                 mesh.add_cylinder((-half_w - overhang, y, half_d), (-0.75, y, half_d), log_r, log_r, segs=8)
                 mesh.add_cylinder((0.75, y, half_d), (half_w + overhang, y, half_d), log_r, log_r, segs=8)
 
         # Left & Right walls (running along Z axis)
         else:
-            # Window openings left and right (logs 4 to 8)
-            if 4 <= i <= 8:
+            # Window openings left and right (logs 5 to 10)
+            if 5 <= i <= 10:
                 mesh.add_cylinder((-half_w, y, -half_d - overhang), (-half_w, y, -0.65), log_r, log_r, segs=8)
                 mesh.add_cylinder((-half_w, y, 0.65), (-half_w, y, half_d + overhang), log_r, log_r, segs=8)
 
                 mesh.add_cylinder((half_w, y, -half_d - overhang), (half_w, y, -0.65), log_r, log_r, segs=8)
                 mesh.add_cylinder((half_w, y, 0.65), (half_w, y, half_d + overhang), log_r, log_r, segs=8)
             else:
-                mesh.add_cylinder((-half_w, y, -half_d - overhang), (-half_w, y, half_d + overhang), log_r, log_r, segs=8)
-                mesh.add_cylinder((half_w, y, -half_d - overhang), (half_w, y, half_d + overhang), log_r, log_r, segs=8)
+                mesh.add_cylinder((-half_w, y, -half_d - overhang), (-half_w, y, half_d + overhang), log_r, log_r, segs=10)
+                mesh.add_cylinder((half_w, y, -half_d - overhang), (half_w, y, half_d + overhang), log_r, log_r, segs=10)
 
-    # Front Door (heavy weathered vertical planks)
-    mesh.add_box((0.0, 1.15, half_d - 0.05), (1.35, 2.2, 0.08), rot_y=0.0)
+    # 2.1 Dimensional Gable Wall Ends (Board & Batten + Siding filling the peak)
+    for gz, g_norm in [(half_d, (0, 0, 1)), (-half_d, (0, 0, -1))]:
+        num_gable_planks = 10
+        for gi in range(num_gable_planks):
+            gy = wall_h + gi * (roof_peak_h - wall_h) / num_gable_planks
+            gh = (roof_peak_h - wall_h) / num_gable_planks
+            gw = half_w * (1.0 - float(gi) / num_gable_planks)
+            mesh.add_box((0.0, gy + gh * 0.5, gz), (gw * 2.0, gh * 0.95, 0.08), rot_y=0.0)
 
-    # Forged Iron Door Strap Hinges and Latch
-    mesh.usemtl("Metal")
-    mesh.add_box((-0.55, 1.85, half_d + 0.02), (0.45, 0.08, 0.02), rot_y=0.0)
-    mesh.add_box((-0.55, 0.45, half_d + 0.02), (0.45, 0.08, 0.02), rot_y=0.0)
-    mesh.add_box(( 0.48, 1.15, half_d + 0.03), (0.10, 0.18, 0.04), rot_y=0.0)
+    # 2.2 Heavy Timber Door Frame & Plank Door
+    # Casing header and jambs
+    mesh.add_box((-0.78, 1.15, half_d + 0.04), (0.12, 2.30, 0.12), rot_y=0.0)
+    mesh.add_box(( 0.78, 1.15, half_d + 0.04), (0.12, 2.30, 0.12), rot_y=0.0)
+    mesh.add_box(( 0.00, 2.30, half_d + 0.04), (1.68, 0.14, 0.12), rot_y=0.0)
+    # Recessed vertical plank door
+    mesh.add_box((0.0, 1.12, half_d - 0.02), (1.42, 2.22, 0.06), rot_y=0.0)
+    # Diagonal Z-brace battens on door
+    mesh.add_box((0.0, 1.85, half_d + 0.02), (1.30, 0.12, 0.03), rot_y=0.0)
+    mesh.add_box((0.0, 0.38, half_d + 0.02), (1.30, 0.12, 0.03), rot_y=0.0)
+    mesh.add_cylinder((-0.55, 0.38, half_d + 0.02), (0.55, 1.85, half_d + 0.02), 0.04, 0.04, segs=6)
 
-    # Windows: Boarded wood planks + interior glass pane
+    # 2.3 3D Window Frames, 4-Pane Mullions & Barricade Planks
     for wx in [-half_w, half_w]:
-        mesh.usemtl("Glass")
-        mesh.add_box((wx, 1.8, 0.0), (0.02, 1.0, 1.0), rot_y=0.0)
-        
-        mesh.usemtl("Wood")
-        # Sill and casing
-        mesh.add_box((wx + (0.06 if wx > 0 else -0.06), 1.25, 0.0), (0.12, 0.08, 1.25), rot_y=0.0)
-        # Weathered protective barricade planks
-        mesh.add_box((wx + (0.06 if wx > 0 else -0.06), 1.95, 0.0), (0.04, 0.18, 1.25), rot_y=0.0)
-        mesh.add_box((wx + (0.06 if wx > 0 else -0.06), 1.65, 0.0), (0.04, 0.18, 1.25), rot_y=0.0)
+        w_dir = 1.0 if wx > 0 else -1.0
+        # Casing header, sill, and side jambs
+        mesh.add_box((wx + w_dir * 0.04, 1.25, 0.0), (0.10, 0.08, 1.45), rot_y=0.0) # Sill
+        mesh.add_box((wx + w_dir * 0.04, 2.25, 0.0), (0.10, 0.08, 1.45), rot_y=0.0) # Header
+        mesh.add_box((wx + w_dir * 0.04, 1.75, -0.68), (0.10, 1.05, 0.08), rot_y=0.0) # Jamb
+        mesh.add_box((wx + w_dir * 0.04, 1.75,  0.68), (0.10, 1.05, 0.08), rot_y=0.0) # Jamb
+        # 4-pane cross-mullion grid
+        mesh.add_box((wx + w_dir * 0.01, 1.75, 0.0), (0.04, 0.04, 1.28), rot_y=0.0) # Horizontal
+        mesh.add_box((wx + w_dir * 0.01, 1.75, 0.0), (0.04, 0.92, 0.04), rot_y=0.0) # Vertical
+        # Weathered protective barricade planks nailed at angles
+        mesh.add_box((wx + w_dir * 0.08, 1.95, 0.0), (0.04, 0.18, 1.40), rot_y=0.04 * w_dir)
+        mesh.add_box((wx + w_dir * 0.08, 1.55, 0.0), (0.04, 0.18, 1.40), rot_y=-0.05 * w_dir)
 
-    # --- 2.3 Pitched Cedar Shake Shingle Roof ---
-    roof_peak_h = wall_h + 1.55
-    roof_overhang = 0.60
-    r_half_w = half_w + roof_overhang
-    r_half_d = half_d + roof_overhang
-
-    mesh.usemtl("Roof")
-    # Left roof slope
-    v_rl1 = mesh.add_v(-r_half_w, wall_h - 0.1,  r_half_d)
-    v_rl2 = mesh.add_v(-r_half_w, wall_h - 0.1, -r_half_d)
-    v_rl3 = mesh.add_v(0.0, roof_peak_h, -r_half_d)
-    v_rl4 = mesh.add_v(0.0, roof_peak_h,  r_half_d)
-    n_rl = mesh.add_vn(-0.7, 0.7, 0.0)
-    vt_r = [mesh.add_vt(0, 0), mesh.add_vt(4, 0), mesh.add_vt(4, 4), mesh.add_vt(0, 4)]
-    mesh.add_face([v_rl1, v_rl2, v_rl3, v_rl4], [n_rl]*4, vt_r)
-
-    # Right roof slope
-    v_rr1 = mesh.add_v(0.0, roof_peak_h,  r_half_d)
-    v_rr2 = mesh.add_v(0.0, roof_peak_h, -r_half_d)
-    v_rr3 = mesh.add_v(r_half_w, wall_h - 0.1, -r_half_d)
-    v_rr4 = mesh.add_v(r_half_w, wall_h - 0.1,  r_half_d)
-    n_rr = mesh.add_vn(0.7, 0.7, 0.0)
-    mesh.add_face([v_rr1, v_rr2, v_rr3, v_rr4], [n_rr]*4, vt_r)
-
-    # Roof ridge cap beam
-    mesh.usemtl("Wood")
-    mesh.add_cylinder((0.0, roof_peak_h + 0.05, -r_half_d), (0.0, roof_peak_h + 0.05, r_half_d), 0.10, 0.10, segs=8)
-
-    # Front Gable triangle
-    vg_l = mesh.add_v(-half_w, wall_h, half_d)
-    vg_r = mesh.add_v(half_w, wall_h, half_d)
-    vg_p = mesh.add_v(0.0, roof_peak_h - 0.05, half_d)
-    ng_f = mesh.add_vn(0.0, 0.0, 1.0)
-    mesh.add_face([vg_l, vg_r, vg_p], [ng_f]*3, [vt_r[0], vt_r[1], vt_r[2]])
-
-    # Back Gable triangle
-    vgb_l = mesh.add_v(half_w, wall_h, -half_d)
-    vgb_r = mesh.add_v(-half_w, wall_h, -half_d)
-    vgb_p = mesh.add_v(0.0, roof_peak_h - 0.05, -half_d)
-    ng_b = mesh.add_vn(0.0, 0.0, -1.0)
-    mesh.add_face([vgb_l, vgb_r, vgb_p], [ng_b]*3, [vt_r[0], vt_r[1], vt_r[2]])
-
-    # --- 2.4 Cast-Iron Woodstove Stovepipe Chimney ---
-    mesh.usemtl("Metal")
-    chim_base = (-1.8, roof_peak_h - 0.5, -0.6)
-    chim_top = (-1.8, roof_peak_h + 1.1, -0.6)
-    mesh.add_cylinder(chim_base, chim_top, 0.12, 0.12, segs=10)
-    # Chimney rain cap
-    mesh.add_cylinder(chim_top, (chim_top[0], chim_top[1] + 0.12, chim_top[2]), 0.22, 0.08, segs=8)
-
-    # --- 2.5 Raised Front Porch Deck, Railings, and Steps ---
-    mesh.usemtl("Wood")
+    # 2.4 Front Porch Deck, Framing, Posts, Railings, and Steps
     porch_d = 2.0
     porch_h = 0.38
     porch_z_front = half_d + porch_d
-    # Floor deck planks
-    mesh.add_box((0.0, porch_h - 0.05, half_d + porch_d * 0.5), (cabin_w + 0.4, 0.10, porch_d), rot_y=0.0)
 
-    # Porch Roof overhang and Support Posts
-    porch_post_r = 0.09
-    for px in [-half_w, half_w]:
-        # Vertical post
-        mesh.add_cylinder((px, 0.0, porch_z_front), (px, wall_h - 0.1, porch_z_front), porch_post_r, porch_post_r, segs=8)
-        # Top header beam
-        mesh.add_cylinder((px, wall_h - 0.1, half_d), (px, wall_h - 0.1, porch_z_front), porch_post_r, porch_post_r, segs=8)
+    # Rim joists and underside timber framing
+    mesh.add_box((0.0, porch_h * 0.5, porch_z_front), (cabin_w + 0.4, porch_h, 0.12), rot_y=0.0)
+    mesh.add_box((-half_w - 0.2, porch_h * 0.5, half_d + porch_d * 0.5), (0.12, porch_h, porch_d), rot_y=0.0)
+    mesh.add_box(( half_w + 0.2, porch_h * 0.5, half_d + porch_d * 0.5), (0.12, porch_h, porch_d), rot_y=0.0)
 
-    mesh.add_cylinder((-half_w, wall_h - 0.1, porch_z_front), (half_w, wall_h - 0.1, porch_z_front), porch_post_r, porch_post_r, segs=8)
+    # 18 individual floor planks running across the deck
+    num_deck_planks = 18
+    plank_d = porch_d / num_deck_planks
+    for di in range(num_deck_planks):
+        pz = half_d + (di + 0.5) * plank_d
+        mesh.add_box((0.0, porch_h - 0.02, pz), (cabin_w + 0.38, 0.04, plank_d * 0.92), rot_y=0.0)
 
-    # Porch Railings and balusters
-    mesh.add_box((-half_w, porch_h + 0.50, half_d + porch_d*0.5), (0.08, 0.06, porch_d), rot_y=0.0)
-    mesh.add_box(( half_w, porch_h + 0.50, half_d + porch_d*0.5), (0.08, 0.06, porch_d), rot_y=0.0)
-    mesh.add_box((-half_w * 0.65, porch_h + 0.50, porch_z_front), (half_w * 0.65, 0.06, 0.08), rot_y=0.0)
-    mesh.add_box(( half_w * 0.65, porch_h + 0.50, porch_z_front), (half_w * 0.65, 0.06, 0.08), rot_y=0.0)
+    # Heavy 8x8 Square Timber Posts (4 posts)
+    post_size = 0.18
+    posts_x = [-half_w, -1.25, 1.25, half_w]
+    for px in posts_x:
+        # Vertical post extending from foundation up to porch roof header at Y = 2.65
+        mesh.add_box((px, 1.35, porch_z_front), (post_size, 2.60, post_size), rot_y=0.0)
+        # 45-degree diagonal knee braces (timber gallows brackets)
+        brace_dir = 1.0 if px < 0 else -1.0
+        if abs(px) > 1.5:
+            # Outer corner post brackets
+            mesh.add_cylinder((px, 2.10, porch_z_front), (px + brace_dir * 0.55, 2.60, porch_z_front), 0.05, 0.05, segs=6)
+            mesh.add_cylinder((px, 2.10, porch_z_front), (px, 2.60, porch_z_front - 0.55), 0.05, 0.05, segs=6)
 
-    # Front Wooden Steps
-    mesh.add_box((0.0, porch_h * 0.66, porch_z_front + 0.28), (1.6, 0.14, 0.48), rot_y=0.0)
-    mesh.add_box((0.0, porch_h * 0.33, porch_z_front + 0.65), (1.6, 0.14, 0.48), rot_y=0.0)
+    # Top Porch Header Beams
+    mesh.add_box((0.0, 2.65, porch_z_front), (cabin_w + 0.4, 0.20, 0.18), rot_y=0.0)
+    # Side beams back to cabin wall
+    mesh.add_box((-half_w, 2.65, half_d + porch_d * 0.5), (0.18, 0.20, porch_d), rot_y=0.0)
+    mesh.add_box(( half_w, 2.65, half_d + porch_d * 0.5), (0.18, 0.20, porch_d), rot_y=0.0)
 
-    # Wall Lantern Housing enclosing PorchLight at (0, 3.0, 3.4)
+    # Rustic X-Brace Porch Balustrade Railings
+    rail_top_y = porch_h + 0.72
+    rail_bot_y = porch_h + 0.12
+    # Left side railing
+    mesh.add_box((-half_w, rail_top_y, half_d + porch_d * 0.5), (0.10, 0.08, porch_d), rot_y=0.0)
+    mesh.add_box((-half_w, rail_bot_y, half_d + porch_d * 0.5), (0.10, 0.08, porch_d), rot_y=0.0)
+    mesh.add_cylinder((-half_w, rail_bot_y, half_d + 0.1), (-half_w, rail_top_y, porch_z_front - 0.1), 0.04, 0.04, segs=6)
+    mesh.add_cylinder((-half_w, rail_top_y, half_d + 0.1), (-half_w, rail_bot_y, porch_z_front - 0.1), 0.04, 0.04, segs=6)
+
+    # Right side railing
+    mesh.add_box(( half_w, rail_top_y, half_d + porch_d * 0.5), (0.10, 0.08, porch_d), rot_y=0.0)
+    mesh.add_box(( half_w, rail_bot_y, half_d + porch_d * 0.5), (0.10, 0.08, porch_d), rot_y=0.0)
+    mesh.add_cylinder(( half_w, rail_bot_y, half_d + 0.1), ( half_w, rail_top_y, porch_z_front - 0.1), 0.04, 0.04, segs=6)
+    mesh.add_cylinder(( half_w, rail_top_y, half_d + 0.1), ( half_w, rail_bot_y, porch_z_front - 0.1), 0.04, 0.04, segs=6)
+
+    # Front Railing Left of entry (-3.2 to -1.25)
+    r_mid_l = (-half_w + (-1.25 - (-half_w)) * 0.5)
+    r_len_l = abs(-1.25 - (-half_w))
+    mesh.add_box((r_mid_l, rail_top_y, porch_z_front), (r_len_l, 0.08, 0.10), rot_y=0.0)
+    mesh.add_box((r_mid_l, rail_bot_y, porch_z_front), (r_len_l, 0.08, 0.10), rot_y=0.0)
+    mesh.add_cylinder((-half_w + 0.1, rail_bot_y, porch_z_front), (-1.25 - 0.1, rail_top_y, porch_z_front), 0.04, 0.04, segs=6)
+    mesh.add_cylinder((-half_w + 0.1, rail_top_y, porch_z_front), (-1.25 - 0.1, rail_bot_y, porch_z_front), 0.04, 0.04, segs=6)
+
+    # Front Railing Right of entry (1.25 to 3.2)
+    r_mid_r = (1.25 + (half_w - 1.25) * 0.5)
+    r_len_r = abs(half_w - 1.25)
+    mesh.add_box((r_mid_r, rail_top_y, porch_z_front), (r_len_r, 0.08, 0.10), rot_y=0.0)
+    mesh.add_box((r_mid_r, rail_bot_y, porch_z_front), (r_len_r, 0.08, 0.10), rot_y=0.0)
+    mesh.add_cylinder((1.25 + 0.1, rail_bot_y, porch_z_front), (half_w - 0.1, rail_top_y, porch_z_front), 0.04, 0.04, segs=6)
+    mesh.add_cylinder((1.25 + 0.1, rail_top_y, porch_z_front), (half_w - 0.1, rail_bot_y, porch_z_front), 0.04, 0.04, segs=6)
+
+    # Sturdy 3-Tread Wooden Steps (centered at doorway)
+    step_w = 2.1
+    mesh.add_box((0.0, porch_h * 0.75, porch_z_front + 0.25), (step_w, 0.12, 0.45), rot_y=0.0)
+    mesh.add_box((0.0, porch_h * 0.50, porch_z_front + 0.58), (step_w, 0.12, 0.45), rot_y=0.0)
+    mesh.add_box((0.0, porch_h * 0.25, porch_z_front + 0.90), (step_w, 0.12, 0.45), rot_y=0.0)
+    # Side timber stringers
+    mesh.add_cylinder((-step_w * 0.5, porch_h, porch_z_front), (-step_w * 0.5, 0.05, porch_z_front + 1.1), 0.08, 0.08, segs=6)
+    mesh.add_cylinder(( step_w * 0.5, porch_h, porch_z_front), ( step_w * 0.5, 0.05, porch_z_front + 1.1), 0.08, 0.08, segs=6)
+
+    # 2.5 Exposed Roof Rafter Tails (8 per side) & Ridge Beam
+    mesh.add_cylinder((0.0, roof_peak_h + 0.05, -half_d - roof_overhang - 0.25),
+                      (0.0, roof_peak_h + 0.05,  half_d + roof_overhang + 0.25), 0.14, 0.14, segs=10)
+
+    for side_x in [-1.0, 1.0]:
+        eave_x = side_x * (half_w + roof_overhang)
+        for ri in range(8):
+            rz = -half_d - 0.2 + ri * (cabin_d + 0.4) / 7.0
+            # Square rafter tail projecting out under eave
+            mesh.add_box((eave_x - side_x * 0.15, wall_h - 0.08, rz), (0.35, 0.10, 0.10), rot_y=0.0)
+
+    # 2.6 Carved USFS Ranger Station Sign (mounted above porch header)
+    mesh.add_box((0.0, 2.95, porch_z_front + 0.08), (1.95, 0.42, 0.06), rot_y=0.0)
+    # Sign mounting brackets
+    mesh.add_cylinder((-0.75, 2.75, porch_z_front + 0.02), (-0.75, 2.95, porch_z_front + 0.08), 0.02, 0.02, segs=4)
+    mesh.add_cylinder(( 0.75, 2.75, porch_z_front + 0.02), ( 0.75, 2.95, porch_z_front + 0.08), 0.02, 0.02, segs=4)
+
+    # 2.7 Split Firewood Cord Stacked Under Side Eave
+    for f_layer in range(4):
+        fy = 0.12 + f_layer * 0.22
+        for f_col in range(6):
+            fz = -1.6 + f_col * 0.24
+            mesh.add_cylinder((-half_w - 0.15, fy, fz), (-half_w - 0.55, fy, fz), 0.08, 0.08, segs=6)
+
+    # =========================================================================
+    # 3. DIMENSIONAL CEDAR SHAKE SHINGLE ROOF & AWNING (usemtl Roof)
+    # =========================================================================
+    mesh.usemtl("Roof")
+    r_w = half_w + roof_overhang
+    r_d = half_d + roof_overhang
+    roof_thick = 0.12
+
+    # 3.1 Main Roof Slopes (Left and Right) with Thick Eaves and Fascia
+    # Left slope (top deck and bottom soffit)
+    mesh.add_quad(
+        (-r_w, wall_h - 0.08,  r_d),
+        (-r_w, wall_h - 0.08, -r_d),
+        ( 0.0, roof_peak_h + 0.02, -r_d),
+        ( 0.0, roof_peak_h + 0.02,  r_d)
+    )
+    # Left underside soffit
+    mesh.add_quad(
+        ( 0.0, roof_peak_h + 0.02 - roof_thick,  r_d),
+        ( 0.0, roof_peak_h + 0.02 - roof_thick, -r_d),
+        (-r_w, wall_h - 0.08 - roof_thick, -r_d),
+        (-r_w, wall_h - 0.08 - roof_thick,  r_d)
+    )
+    # Left eave fascia board
+    mesh.add_quad(
+        (-r_w, wall_h - 0.08, -r_d),
+        (-r_w, wall_h - 0.08,  r_d),
+        (-r_w, wall_h - 0.08 - roof_thick,  r_d),
+        (-r_w, wall_h - 0.08 - roof_thick, -r_d)
+    )
+
+    # Right slope (top deck and bottom soffit)
+    mesh.add_quad(
+        ( 0.0, roof_peak_h + 0.02,  r_d),
+        ( 0.0, roof_peak_h + 0.02, -r_d),
+        ( r_w, wall_h - 0.08, -r_d),
+        ( r_w, wall_h - 0.08,  r_d)
+    )
+    # Right underside soffit
+    mesh.add_quad(
+        ( r_w, wall_h - 0.08 - roof_thick,  r_d),
+        ( r_w, wall_h - 0.08 - roof_thick, -r_d),
+        ( 0.0, roof_peak_h + 0.02 - roof_thick, -r_d),
+        ( 0.0, roof_peak_h + 0.02 - roof_thick,  r_d)
+    )
+    # Right eave fascia board
+    mesh.add_quad(
+        ( r_w, wall_h - 0.08,  r_d),
+        ( r_w, wall_h - 0.08, -r_d),
+        ( r_w, wall_h - 0.08 - roof_thick, -r_d),
+        ( r_w, wall_h - 0.08 - roof_thick,  r_d)
+    )
+
+    # Gable Barge Boards / Fascia Trim (Front and Back)
+    for fz in [r_d, -r_d]:
+        mesh.add_quad(
+            (-r_w, wall_h - 0.08, fz),
+            ( 0.0, roof_peak_h + 0.02, fz),
+            ( 0.0, roof_peak_h + 0.02 - roof_thick, fz),
+            (-r_w, wall_h - 0.08 - roof_thick, fz)
+        )
+        mesh.add_quad(
+            ( 0.0, roof_peak_h + 0.02, fz),
+            ( r_w, wall_h - 0.08, fz),
+            ( r_w, wall_h - 0.08 - roof_thick, fz),
+            ( 0.0, roof_peak_h + 0.02 - roof_thick, fz)
+        )
+
+    # Dimensional Stepped Cedar Shingle Courses (6 relief courses per slope)
+    for c_idx in range(6):
+        frac1 = float(c_idx) / 6.0
+        frac2 = float(c_idx + 1) / 6.0
+        # Left slope stepped courses
+        x1 = -r_w + frac1 * r_w
+        x2 = -r_w + frac2 * r_w
+        y1 = (wall_h - 0.08) + frac1 * (roof_peak_h - wall_h + 0.1) + 0.02
+        y2 = (wall_h - 0.08) + frac2 * (roof_peak_h - wall_h + 0.1) + 0.02
+        mesh.add_box(((x1 + x2) * 0.5, (y1 + y2) * 0.5, 0.0), (abs(x2 - x1), 0.04, r_d * 2.02), rot_y=0.0)
+
+        # Right slope stepped courses
+        rx1 = r_w - frac1 * r_w
+        rx2 = r_w - frac2 * r_w
+        mesh.add_box(((rx1 + rx2) * 0.5, (y1 + y2) * 0.5, 0.0), (abs(rx2 - rx1), 0.04, r_d * 2.02), rot_y=0.0)
+
+    # 3.2 Timber Porch Roof Awning (Shed Roof extending over porch deck)
+    porch_roof_z_front = porch_z_front + 0.25
+    mesh.add_quad(
+        (-r_w * 0.95, 3.25, half_d - 0.1),
+        ( r_w * 0.95, 3.25, half_d - 0.1),
+        ( r_w * 0.95, 2.65, porch_roof_z_front),
+        (-r_w * 0.95, 2.65, porch_roof_z_front)
+    )
+    # Porch awning fascia front edge
+    mesh.add_quad(
+        (-r_w * 0.95, 2.65, porch_roof_z_front),
+        ( r_w * 0.95, 2.65, porch_roof_z_front),
+        ( r_w * 0.95, 2.55, porch_roof_z_front),
+        (-r_w * 0.95, 2.55, porch_roof_z_front)
+    )
+
+    # =========================================================================
+    # 4. CAST-IRON CHIMNEY, HARDWARE & LANTERN SCONCE (usemtl Metal)
+    # =========================================================================
     mesh.usemtl("Metal")
-    mesh.add_cylinder((0.0, 2.7, half_d + 0.05), (0.0, 2.9, half_d + 0.35), 0.03, 0.03, segs=6)
-    mesh.add_box((0.0, 3.0, half_d + 0.35), (0.22, 0.32, 0.22), rot_y=0.0)
+
+    # 4.1 Cast-Iron Woodstove Stovepipe Chimney
+    chim_x = -1.8
+    chim_z = -0.6
+    chim_base_y = roof_peak_h - 0.4
+    chim_top_y = roof_peak_h + 1.25
+
+    # Flashing collar plate at roof penetration
+    mesh.add_box((chim_x, chim_base_y + 0.08, chim_z), (0.42, 0.08, 0.42), rot_y=0.0)
+    # Stovepipe flanged cylinder
+    mesh.add_cylinder((chim_x, chim_base_y, chim_z), (chim_x, chim_top_y, chim_z), 0.13, 0.13, segs=12)
+    # Clamp ring flange
+    mesh.add_cylinder((chim_x, chim_base_y + 0.8, chim_z), (chim_x, chim_base_y + 0.86, chim_z), 0.15, 0.15, segs=10)
+    # Chimney rain cap & spark arrestor hood
+    mesh.add_cylinder((chim_x, chim_top_y, chim_z), (chim_x, chim_top_y + 0.14, chim_z), 0.24, 0.06, segs=10)
+    # Chimney support struts to cap
+    mesh.add_cylinder((chim_x - 0.10, chim_top_y - 0.05, chim_z), (chim_x - 0.10, chim_top_y + 0.05, chim_z), 0.015, 0.015, segs=4)
+    mesh.add_cylinder((chim_x + 0.10, chim_top_y - 0.05, chim_z), (chim_x + 0.10, chim_top_y + 0.05, chim_z), 0.015, 0.015, segs=4)
+
+    # 3 Steel Guy Wires anchoring chimney to roof deck
+    gw_top = (chim_x, chim_top_y - 0.15, chim_z)
+    mesh.add_cylinder(gw_top, (chim_x - 1.1, chim_base_y - 0.2, chim_z - 0.8), 0.008, 0.008, segs=4)
+    mesh.add_cylinder(gw_top, (chim_x - 0.9, chim_base_y - 0.2, chim_z + 0.8), 0.008, 0.008, segs=4)
+    mesh.add_cylinder(gw_top, (chim_x + 0.8, chim_base_y - 0.1, chim_z), 0.008, 0.008, segs=4)
+
+    # 4.2 Forged Iron Door Strap Hinges and Heavy Latch
+    mesh.add_box((-0.55, 1.85, half_d + 0.03), (0.48, 0.08, 0.02), rot_y=0.0)
+    mesh.add_box((-0.55, 0.45, half_d + 0.03), (0.48, 0.08, 0.02), rot_y=0.0)
+    # Hinge pin barrels
+    mesh.add_cylinder((-0.74, 1.78, half_d + 0.04), (-0.74, 1.92, half_d + 0.04), 0.025, 0.025, segs=6)
+    mesh.add_cylinder((-0.74, 0.38, half_d + 0.04), (-0.74, 0.52, half_d + 0.04), 0.025, 0.025, segs=6)
+    # Latch bar and strike plate
+    mesh.add_box((0.48, 1.15, half_d + 0.04), (0.12, 0.22, 0.04), rot_y=0.0)
+    mesh.add_cylinder((0.48, 1.08, half_d + 0.05), (0.48, 1.02, half_d + 0.05), 0.02, 0.02, segs=4)
+
+    # 4.3 Wall Lantern Housing & Arm Sconce (enclosing PorchLight at (0, 3.0, 3.4))
+    mesh.add_cylinder((0.0, 2.75, half_d + 0.05), (0.0, 2.95, half_d + 0.38), 0.03, 0.03, segs=6)
+    mesh.add_box((0.0, 3.0, half_d + 0.38), (0.24, 0.34, 0.24), rot_y=0.0)
+
+    # =========================================================================
+    # 5. WINDOW GLASS PANES (usemtl Glass)
+    # =========================================================================
+    mesh.usemtl("Glass")
+    for wx in [-half_w, half_w]:
+        mesh.add_box((wx, 1.75, 0.0), (0.02, 0.94, 1.30), rot_y=0.0)
 
     mesh.save("assets/models/cabin.obj", mat_order=["Wood", "Roof", "Metal", "Stone", "Glass"])
 
@@ -949,153 +1257,363 @@ def generate_camp_props():
 
 def generate_elk_carcass():
     """
-    Overhauled Anatomical Mutilated Cervid Carcass:
-    - 16-segment curved spinal column with dorsal processes
-    - Cervid skull with branching multi-tine antlers and velvet strips
-    - Shattered thoracic ribcage with fractured ribs pried open outward
-    - Fractured long bones with hollow marrow cavities
-    - Clinging visceral muscle sinew and torn viscera
+    Overhauled Anatomical Mutilated Cervid Carcass (700lb Bull Elk):
+    - Full anatomical animal body mass collapsed on its flank
+    - Dark brown shaggy elk pelt/hide draped over haunches, neck, and shoulders
+    - Torn hide flaps peeled back with jagged ripped margins
+    - Shredded dark red muscle walls, sinew, and intercostal muscle
+    - Catastrophic skeletal trauma: 16-segment dislocated spine, pried-apart
+      thoracic ribcage with shattered compound fractures and exposed bone marrow
+    - Massive 6-point branching antlers with velvet peels, skull, and mandible
+    - Spilled viscera: looping tubular intestines and torn thoracic organs
+    - Cloven hooves, compound fractured foreleg, and sprawling hindquarters
     """
     mesh = ObjMesh("elk_carcass")
+
+    # =========================================================================
+    # 1. ELK PELT & ANATOMICAL BODY MASS (usemtl Pelt)
+    # =========================================================================
+    mesh.usemtl("Pelt")
+
+    # 1.1 Massive Collapsed Torso & Haunches
+    # Heavy rear haunch (pelvis & rump)
+    mesh.add_ellipsoid((0.75, 0.28, 0.05), (0.50, 0.32, 0.40), segs_u=14, segs_v=10, rot_y=-0.1)
+    # Flank / abdomen belly mass (lower portion resting on ground)
+    mesh.add_ellipsoid((0.10, 0.22, 0.02), (0.54, 0.26, 0.42), segs_u=14, segs_v=10, rot_y=0.05)
+    # Heavy front shoulder girdle & withers
+    mesh.add_ellipsoid((-0.55, 0.32, 0.08), (0.50, 0.34, 0.38), segs_u=14, segs_v=10, rot_y=0.15)
+
+    # 1.2 Muscular Cervid Neck & Mane
+    # Thick neck tube sweeping forward and twisting slightly toward the ground
+    neck_pts = [
+        ((-0.55, 0.32, 0.08), (0.28, 0.24)),
+        ((-0.80, 0.28, 0.12), (0.26, 0.22)),
+        ((-1.05, 0.24, 0.16), (0.23, 0.20)),
+        ((-1.32, 0.18, 0.20), (0.20, 0.16))   # Base of skull
+    ]
+    mesh.add_tapered_tube(neck_pts, segs=12, u_scale=2.0, v_scale=2.0)
+
+    # Shaggy dorsal neck mane fur ridges
+    for mx, my, mz in [(-0.65, 0.44, 0.08), (-0.85, 0.40, 0.12), (-1.05, 0.35, 0.15)]:
+        mesh.add_ellipsoid((mx, my, mz), (0.14, 0.09, 0.12), segs_u=8, segs_v=6)
+
+    # 1.3 Elk Head (Furred Skull Cap, Snout, Muzzle, Ears)
+    # Cranium (furred braincase)
+    mesh.add_ellipsoid((-1.36, 0.22, 0.20), (0.20, 0.15, 0.17), segs_u=12, segs_v=8, rot_y=0.2)
+    # Long cervid muzzle & bridge
+    muzzle_pts = [
+        ((-1.36, 0.20, 0.20), 0.14),
+        ((-1.55, 0.16, 0.22), 0.11),
+        ((-1.75, 0.12, 0.24), 0.075)  # Black leathery nose pad
+    ]
+    mesh.add_tapered_tube(muzzle_pts, segs=10)
+    # Black nose pad
+    mesh.add_ellipsoid((-1.76, 0.12, 0.24), (0.05, 0.04, 0.06), segs_u=8, segs_v=6)
+
+    # Pinned back cervid ears (lying flat against the furred neck)
+    # Left ear
+    ear_l = [((-1.28, 0.30, 0.12), 0.06), ((-1.18, 0.32, 0.08), 0.04), ((-1.08, 0.33, 0.05), 0.015)]
+    mesh.add_tapered_tube(ear_l, segs=6)
+    # Right ear
+    ear_r = [((-1.32, 0.28, 0.28), 0.06), ((-1.22, 0.29, 0.32), 0.04), ((-1.12, 0.30, 0.35), 0.015)]
+    mesh.add_tapered_tube(ear_r, segs=6)
+
+    # 1.4 Limbs & Cloven Hooves
+    # Left Hind Leg: Sprawled backward askew
+    mesh.add_cylinder((0.85, 0.24, 0.20), (1.25, 0.20, 0.38), 0.16, 0.11, segs=8)  # Thigh
+    mesh.add_cylinder((1.25, 0.20, 0.38), (1.60, 0.10, 0.52), 0.11, 0.07, segs=8)  # Cannon bone / hock
+    # Cloven dark hoof
+    mesh.add_box((1.68, 0.05, 0.56), (0.13, 0.08, 0.09), rot_y=-0.35)
+
+    # Left Foreleg: Compound fracture - torn upper limb and dangling broken shaft
+    mesh.add_cylinder((-0.55, 0.28, -0.18), (-0.85, 0.22, -0.42), 0.14, 0.09, segs=8) # Upper arm
+    mesh.add_cylinder((-0.88, 0.16, -0.48), (-1.18, 0.08, -0.68), 0.08, 0.05, segs=6) # Broken dangling forearm
+    mesh.add_box((-1.24, 0.04, -0.74), (0.12, 0.07, 0.08), rot_y=0.45) # Hoof
+
+    # 1.5 Torn Hide Flaps & Shredded Skin Borders (folded back to expose raw muscle)
+    hide_flaps = [
+        # (p1, p2, p3, p4) peeled back skin tags
+        ((-0.45, 0.36, -0.05), (-0.35, 0.38, -0.15), (-0.25, 0.22, -0.22), (-0.35, 0.20, -0.10)),
+        ((-0.20, 0.38, -0.08), (-0.05, 0.40, -0.18), ( 0.05, 0.24, -0.25), (-0.10, 0.22, -0.12)),
+        (( 0.10, 0.36, -0.05), ( 0.25, 0.38, -0.15), ( 0.35, 0.20, -0.22), ( 0.20, 0.18, -0.10)),
+        (( 0.40, 0.34, -0.02), ( 0.55, 0.35, -0.12), ( 0.62, 0.18, -0.18), ( 0.48, 0.16, -0.06)),
+        # Flaps on abdominal/haunch side
+        ((-0.30, 0.35, 0.18), (-0.20, 0.36, 0.32), (-0.15, 0.18, 0.38), (-0.25, 0.16, 0.24)),
+        (( 0.05, 0.33, 0.16), ( 0.18, 0.34, 0.30), ( 0.25, 0.16, 0.36), ( 0.12, 0.15, 0.22))
+    ]
+    for p1, p2, p3, p4 in hide_flaps:
+        mesh.add_quad(p1, p2, p3, p4)
+
+    # =========================================================================
+    # 2. RAW FLESH, STRIATED MUSCLE & SINEW (usemtl Flesh)
+    # =========================================================================
+    mesh.usemtl("Flesh")
+
+    # 2.1 Internal Raw Muscle Lining of Torn Cavity
+    # Deep red intercostal and abdominal muscle walls
+    mesh.add_ellipsoid((-0.05, 0.18, -0.02), (0.62, 0.18, 0.32), segs_u=12, segs_v=8)
+    mesh.add_ellipsoid((-0.45, 0.24, -0.05), (0.35, 0.16, 0.25), segs_u=10, segs_v=6)
+    mesh.add_ellipsoid(( 0.42, 0.22,  0.00), (0.38, 0.18, 0.28), segs_u=10, segs_v=6)
+
+    # Torn visceral thoracic organ masses (collapsed lung tissue & dark liver lobe)
+    mesh.add_ellipsoid((-0.25, 0.16, -0.04), (0.24, 0.12, 0.18), segs_u=10, segs_v=6)
+    mesh.add_ellipsoid(( 0.15, 0.14, -0.06), (0.22, 0.11, 0.16), segs_u=10, segs_v=6)
+
+    # 2.2 Shredded Muscle Tendons & Hanging Sinew Strands
+    sinew_strands = [
+        ((-0.42, 0.32, -0.18), (-0.46, 0.10, -0.28), 0.022, 0.006),
+        ((-0.22, 0.36, -0.22), (-0.20, 0.08, -0.35), 0.020, 0.005),
+        (( 0.02, 0.34, -0.24), ( 0.06, 0.06, -0.38), 0.024, 0.007),
+        (( 0.24, 0.30, -0.20), ( 0.30, 0.08, -0.32), 0.018, 0.005),
+        ((-0.72, 0.26, -0.32), (-0.82, 0.06, -0.42), 0.025, 0.008),
+        (( 0.65, 0.26,  0.15), ( 0.85, 0.05,  0.28), 0.022, 0.007)
+    ]
+    for sp1, sp2, sr1, sr2 in sinew_strands:
+        mesh.add_cylinder(sp1, sp2, sr1, sr2, segs=6)
+
+    # =========================================================================
+    # 3. SKELETON, PRIED RIBCAGE & ANTLERS (usemtl Bone)
+    # =========================================================================
     mesh.usemtl("Bone")
-    
-    # 1. Cervid Skull & Mandible
-    # Cranium (braincase)
-    mesh.add_box((-1.35, 0.22, 0.1), (0.32, 0.24, 0.28), rot_y=0.2)
-    # Nasal bridge and muzzle
-    mesh.add_cylinder((-1.35, 0.22, 0.1), (-1.82, 0.11, 0.18), 0.14, 0.06, segs=8)
-    # Lower mandible laying askew in the gore
-    mesh.add_cylinder((-1.32, 0.09, 0.14), (-1.76, 0.04, 0.22), 0.08, 0.03, segs=6)
 
-    # 2. Curved 3D Branched Antlers with Velvet Peeling
+    # 3.1 16-Segment Curved Spine with Catastrophic Traumatic Dislocation
+    spine_x = [-1.25, -1.10, -0.95, -0.80, -0.65, -0.50, -0.35, -0.20, -0.05, 0.10, 0.25, 0.40, 0.55, 0.70, 0.85, 1.00]
+    spine_pts = []
+    for idx, sx in enumerate(spine_x):
+        # Traumatic dislocation at index 7-9 (snapped backward)
+        disloc_y = 0.08 if 6 <= idx <= 9 else 0.0
+        disloc_z = -0.08 if 6 <= idx <= 9 else 0.0
+        sy = 0.22 + 0.14 * math.sin(float(idx) / len(spine_x) * math.pi) + disloc_y
+        sz = 0.04 * math.cos(float(idx) / len(spine_x) * math.pi) + disloc_z
+        spine_pts.append((sx, sy, sz))
+
+    for i in range(len(spine_pts)-1):
+        mesh.add_cylinder(spine_pts[i], spine_pts[i+1], 0.055, 0.055, segs=8)
+        # Spinous dorsal processes
+        top_p = (spine_pts[i][0], spine_pts[i][1] + 0.12, spine_pts[i][2])
+        mesh.add_cylinder(spine_pts[i], top_p, 0.024, 0.010, segs=6)
+
+    # 3.2 Shattered Thoracic Ribcage (10 anatomical rib pairs)
+    for idx in range(3, 13):
+        rx = spine_pts[idx][0]
+        ry = spine_pts[idx][1]
+        rib_w = 0.38 + 0.16 * math.sin((idx - 3) / 10.0 * math.pi)
+        
+        # Lower right ribs (resting curved in the gore pool)
+        r_mid = (rx, ry - 0.08, rib_w * 0.65)
+        r_tip = (rx, 0.03, rib_w * 0.95)
+        mesh.add_cylinder((rx, ry, 0.0), r_mid, 0.022, 0.018, segs=6)
+        mesh.add_cylinder(r_mid, r_tip, 0.018, 0.012, segs=6)
+
+        # Upper left ribs: Pried apart, shattered outward by cryptid claws
+        if idx in [5, 6, 7, 8]:
+            # Jagged compound breaks pointing upward with exposed marrow hollows
+            l_mid = (rx + 0.04, ry + 0.22, -rib_w * 0.70)
+            l_tip = (rx + 0.08, ry + 0.45, -rib_w * 1.05)
+            mesh.add_cylinder((rx, ry, 0.0), l_mid, 0.024, 0.018, segs=6)
+            mesh.add_cylinder(l_mid, l_tip, 0.018, 0.008, segs=6)
+            # Splintered bone shards
+            mesh.add_cylinder(l_tip, (l_tip[0] + 0.04, l_tip[1] + 0.08, l_tip[2] - 0.03), 0.007, 0.002, segs=4)
+        else:
+            l_mid = (rx, ry + 0.10, -rib_w * 0.60)
+            l_tip = (rx, 0.05, -rib_w * 0.90)
+            mesh.add_cylinder((rx, ry, 0.0), l_mid, 0.020, 0.016, segs=6)
+            mesh.add_cylinder(l_mid, l_tip, 0.016, 0.010, segs=6)
+
+    # 3.3 Compound Fracture Leg Bone Protrusions
+    # Exposed shattered radius/ulna sticking out of left foreleg
+    mesh.add_cylinder((-0.82, 0.20, -0.40), (-0.98, 0.16, -0.52), 0.028, 0.014, segs=6)
+    # Shattered pelvis crest bone plate
+    mesh.add_box((0.92, 0.30, -0.08), (0.22, 0.14, 0.06), rot_y=0.25)
+
+    # 3.4 Skull Zygomatic Plate & Mandible with Molar Dentition
+    # Mandible lying askew in the gore
+    mesh.add_cylinder((-1.36, 0.12, 0.26), (-1.72, 0.06, 0.30), 0.055, 0.025, segs=6)
+    # Molars along mandible
+    for mx in [-1.45, -1.52, -1.59, -1.66]:
+        mesh.add_box((mx, 0.11, 0.28), (0.025, 0.025, 0.020), rot_y=0.1)
+
+    # 3.5 Magnificent 6-Point Branching Antlers with Velvet Strips
     def add_antler(side=1.0):
-        p_base = (-1.38, 0.32, 0.1 + side * 0.14)
-        p1 = (-1.42, 0.54, 0.1 + side * 0.36)
-        p2 = (-1.35, 0.82, 0.1 + side * 0.58)
-        p3 = (-1.16, 1.02, 0.1 + side * 0.62)
-        p4 = (-0.92, 1.12, 0.1 + side * 0.54)
-        mesh.add_cylinder(p_base, p1, 0.046, 0.038, segs=8)
-        mesh.add_cylinder(p1, p2, 0.038, 0.030, segs=8)
-        mesh.add_cylinder(p2, p3, 0.030, 0.022, segs=6)
-        mesh.add_cylinder(p3, p4, 0.022, 0.012, segs=6)
+        # Base burr / coronet at pedicle
+        p_base = (-1.38, 0.30, 0.20 + side * 0.12)
+        p1 = (-1.42, 0.52, 0.20 + side * 0.34)
+        p2 = (-1.35, 0.80, 0.20 + side * 0.54)
+        p3 = (-1.16, 1.04, 0.20 + side * 0.60)
+        p4 = (-0.88, 1.15, 0.20 + side * 0.52)
+        mesh.add_cylinder(p_base, p1, 0.052, 0.042, segs=8)
+        mesh.add_cylinder(p1, p2, 0.042, 0.032, segs=8)
+        mesh.add_cylinder(p2, p3, 0.032, 0.024, segs=6)
+        mesh.add_cylinder(p3, p4, 0.024, 0.012, segs=6)
 
-        # Brow tine
-        mesh.add_cylinder(p1, (-1.68, 0.50, 0.1 + side * 0.30), 0.028, 0.010, segs=6)
-        # Bez tine
-        mesh.add_cylinder(p2, (-1.52, 0.76, 0.1 + side * 0.50), 0.024, 0.009, segs=6)
-        # Royal tine
-        mesh.add_cylinder(p3, (-1.12, 1.25, 0.1 + side * 0.60), 0.022, 0.008, segs=6)
+        # Brow tine (eyeguard) pointing forward over the eyes
+        mesh.add_cylinder(p1, (-1.70, 0.50, 0.20 + side * 0.26), 0.030, 0.010, segs=6)
+        # Bay / Bez tine pointing forward-up
+        mesh.add_cylinder(p2, (-1.55, 0.78, 0.20 + side * 0.46), 0.026, 0.009, segs=6)
+        # Royal tine branching upward at mid-beam
+        mesh.add_cylinder(p3, (-1.12, 1.28, 0.20 + side * 0.58), 0.024, 0.008, segs=6)
+        # Crown / terminal fork tine
+        mesh.add_cylinder(p4, (-0.72, 1.22, 0.20 + side * 0.44), 0.016, 0.006, segs=6)
 
     add_antler(1.0)
     add_antler(-1.0)
 
-    # 3. 16-Segment Curved Spine Vertebrae Column with Dorsal Spinous Processes
-    spine_x = [-1.25, -1.10, -0.95, -0.80, -0.65, -0.50, -0.35, -0.20, -0.05, 0.10, 0.25, 0.40, 0.55, 0.70, 0.85, 1.00]
-    spine_pts = []
-    for idx, sx in enumerate(spine_x):
-        sy = 0.18 + 0.14 * math.sin(float(idx) / len(spine_x) * math.pi)
-        sz = 0.06 * math.cos(float(idx) / len(spine_x) * math.pi)
-        spine_pts.append((sx, sy, sz))
-
-    for i in range(len(spine_pts)-1):
-        mesh.add_cylinder(spine_pts[i], spine_pts[i+1], 0.065, 0.065, segs=8)
-        # Spinous process
-        top_p = (spine_pts[i][0], spine_pts[i][1] + 0.14, spine_pts[i][2])
-        mesh.add_cylinder(spine_pts[i], top_p, 0.028, 0.012, segs=6)
-
-    # 4. Shattered Thoracic Ribcage (catastrophic cryptid blunt trauma)
-    for idx in range(3, 13):
-        rx = spine_pts[idx][0]
-        ry = spine_pts[idx][1]
-        rib_w = 0.42 + 0.18 * math.sin((idx - 3) / 10.0 * math.pi)
-        
-        # Right side: Intact curved ribs resting in gore
-        r_mid = (rx, ry + 0.14, rib_w * 0.7)
-        r_tip = (rx, 0.03, rib_w)
-        mesh.add_cylinder((rx, ry, 0.0), r_mid, 0.022, 0.018, segs=6)
-        mesh.add_cylinder(r_mid, r_tip, 0.018, 0.012, segs=6)
-
-        # Left side: Pried apart, shattered outward by cryptid claws
-        if idx in [5, 6, 7, 8]:
-            # Jagged compound breaks pointing upward with jagged tips
-            l_mid = (rx + 0.06, ry + 0.32, -rib_w * 0.75)
-            l_tip = (rx + 0.10, ry + 0.48, -rib_w * 1.05)
-            mesh.add_cylinder((rx, ry, 0.0), l_mid, 0.024, 0.018, segs=6)
-            mesh.add_cylinder(l_mid, l_tip, 0.018, 0.007, segs=6)
-        else:
-            l_mid = (rx, ry + 0.12, -rib_w * 0.65)
-            l_tip = (rx, 0.04, -rib_w * 0.95)
-            mesh.add_cylinder((rx, ry, 0.0), l_mid, 0.022, 0.018, segs=6)
-            mesh.add_cylinder(l_mid, l_tip, 0.018, 0.012, segs=6)
-
-    # 5. Pelvis and Fractured Limbs with Exposed Marrow Cavities
-    mesh.add_box((0.95, 0.16, 0.05), (0.28, 0.18, 0.36), rot_y=-0.1)
-
-    # Snapped foreleg (compound fracture)
-    mesh.add_cylinder((-0.80, 0.22, -0.35), (-1.12, 0.14, -0.68), 0.045, 0.035, segs=6)
-    mesh.add_cylinder((-1.12, 0.14, -0.68), (-1.38, 0.04, -0.84), 0.035, 0.022, segs=6)
-
-    # Snapped hindleg with jagged bone marrow opening
-    mesh.add_cylinder((0.95, 0.16, 0.18), (1.32, 0.22, 0.42), 0.050, 0.035, segs=6)
-    mesh.add_cylinder((1.32, 0.22, 0.42), (1.58, 0.05, 0.58), 0.032, 0.020, segs=6)
-
-    # 6. Clinging Visceral Flesh, Sinew, and Torn Muscle Tissue
+    # =========================================================================
+    # 4. SPILLED VISCERA, INTESTINES & COAGULATED GORE (usemtl Gore)
+    # =========================================================================
     mesh.usemtl("Gore")
-    mesh.add_box((-0.20, 0.14, 0.0), (0.82, 0.20, 0.48), rot_y=0.05)
-    mesh.add_box(( 0.30, 0.12, -0.05), (0.50, 0.16, 0.38), rot_y=-0.15)
-    # Sinew strands hanging from shattered ribs
-    for sinew_x, sinew_z in [(-0.35, -0.42), (-0.15, -0.52), (0.10, -0.38)]:
-        mesh.add_cylinder((sinew_x, 0.28, sinew_z), (sinew_x + 0.04, 0.08, sinew_z - 0.05), 0.015, 0.005, segs=4)
 
-    mesh.save("assets/models/elk_carcass.obj", mat_order=["Bone", "Gore"])
+    # 4.1 Spilled Intestinal Loops (convoluted winding tubular coils spilling onto ground)
+    gut_points = [
+        ( 0.05, 0.16, -0.05),
+        ( 0.12, 0.12, -0.15),
+        ( 0.22, 0.08, -0.22),
+        ( 0.15, 0.05, -0.32),
+        ( 0.02, 0.04, -0.26),
+        (-0.08, 0.04, -0.34),
+        (-0.02, 0.05, -0.42),
+        ( 0.12, 0.05, -0.44),
+        ( 0.26, 0.06, -0.38),
+        ( 0.38, 0.05, -0.45),
+        ( 0.46, 0.04, -0.35),
+        ( 0.35, 0.04, -0.25),
+        ( 0.28, 0.06, -0.16),
+        ( 0.36, 0.05, -0.08),
+        ( 0.48, 0.04, -0.14)
+    ]
+    gut_pts_radii = [(p, 0.034) for p in gut_points]
+    mesh.add_tapered_tube(gut_pts_radii, segs=8, u_scale=1.0, v_scale=4.0)
+
+    # Second winding intestine loop
+    gut_points2 = [
+        ( 0.20, 0.14,  0.08),
+        ( 0.32, 0.10,  0.18),
+        ( 0.45, 0.06,  0.24),
+        ( 0.52, 0.04,  0.16),
+        ( 0.42, 0.04,  0.08),
+        ( 0.50, 0.04,  0.02),
+        ( 0.60, 0.03,  0.08)
+    ]
+    gut_pts_radii2 = [(p, 0.030) for p in gut_points2]
+    mesh.add_tapered_tube(gut_pts_radii2, segs=8, u_scale=1.0, v_scale=2.0)
+
+    # 4.2 Thick Coagulated Clot Mound Inside Cavity Floor
+    mesh.add_ellipsoid((-0.08, 0.08, -0.05), (0.45, 0.06, 0.28), segs_u=10, segs_v=6)
+
+    # 4.3 Bloody Velvet Strips Peeling from Antlers
+    mesh.add_cylinder((-1.35, 0.80, 0.54), (-1.38, 0.62, 0.56), 0.015, 0.005, segs=4)
+    mesh.add_cylinder((-1.16, 1.04, 0.60), (-1.18, 0.86, 0.62), 0.012, 0.004, segs=4)
+    mesh.add_cylinder((-1.35, 0.80, -0.14), (-1.38, 0.62, -0.16), 0.015, 0.005, segs=4)
+
+    mesh.save("assets/models/elk_carcass.obj", mat_order=["Pelt", "Flesh", "Bone", "Gore"])
 
 
 def generate_carcass_gore_pool():
     """
-    Multi-tiered organic coagulated gore splatter pool decal.
+    Multi-tiered organic coagulated gore splatter pool decal:
+    - Tier 1: Thick coagulated central gore mound (raised viscous clots)
+    - Tier 2: Wide irregular spreading blood pool with lobed fingers
+    - Tier 3: Radiating satellite arterial spray droplets & directional drag streaks
     """
     mesh = ObjMesh("carcass_gore_pool")
     mesh.usemtl("Gore")
-    center = (0.0, 0.004, 0.0)
-    c_idx = mesh.add_v(center[0], center[1], center[2])
-    c_vn = mesh.add_vn(0, 1, 0)
-    c_vt = mesh.add_vt(0.5, 0.5)
 
-    n_pts = 32
+    # 1. Tier 1: Thick Coagulated Central Gore Mound (Y = 0.012m)
+    c1 = (0.05, 0.012, -0.10)
+    c1_idx = mesh.add_v(c1[0], c1[1], c1[2])
+    c1_vn = mesh.add_vn(0, 1, 0)
+    c1_vt = mesh.add_vt(0.5, 0.5)
+
+    n_mound = 24
+    mound_radii = [
+        1.1, 0.9, 1.3, 1.5, 1.2, 0.8, 1.4, 1.6,
+        1.3, 1.0, 1.5, 1.7, 1.4, 0.9, 1.3, 1.6,
+        1.2, 0.9, 1.4, 1.5, 1.1, 0.8, 1.2, 1.4
+    ]
+    mound_v = []
+    mound_vn = []
+    mound_vt = []
+    for i in range(n_mound):
+        angle = 2.0 * math.pi * i / n_mound
+        r = mound_radii[i] * 0.75
+        px = c1[0] + math.cos(angle) * r * 1.35
+        pz = c1[2] + math.sin(angle) * r * 0.85
+        mound_v.append(mesh.add_v(px, 0.008, pz))
+        mound_vn.append(mesh.add_vn(0, 1, 0))
+        mound_vt.append(mesh.add_vt(0.5 + px * 0.25, 0.5 + pz * 0.25))
+
+    for i in range(n_mound):
+        nxt = (i + 1) % n_mound
+        mesh.add_face([c1_idx, mound_v[i], mound_v[nxt]],
+                      [c1_vn, mound_vn[i], mound_vn[nxt]],
+                      [c1_vt, mound_vt[i], mound_vt[nxt]])
+
+    # 2. Tier 2: Sprawling Viscous Base Pool (Y = 0.004m, 36 lobes)
+    c2 = (0.0, 0.004, 0.0)
+    c2_idx = mesh.add_v(c2[0], c2[1], c2[2])
+    c2_vn = mesh.add_vn(0, 1, 0)
+    c2_vt = mesh.add_vt(0.5, 0.5)
+
+    n_pts = 36
+    radii_base = [
+        1.6, 2.1, 1.4, 1.0, 1.8, 2.5, 2.0, 1.3,
+        0.9, 1.7, 2.3, 1.5, 1.1, 2.0, 2.8, 2.2,
+        1.5, 1.0, 1.8, 2.4, 1.9, 1.3, 0.9, 1.5,
+        2.0, 2.7, 1.8, 1.2, 1.6, 2.2, 1.6, 1.1,
+        1.7, 2.3, 1.5, 1.2
+    ]
     outer_v = []
     outer_vn = []
     outer_vt = []
-
-    radii_base = [
-        1.5, 1.9, 1.3, 0.9, 1.7, 2.3, 1.8, 1.2,
-        0.8, 1.6, 2.1, 1.4, 1.0, 1.8, 2.5, 1.9,
-        1.3, 0.9, 1.6, 2.2, 1.7, 1.2, 0.8, 1.4,
-        1.8, 2.4, 1.6, 1.1, 1.5, 2.0, 1.4, 1.0
-    ]
-
     for i in range(n_pts):
         angle = 2.0 * math.pi * i / n_pts
-        r = radii_base[i] * 0.88
-        px = math.cos(angle) * r * 1.45
-        pz = math.sin(angle) * r * 0.90
+        r = radii_base[i] * 0.95
+        px = math.cos(angle) * r * 1.50
+        pz = math.sin(angle) * r * 0.95
         outer_v.append(mesh.add_v(px, 0.004, pz))
         outer_vn.append(mesh.add_vn(0, 1, 0))
-        outer_vt.append(mesh.add_vt(0.5 + px * 0.22, 0.5 + pz * 0.22))
+        outer_vt.append(mesh.add_vt(0.5 + px * 0.18, 0.5 + pz * 0.18))
 
     for i in range(n_pts):
         nxt = (i + 1) % n_pts
-        mesh.add_face([c_idx, outer_v[i], outer_v[nxt]],
-                      [c_vn, outer_vn[i], outer_vn[nxt]],
-                      [c_vt, outer_vt[i], outer_vt[nxt]])
+        mesh.add_face([c2_idx, outer_v[i], outer_v[nxt]],
+                      [c2_vn, outer_vn[i], outer_vn[nxt]],
+                      [c2_vt, outer_vt[i], outer_vt[nxt]])
 
-    # Radiating arterial spray droplets and satellite splatters
+    # 3. Tier 3: Directional Drag Streaks (where carcass was thrashed/dragged)
+    drag_streaks = [
+        ((-0.8, -0.6), (-2.2, -1.2), 0.35),
+        (( 0.6, -0.5), ( 2.4, -0.9), 0.40),
+        ((-0.2,  0.8), (-0.6,  2.2), 0.32)
+    ]
+    for (sx, sz), (ex, ez), width in drag_streaks:
+        dx, dz = ex - sx, ez - sz
+        dl = math.sqrt(dx*dx + dz*dz)
+        if dl > 0.001:
+            px, pz = -dz / dl * width * 0.5, dx / dl * width * 0.5
+            mesh.add_quad(
+                (sx + px, 0.005, sz + pz),
+                (ex + px * 0.6, 0.005, ez + pz * 0.6),
+                (ex - px * 0.6, 0.005, ez - pz * 0.6),
+                (sx - px, 0.005, sz - pz)
+            )
+
+    # 4. Radiating Arterial Spray Droplets & Satellite Splatters (14 droplets)
     splatters = [
-        (-2.1, -1.0, 0.30),
-        (-1.6,  1.2, 0.38),
-        ( 2.2, -0.9, 0.32),
-        ( 1.8,  1.1, 0.40),
-        (-0.8, -1.5, 0.26),
-        ( 0.6,  1.6, 0.28)
+        (-2.4, -1.2, 0.35),
+        (-1.8,  1.4, 0.42),
+        ( 2.5, -1.1, 0.38),
+        ( 2.1,  1.3, 0.44),
+        (-1.1, -1.8, 0.30),
+        ( 0.8,  1.9, 0.32),
+        (-3.1, -0.4, 0.25),
+        ( 3.0,  0.2, 0.28),
+        (-1.5, -2.2, 0.22),
+        ( 1.4, -1.7, 0.26),
+        ( 1.9, -2.0, 0.20),
+        (-2.6,  0.8, 0.24),
+        ( 0.2, -2.4, 0.22),
+        ( 2.7,  1.8, 0.26)
     ]
     for sx, sz, sr in splatters:
         sc_idx = mesh.add_v(sx, 0.004, sz)
@@ -1109,8 +1627,8 @@ def generate_carcass_gore_pool():
         for j in range(s_pts):
             jn = (j + 1) % s_pts
             mesh.add_face([sc_idx, s_v[j], s_v[jn]],
-                          [c_vn, c_vn, c_vn],
-                          [c_vt, c_vt, c_vt])
+                          [c2_vn, c2_vn, c2_vn],
+                          [c2_vt, c2_vt, c2_vt])
 
     mesh.save("assets/models/carcass_gore_pool.obj")
 

@@ -55,8 +55,34 @@ All 8 child issues and the **Graphics Realism Overhaul Master Plan ([Issue #1](h
 - Implemented `GraphicsSettingsManager` (`scripts/systems/graphics_settings.gd`) with Low, Medium, High, and Ultra presets controlling resolution scale, shadow maps, volumetric fog, SSAO, and SSIL.
 - Created automated benchmarking and profiling harness (`scripts/tools/profile_runner.gd`) and visual QA test suite (`scripts/tools/visual_qa.py`).
 - Verified zero memory leaks (+3.55MB stable delta within budget), 35/35 flawless resource audits, and ~145 FPS estimated throughput across all presets. Report generated in `reports/visual_qa_report.json`.
+### Deep Realism Overhaul: Cabin, Carcass & Sasquatch Visuals
+In response to gameplay test feedback, completed an end-to-end anatomical and architectural overhaul:
+
+1. **Mutilated Elk Carcass & Gore Pool ([`clue_carcass.tscn`](file:///home/m3tal/apps/the-black-pines/scenes/interactables/clue_carcass.tscn), [`elk_carcass.obj`](file:///home/m3tal/apps/the-black-pines/assets/models/elk_carcass.obj), [`carcass_gore_pool.obj`](file:///home/m3tal/apps/the-black-pines/assets/models/carcass_gore_pool.obj))**:
+   - Replaced the previous basic cylinder skeleton with a full 700lb bull elk anatomical body mass (3,301 vertices, 2,052 faces).
+   - **4 PBR Material Surfaces**:
+     - `Pelt`: Shaggy coarse elk hide ([`mat_elk_pelt.tres`](file:///home/m3tal/apps/the-black-pines/assets/materials/mat_elk_pelt.tres)) draped across haunches, dorsal mane, snout, ears, and hooves, with peeled skin flaps folded back from the kill site.
+     - `Flesh`: Raw deep-red striated muscle walls and sinew ([`mat_carcass_flesh.tres`](file:///home/m3tal/apps/the-black-pines/assets/materials/mat_carcass_flesh.tres)) with wet clearcoat and subsurface scattering.
+     - `Bone`: Catastrophic 16-segment dislocated spine, pried-apart thoracic ribcage with jagged compound fractures and exposed bone marrow, cervid skull, and branching 6-point antlers with peeled velvet strips ([`mat_weathered_bone.tres`](file:///home/m3tal/apps/the-black-pines/assets/materials/mat_weathered_bone.tres)).
+     - `Gore`: Convoluted spilled tubular intestinal coils, torn visceral organs, and congealed blood pool ([`mat_gore_blood.tres`](file:///home/m3tal/apps/the-black-pines/assets/materials/mat_gore_blood.tres)).
+   - **Multi-Tiered Gore Splatter**: Viscous central gore mound, 36-lobed organic base pool, directional thrash drag streaks, and 14 radiating arterial spray droplets.
+
+2. **Ranger Station Cabin ([`ranger_station.tscn`](file:///home/m3tal/apps/the-black-pines/scenes/interactables/ranger_station.tscn), [`cabin.obj`](file:///home/m3tal/apps/the-black-pines/assets/models/cabin.obj))**:
+   - Upgraded architecture to 2,728 vertices and 1,516 faces across 5 PBR materials (`Wood`, `Roof`, `Metal`, `Stone`, `Glass`).
+   - **Dimensional Cedar Shake Roof**: Deep 0.75m overhanging eaves, thick dimensional roof deck, heavy barge/fascia boards, 6 stepped 3D shingle relief courses per slope, interlocking timber ridge cap, and 16 exposed rafter tails.
+   - **Timber Porch Roof Awning**: Dedicated sloping shed roof extending over the front porch deck.
+   - **Heavy Timber Framing**: 4 square 8x8 posts with 45° diagonal knee braces (timber gallows brackets), rustic X-brace Adirondack balustrades, 18-plank deck flooring with rim joists, and 3-tread timber steps.
+   - **Masonry Foundation**: Continuous rough-hewn fieldstone perimeter skirting embedding the cabin securely into the undulating terrain.
+   - **Props & Details**: Carved wooden "U.S. FOREST SERVICE - BLACK PINE STATION 04" sign, split firewood cord stacked under side eave, cast-iron stovepipe with roof flashing collar, rain cap, and 3 steel guy wires.
+
+3. **Sasquatch Cryptid Overhaul ([`sasquatch.tscn`](file:///home/m3tal/apps/the-black-pines/scenes/creatures/sasquatch.tscn), `sasquatch_*.obj`)**:
+   - **Anatomical Proportions**: Colossal hunched trapezius muscles burying the neck directly into the shoulder girdle (Patterson-Gimlin silhouette), massive dual dorsal humps, deep barrel chest, and broad pelvis.
+   - **Menacing Facial Sculpt**: Peaked sagittal crest blade, heavy supraorbital brow ridge, cavernous deep sunken eye orbits (housing the glowing eyes), wrinkled black snout with flared nostrils, sneering snarl revealing long curved sabre canine fangs, interlocking lower canines, and sharp incisors ([`mat_weathered_bone.tres`](file:///home/m3tal/apps/the-black-pines/assets/materials/mat_weathered_bone.tres)).
+   - **Arms, Claws & Feet**: Corded vascular forearms, 5 articulated digits ending in razor-sharp curved black keratin talons, bowed muscular quadriceps, and broad plantigrade 5-toed clawed feet.
+   - **Volumetric Fur Cards**: Expanded multi-tiered fringe cards along sagittal crest, dorsal spine, shoulder mantle, triceps, forearms, and flanks.
 
 ---
+
 
 ## 2. Automated Verification Results
 

@@ -1,0 +1,18 @@
+[gd_scene load_steps=5 format=3 uid="uid://tree_snag_dead_01"]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/tree_snag_dead.obj" id="1_snag_mesh"]
+[ext_resource type="Material" path="res://assets/materials/mat_cabin_wood.tres" id="2_wood_mat"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_snag"]
+height = 9.0
+radius = 0.6
+
+[node name="TreeSnagDead" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+shape = SubResource("CylinderShape3D_snag")
+
+[node name="SnagMesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_snag_mesh")
+surface_material_override/0 = ExtResource("2_wood_mat")

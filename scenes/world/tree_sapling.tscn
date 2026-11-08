@@ -1,0 +1,18 @@
+[gd_scene load_steps=5 format=3 uid="uid://tree_sapling_01"]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/tree_sapling.obj" id="1_sapling_mesh"]
+[ext_resource type="Material" path="res://assets/materials/mat_pine_needles.tres" id="2_needles"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sapling"]
+height = 2.8
+radius = 0.2
+
+[node name="TreeSapling" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+shape = SubResource("CylinderShape3D_sapling")
+
+[node name="SaplingMesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_sapling_mesh")
+surface_material_override/0 = ExtResource("2_needles")

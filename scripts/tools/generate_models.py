@@ -667,6 +667,195 @@ def generate_pine_tree():
     combined_mesh.save("assets/models/pine_tree.obj")
 
 
+def generate_douglas_fir():
+    trunk_mesh = ObjMesh("tree_douglas_fir_trunk")
+    foliage_mesh = ObjMesh("tree_douglas_fir_foliage")
+
+    # Mature 18m Douglas Fir with flared base
+    trunk_h = 18.0
+    trunk_mesh.add_cylinder((0.0, 0.0, 0.0), (0.0, trunk_h, 0.0), 0.68, 0.16, segs=14, u_start=0.0, u_end=1.0, v_start=0.0, v_end=6.0)
+
+    # 7 tiers of broad drooping boughs with asymmetrical reach
+    tiers = [
+        (3.8, 5.0, 5.2, 0.0),
+        (6.0, 4.6, 4.5, 0.45),
+        (8.2, 4.2, 3.8, 0.90),
+        (10.4, 3.8, 3.2, 0.25),
+        (12.5, 3.4, 2.5, 0.70),
+        (14.5, 3.0, 1.8, 1.15),
+        (16.2, 2.2, 1.1, 0.50)
+    ]
+
+    for y_base, h_tier, r_base, rot_offset in tiers:
+        boughs = 14
+        v_top = foliage_mesh.add_v(0.0, y_base + h_tier, 0.0)
+        vt_top = foliage_mesh.add_vt(0.5, 1.0)
+        vn_top = foliage_mesh.add_vn(0.0, 1.0, 0.0)
+
+        ring_v = []
+        ring_vn = []
+        ring_vt = []
+        under_v = []
+        under_vn = []
+
+        under_center = foliage_mesh.add_v(0.0, y_base + 0.45, 0.0)
+        under_c_n = foliage_mesh.add_vn(0.0, -1.0, 0.0)
+        under_c_vt = foliage_mesh.add_vt(0.5, 0.5)
+
+        for b in range(boughs + 1):
+            theta = 2.0 * math.pi * b / boughs + rot_offset
+            # Organic drooping tip dip and radial noise
+            dip = -0.45
+            rb = r_base * (0.85 + 0.3 * (b % 3 == 0) + 0.15 * math.sin(b * 1.5))
+            bx = math.cos(theta) * rb
+            bz = math.sin(theta) * rb
+            by = y_base + dip
+
+            ring_v.append(foliage_mesh.add_v(bx, by, bz))
+            ring_vn.append(foliage_mesh.add_vn(math.cos(theta) * 0.7, 0.5, math.sin(theta) * 0.7))
+            u_c = float(b) / boughs
+            ring_vt.append(foliage_mesh.add_vt(u_c, 0.0))
+
+            under_v.append(foliage_mesh.add_v(bx * 0.85, by + 0.15, bz * 0.85))
+            under_vn.append(foliage_mesh.add_vn(math.cos(theta) * 0.3, -0.9, math.sin(theta) * 0.3))
+
+        for b in range(boughs):
+            foliage_mesh.add_face([v_top, ring_v[b], ring_v[b+1]],
+                                  [vn_top, ring_vn[b], ring_vn[b+1]],
+                                  [vt_top, ring_vt[b], ring_vt[b+1]])
+            foliage_mesh.add_face([under_center, under_v[b+1], under_v[b]],
+                                  [under_c_n, under_vn[b+1], under_vn[b]],
+                                  [under_c_vt, ring_vt[b+1], ring_vt[b]])
+
+    trunk_mesh.save("assets/models/tree_douglas_fir_trunk.obj")
+    foliage_mesh.save("assets/models/tree_douglas_fir_foliage.obj")
+
+
+def generate_tall_pine():
+    trunk_mesh = ObjMesh("tree_pine_tall_trunk")
+    foliage_mesh = ObjMesh("tree_pine_tall_foliage")
+
+    # Slender 15m lodgepole pine
+    trunk_h = 15.0
+    trunk_mesh.add_cylinder((0.0, 0.0, 0.0), (0.0, trunk_h, 0.0), 0.38, 0.12, segs=10, u_start=0.0, u_end=1.0, v_start=0.0, v_end=5.0)
+
+    # Broken dead stub branches on lower trunk
+    stubs = [
+        ((-0.25, 4.2, 0.1), (-0.75, 4.0, 0.2)),
+        ((0.15, 5.5, -0.2), (0.65, 5.3, -0.5)),
+        ((-0.1, 6.8, -0.2), (-0.5, 6.6, -0.4)),
+        ((0.2, 7.8, 0.1), (0.6, 7.6, 0.3))
+    ]
+    for p1, p2 in stubs:
+        trunk_mesh.add_cylinder(p1, p2, 0.06, 0.02, segs=6)
+
+    # 4 compact high canopy tiers
+    tiers = [
+        (8.5, 3.2, 2.8, 0.1),
+        (10.2, 2.8, 2.3, 0.6),
+        (11.8, 2.4, 1.8, 1.1),
+        (13.2, 2.0, 1.1, 0.3)
+    ]
+    for y_base, h_tier, r_base, rot_offset in tiers:
+        boughs = 10
+        v_top = foliage_mesh.add_v(0.0, y_base + h_tier, 0.0)
+        vt_top = foliage_mesh.add_vt(0.5, 1.0)
+        vn_top = foliage_mesh.add_vn(0.0, 1.0, 0.0)
+
+        ring_v = []
+        ring_vn = []
+        ring_vt = []
+        for b in range(boughs + 1):
+            theta = 2.0 * math.pi * b / boughs + rot_offset
+            dip = -0.25
+            rb = r_base * (0.9 + 0.2 * (b % 2))
+            bx = math.cos(theta) * rb
+            bz = math.sin(theta) * rb
+            by = y_base + dip
+            ring_v.append(foliage_mesh.add_v(bx, by, bz))
+            ring_vn.append(foliage_mesh.add_vn(math.cos(theta) * 0.7, 0.5, math.sin(theta) * 0.7))
+            ring_vt.append(foliage_mesh.add_vt(float(b) / boughs, 0.0))
+
+        for b in range(boughs):
+            foliage_mesh.add_face([v_top, ring_v[b], ring_v[b+1]],
+                                  [vn_top, ring_vn[b], ring_vn[b+1]],
+                                  [vt_top, ring_vt[b], ring_vt[b+1]])
+
+    trunk_mesh.save("assets/models/tree_pine_tall_trunk.obj")
+    foliage_mesh.save("assets/models/tree_pine_tall_foliage.obj")
+
+
+def generate_dead_snag():
+    mesh = ObjMesh("tree_snag_dead")
+    # Broken rotten snag trunk: height 8.5m, radius 0.55m
+    trunk_h = 8.5
+    mesh.add_cylinder((0.0, 0.0, 0.0), (0.0, trunk_h, 0.0), 0.58, 0.38, segs=12, u_start=0.0, u_end=1.0, v_start=0.0, v_end=3.0)
+
+    # Fractured jagged crown top with splintered wooden teeth
+    splinters = [
+        (-0.25, trunk_h, -0.15, 1.2),
+        ( 0.20, trunk_h, -0.22, 1.6),
+        ( 0.30, trunk_h,  0.18, 0.9),
+        (-0.18, trunk_h,  0.25, 1.4),
+        ( 0.00, trunk_h,  0.00, 1.8)
+    ]
+    for sx, sy, sz, sh in splinters:
+        p1 = (sx, sy - 0.2, sz)
+        p2 = (sx + sx * 0.2, sy + sh, sz + sz * 0.2)
+        mesh.add_cylinder(p1, p2, 0.10, 0.015, segs=6)
+
+    # 4 crooked dead limbs sticking out
+    dead_limbs = [
+        ((0.2, 4.5, 0.2), (1.4, 4.2, 0.6)),
+        ((-0.2, 5.8, 0.1), (-1.2, 5.4, 0.3)),
+        ((0.1, 6.6, -0.2), (0.8, 6.2, -1.0)),
+        ((-0.15, 7.2, -0.1), (-0.9, 7.0, -0.7))
+    ]
+    for lp1, lp2 in dead_limbs:
+        mesh.add_cylinder(lp1, lp2, 0.12, 0.03, segs=6)
+
+    mesh.save("assets/models/tree_snag_dead.obj")
+
+
+def generate_tree_sapling():
+    mesh = ObjMesh("tree_sapling")
+    # Young understory pine: height 2.8m, trunk radius 0.07m
+    mesh.add_cylinder((0.0, 0.0, 0.0), (0.0, 2.8, 0.0), 0.08, 0.02, segs=6, u_start=0.0, u_end=1.0, v_start=0.0, v_end=1.0)
+
+    # 3 dense soft foliage tiers
+    tiers = [
+        (0.6, 1.1, 0.9, 0.0),
+        (1.3, 0.9, 0.7, 0.5),
+        (1.9, 0.9, 0.45, 1.0)
+    ]
+    for y_base, h_tier, r_base, rot_offset in tiers:
+        boughs = 8
+        v_top = mesh.add_v(0.0, y_base + h_tier, 0.0)
+        vt_top = mesh.add_vt(0.5, 1.0)
+        vn_top = mesh.add_vn(0.0, 1.0, 0.0)
+
+        ring_v = []
+        ring_vn = []
+        ring_vt = []
+        for b in range(boughs + 1):
+            theta = 2.0 * math.pi * b / boughs + rot_offset
+            dip = -0.18
+            rb = r_base * (0.85 + 0.3 * (b % 2))
+            bx = math.cos(theta) * rb
+            bz = math.sin(theta) * rb
+            by = y_base + dip
+            ring_v.append(mesh.add_v(bx, by, bz))
+            ring_vn.append(mesh.add_vn(math.cos(theta) * 0.7, 0.5, math.sin(theta) * 0.7))
+            ring_vt.append(mesh.add_vt(float(b) / boughs, 0.0))
+
+        for b in range(boughs):
+            mesh.add_face([v_top, ring_v[b], ring_v[b+1]],
+                          [vn_top, ring_vn[b], ring_vn[b+1]],
+                          [vt_top, ring_vt[b], ring_vt[b+1]])
+
+    mesh.save("assets/models/tree_sapling.obj")
+
+
 if __name__ == "__main__":
     print("Generating high-fidelity 3D OBJ models...")
     generate_elk_carcass()
@@ -675,4 +864,8 @@ if __name__ == "__main__":
     generate_tent()
     generate_cabin()
     generate_pine_tree()
+    generate_douglas_fir()
+    generate_tall_pine()
+    generate_dead_snag()
+    generate_tree_sapling()
     print("All models generated successfully!")

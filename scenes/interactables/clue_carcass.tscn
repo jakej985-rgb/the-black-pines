@@ -1,68 +1,20 @@
-[gd_scene load_steps=10 format=3 uid="uid://clue_carcass_01"]
+[gd_scene load_steps=7 format=3 uid="uid://clue_carcass_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
+[ext_resource type="ArrayMesh" path="res://assets/models/elk_carcass.obj" id="2_carcass_mesh"]
+[ext_resource type="Material" path="res://assets/materials/mat_weathered_bone.tres" id="3_bone_mat"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_carcass_trigger"]
-size = Vector3(3.2, 1.2, 2.4)
+[sub_resource type="BoxShape3D" id="BoxShape3D_carcass_col"]
+size = Vector3(3.2, 1.2, 2.2)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fur"]
-albedo_color = Color(0.22, 0.15, 0.1, 1)
-roughness = 0.92
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_torso_hind"]
-material = SubResource("StandardMaterial3D_fur")
-radius = 0.28
-height = 1.3
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flesh_dark"]
-albedo_color = Color(0.16, 0.04, 0.03, 1)
-roughness = 0.55
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_torso_front"]
-material = SubResource("StandardMaterial3D_flesh_dark")
-radius = 0.32
-height = 1.2
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bone"]
-albedo_color = Color(0.82, 0.8, 0.72, 1)
-roughness = 0.65
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_rib"]
-material = SubResource("StandardMaterial3D_bone")
-top_radius = 0.025
-bottom_radius = 0.035
-height = 0.65
-
-[sub_resource type="BoxMesh" id="BoxMesh_skull"]
-material = SubResource("StandardMaterial3D_bone")
-size = Vector3(0.22, 0.2, 0.55)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_antler_beam"]
-material = SubResource("StandardMaterial3D_bone")
-top_radius = 0.02
-bottom_radius = 0.035
-height = 0.9
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_antler_tine"]
-material = SubResource("StandardMaterial3D_bone")
-top_radius = 0.012
-bottom_radius = 0.02
-height = 0.35
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_leg"]
-material = SubResource("StandardMaterial3D_fur")
-top_radius = 0.09
-bottom_radius = 0.06
-height = 0.95
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_coagulated_blood"]
-albedo_color = Color(0.14, 0.02, 0.02, 1)
-roughness = 0.3
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dark_gore"]
+albedo_color = Color(0.12, 0.02, 0.02, 1)
+roughness = 0.25
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_blood_patch"]
-material = SubResource("StandardMaterial3D_coagulated_blood")
-top_radius = 0.6
-bottom_radius = 0.9
+material = SubResource("StandardMaterial3D_dark_gore")
+top_radius = 0.7
+bottom_radius = 1.1
 height = 0.015
 
 [node name="ClueCarcass" type="StaticBody3D"]
@@ -70,87 +22,18 @@ collision_layer = 1
 collision_mask = 0
 script = ExtResource("1_clue")
 prompt_message = "[E] Inspect Mutilated Remains"
-inspection_text = "A full-grown bull elk, snapped clean in half. The spine is twisted backward at a 90-degree angle with catastrophic blunt trauma. The ribcage was pried apart like toothpicks by immense clawed hands. The meat was left untouched—only the skull and long leg bones were shattered to harvest bone marrow. The carcass is still warm in the freezing night."
+inspection_text = "A full-grown bull elk, snapped clean in half. The spine is twisted backward with catastrophic blunt force. The ribcage was pried apart like toothpicks by immense clawed hands. The meat was left untouched—only the skull and long leg bones were shattered to harvest bone marrow. The carcass is still warm in the freezing night."
 clue_title = "Mutilated Bull Elk"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-shape = SubResource("BoxShape3D_carcass_trigger")
+shape = SubResource("BoxShape3D_carcass_col")
 
-[node name="BloodPool1" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.8, 0.1, 0.01, -0.1)
+[node name="BloodPool" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.4, 0, 0, 0, 1, 0, 0, 0, 1.8, 0, 0.01, 0)
 mesh = SubResource("CylinderMesh_blood_patch")
 
-[node name="BloodPool2" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.9, 0, 0.4, 0, 1, 0, -0.4, 0, 0.9, -0.8, 0.01, 0.4)
-mesh = SubResource("CylinderMesh_blood_patch")
-
-[node name="HindTorso" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.939693, 0, 0.34202, 0.34202, 0, -0.939693, 0, 1, 0, -0.6, 0.22, 0.25)
-mesh = SubResource("CapsuleMesh_torso_hind")
-
-[node name="FrontTorso" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.5, 0, -0.866025, 0.866025, 0, 0.5, 0, 1, 0, 0.4, 0.26, -0.1)
-mesh = SubResource("CapsuleMesh_torso_front")
-
-[node name="Ribs" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.25, -0.1)
-
-[node name="RibLeft1" type="MeshInstance3D" parent="Ribs"]
-transform = Transform3D(0.866025, -0.5, 0, 0.5, 0.866025, 0, 0, 0, 1, -0.25, 0.2, 0.22)
-mesh = SubResource("CylinderMesh_rib")
-
-[node name="RibLeft2" type="MeshInstance3D" parent="Ribs"]
-transform = Transform3D(0.866025, -0.5, 0, 0.5, 0.866025, 0, 0, 0, 1, 0, 0.22, 0.24)
-mesh = SubResource("CylinderMesh_rib")
-
-[node name="RibLeft3" type="MeshInstance3D" parent="Ribs"]
-transform = Transform3D(0.866025, -0.5, 0, 0.5, 0.866025, 0, 0, 0, 1, 0.25, 0.18, 0.22)
-mesh = SubResource("CylinderMesh_rib")
-
-[node name="RibRight1" type="MeshInstance3D" parent="Ribs"]
-transform = Transform3D(0.866025, 0.5, 0, -0.5, 0.866025, 0, 0, 0, 1, -0.25, 0.2, -0.22)
-mesh = SubResource("CylinderMesh_rib")
-
-[node name="RibRight2" type="MeshInstance3D" parent="Ribs"]
-transform = Transform3D(0.866025, 0.5, 0, -0.5, 0.866025, 0, 0, 0, 1, 0, 0.22, -0.24)
-mesh = SubResource("CylinderMesh_rib")
-
-[node name="RibRight3" type="MeshInstance3D" parent="Ribs"]
-transform = Transform3D(0.866025, 0.5, 0, -0.5, 0.866025, 0, 0, 0, 1, 0.25, 0.18, -0.22)
-mesh = SubResource("CylinderMesh_rib")
-
-[node name="HeadAndAntlers" type="Node3D" parent="."]
-transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 1.15, 0.15, -0.3)
-
-[node name="Skull" type="MeshInstance3D" parent="HeadAndAntlers"]
-transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0.08, 0)
-mesh = SubResource("BoxMesh_skull")
-
-[node name="AntlerLeftMain" type="MeshInstance3D" parent="HeadAndAntlers"]
-transform = Transform3D(0.866025, -0.433013, 0.25, 0.5, 0.75, -0.433013, 0, 0.5, 0.866025, -0.15, 0.45, -0.1)
-mesh = SubResource("CylinderMesh_antler_beam")
-
-[node name="TineLeft1" type="MeshInstance3D" parent="HeadAndAntlers/AntlerLeftMain"]
-transform = Transform3D(0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0, 1, 0.12, 0.15, 0)
-mesh = SubResource("CylinderMesh_antler_tine")
-
-[node name="AntlerRightMain" type="MeshInstance3D" parent="HeadAndAntlers"]
-transform = Transform3D(0.866025, 0.433013, -0.25, -0.5, 0.75, -0.433013, 0, 0.5, 0.866025, 0.15, 0.45, -0.1)
-mesh = SubResource("CylinderMesh_antler_beam")
-
-[node name="TineRight1" type="MeshInstance3D" parent="HeadAndAntlers/AntlerRightMain"]
-transform = Transform3D(0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0, 1, -0.12, 0.15, 0)
-mesh = SubResource("CylinderMesh_antler_tine")
-
-[node name="HindLeg1" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.965926, 0.258819, 0, 0, 0, 1, 0.258819, -0.965926, 0, -1.15, 0.1, 0.4)
-mesh = SubResource("CylinderMesh_leg")
-
-[node name="HindLeg2" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.866025, -0.5, 0, 0, 0, 1, -0.5, -0.866025, 0, -0.9, 0.1, 0.75)
-mesh = SubResource("CylinderMesh_leg")
-
-[node name="FrontLeg1" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.707107, 0.707107, 0, 0, 0, 1, 0.707107, -0.707107, 0, 0.65, 0.1, -0.6)
-mesh = SubResource("CylinderMesh_leg")
+[node name="CarcassMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = ExtResource("2_carcass_mesh")
+surface_material_override/0 = ExtResource("3_bone_mat")

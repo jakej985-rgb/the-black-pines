@@ -1,46 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://ranger_station_01"]
+[gd_scene load_steps=8 format=3 uid="uid://ranger_station_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
-[ext_resource type="Material" path="res://assets/materials/mat_cabin_wood.tres" id="2_wood_mat"]
+[ext_resource type="ArrayMesh" path="res://assets/models/cabin.obj" id="2_cabin_mesh"]
+[ext_resource type="Material" path="res://assets/materials/mat_cabin_wood.tres" id="3_wood_mat"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cabin"]
-size = Vector3(6.4, 3.4, 5.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_wall"]
-material = ExtResource("2_wood_mat")
-size = Vector3(6, 3.2, 5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_roof_tin"]
-albedo_color = Color(0.14, 0.13, 0.12, 1)
-metallic = 0.5
-roughness = 0.7
-
-[sub_resource type="PrismMesh" id="PrismMesh_roof"]
-material = SubResource("StandardMaterial3D_roof_tin")
-left_to_right = 0.5
-size = Vector3(7.2, 1.8, 6.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_porch_deck"]
-material = ExtResource("2_wood_mat")
-size = Vector3(5.6, 0.25, 1.8)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_pillar"]
-material = ExtResource("2_wood_mat")
-top_radius = 0.1
-bottom_radius = 0.12
-height = 2.8
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_window_dark"]
-albedo_color = Color(0.04, 0.05, 0.06, 1)
-roughness = 0.2
-
-[sub_resource type="BoxMesh" id="BoxMesh_window"]
-material = SubResource("StandardMaterial3D_window_dark")
-size = Vector3(1.1, 1.1, 0.1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_board"]
-material = ExtResource("2_wood_mat")
-size = Vector3(1.3, 0.18, 0.08)
+size = Vector3(6.8, 4.2, 7.2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_door_sign"]
 size = Vector3(1.4, 2.0, 0.4)
@@ -56,56 +21,17 @@ size = Vector3(0.5, 0.7, 0.04)
 [node name="RangerStation" type="Node3D"]
 
 [node name="CabinBody" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="CabinBody"]
-mesh = SubResource("BoxMesh_wall")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CabinBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0.4)
 shape = SubResource("BoxShape3D_cabin")
 
-[node name="RoofBody" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0.3)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RoofBody"]
-mesh = SubResource("PrismMesh_roof")
-
-[node name="PorchDeck" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 3.2)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="PorchDeck"]
-mesh = SubResource("BoxMesh_porch_deck")
-
-[node name="PillarLeft" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 1.5, 3.8)
-mesh = SubResource("CylinderMesh_pillar")
-
-[node name="PillarRight" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 1.5, 3.8)
-mesh = SubResource("CylinderMesh_pillar")
-
-[node name="WindowLeft" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 1.6, 2.52)
-mesh = SubResource("BoxMesh_window")
-
-[node name="WindowPlank1" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, -1.8, 1.7, 2.58)
-mesh = SubResource("BoxMesh_board")
-
-[node name="WindowPlank2" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.965926, -0.258819, 0, 0.258819, 0.965926, 0, 0, 0, 1, -1.8, 1.45, 2.58)
-mesh = SubResource("BoxMesh_board")
-
-[node name="WindowRight" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.6, 2.52)
-mesh = SubResource("BoxMesh_window")
-
-[node name="WindowPlank3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 1.6, 2.58)
-mesh = SubResource("BoxMesh_board")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CabinBody"]
+mesh = ExtResource("2_cabin_mesh")
+surface_material_override/0 = ExtResource("3_wood_mat")
 
 [node name="DoorSign" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.4, 2.55)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.5, 2.45)
 collision_layer = 1
 collision_mask = 0
 script = ExtResource("1_clue")
@@ -120,9 +46,9 @@ shape = SubResource("BoxShape3D_door_sign")
 mesh = SubResource("BoxMesh_notice_board")
 
 [node name="PorchLight" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 3.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 3.4)
 light_color = Color(1, 0.78, 0.45, 1)
 light_energy = 2.4
 shadow_enabled = true
-omni_range = 15.0
+omni_range = 16.0
 omni_attenuation = 1.15

@@ -1,79 +1,18 @@
-[gd_scene load_steps=7 format=3 uid="uid://pine_tree_01"]
+[gd_scene load_steps=5 format=3 uid="uid://pine_tree_01"]
 
-[ext_resource type="Material" path="res://assets/materials/mat_pine_bark.tres" id="1_bark"]
+[ext_resource type="ArrayMesh" path="res://assets/models/pine_tree.obj" id="1_tree_mesh"]
 [ext_resource type="Material" path="res://assets/materials/mat_pine_needles.tres" id="2_needles"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]
-height = 9.0
-radius = 0.4
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
-material = ExtResource("1_bark")
-top_radius = 0.16
-bottom_radius = 0.38
-height = 8.5
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_flare"]
-material = ExtResource("1_bark")
-top_radius = 0.38
-bottom_radius = 0.65
-height = 0.9
-
-[sub_resource type="BoxMesh" id="BoxMesh_stub"]
-material = ExtResource("1_bark")
-size = Vector3(0.1, 0.08, 0.8)
-
-[sub_resource type="PrismMesh" id="PrismMesh_bough"]
-material = ExtResource("2_needles")
-left_to_right = 0.5
-size = Vector3(3.2, 1.4, 2.6)
+height = 9.5
+radius = 0.45
 
 [node name="PineTree" type="StaticBody3D"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.75, 0)
 shape = SubResource("CylinderShape3D_trunk")
 
-[node name="RootFlare" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-mesh = SubResource("CylinderMesh_flare")
-
-[node name="Trunk" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.7, 0)
-mesh = SubResource("CylinderMesh_trunk")
-
-[node name="DeadStub1" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, 0.3, 2.2, 0)
-mesh = SubResource("BoxMesh_stub")
-
-[node name="DeadStub2" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.707107, 0, 0.707107, -0.183013, 0.965926, 0.183013, -0.683013, -0.258819, 0.683013, -0.2, 2.8, 0.2)
-mesh = SubResource("BoxMesh_stub")
-
-[node name="BoughTier1_A" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.965926, 0, 0.258819, 0, 0.95, 0, -0.258819, 0, 0.965926, 0, 4.2, 0)
-mesh = SubResource("PrismMesh_bough")
-
-[node name="BoughTier1_B" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.258819, 0, -0.965926, 0, 0.9, 0, 0.965926, 0, 0.258819, 0, 4.5, 0)
-mesh = SubResource("PrismMesh_bough")
-
-[node name="BoughTier2_A" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.683013, 0, 0.5, 0, 0.85, 0, -0.5, 0, 0.683013, 0, 5.7, 0)
-mesh = SubResource("PrismMesh_bough")
-
-[node name="BoughTier2_B" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.183013, 0, -0.7, 0, 0.8, 0, 0.7, 0, 0.183013, 0, 6.0, 0)
-mesh = SubResource("PrismMesh_bough")
-
-[node name="BoughTier3_A" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.5, 0, 0.3, 0, 0.75, 0, -0.3, 0, 0.5, 0, 7.2, 0)
-mesh = SubResource("PrismMesh_bough")
-
-[node name="BoughTier3_B" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.2, 0, -0.45, 0, 0.7, 0, 0.45, 0, 0.2, 0, 7.5, 0)
-mesh = SubResource("PrismMesh_bough")
-
-[node name="BoughTop" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.3, 0, 0, 0, 0.85, 0, 0, 0, 0.3, 0, 8.5, 0)
-mesh = SubResource("PrismMesh_bough")
+[node name="TreeMesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_tree_mesh")
+surface_material_override/0 = ExtResource("2_needles")

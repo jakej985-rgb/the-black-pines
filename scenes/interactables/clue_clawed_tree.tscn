@@ -1,44 +1,26 @@
-[gd_scene load_steps=7 format=3 uid="uid://clue_clawed_tree_01"]
+[gd_scene load_steps=6 format=3 uid="uid://clue_clawed_tree_01"]
 
 [ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
-[ext_resource type="PackedScene" path="res://scenes/world/pine_tree.tscn" id="2_tree"]
+[ext_resource type="ArrayMesh" path="res://assets/models/clawed_tree.obj" id="2_trunk_mesh"]
+[ext_resource type="Material" path="res://assets/materials/mat_pine_bark.tres" id="3_bark_mat"]
+[ext_resource type="Material" path="res://assets/materials/mat_exposed_wood.tres" id="4_wood_mat"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_claw_trigger"]
-size = Vector3(1.8, 2.5, 1.8)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sap"]
-albedo_color = Color(0.62, 0.42, 0.16, 1)
-roughness = 0.12
-metallic = 0.15
-rim_enabled = true
-rim = 0.5
-
-[sub_resource type="BoxMesh" id="BoxMesh_gouge"]
-material = SubResource("StandardMaterial3D_sap")
-size = Vector3(0.08, 1.2, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]
+height = 9.0
+radius = 0.55
 
 [node name="ClueClawedTree" type="StaticBody3D"]
 collision_layer = 1
 collision_mask = 0
 script = ExtResource("1_clue")
 prompt_message = "[E] Inspect Claw Marks"
-inspection_text = "Violent gouges scored deeply into the trunk 9 feet off the ground. Thick golden sap is still dripping down the shredded bark. No black bear or grizzly could reach this height standing upright. It marked this tree as its territory only moments ago."
-clue_title = "High Territorial Gouges"
-
-[node name="PineTree" parent="." instance=ExtResource("2_tree")]
+inspection_text = "Violent gouges carved 3 inches deep into the trunk 9 feet off the ground. The bark was shredded open like wet paper, exposing splintered sapwood dripping with thick golden resin. No black bear or grizzly could reach this height standing upright. It marked this tree as its territory only moments ago."
+clue_title = "Deep Territorial Gouges"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
-shape = SubResource("BoxShape3D_claw_trigger")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+shape = SubResource("CylinderShape3D_trunk")
 
-[node name="Gouge1" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 2.9, 0.36)
-mesh = SubResource("BoxMesh_gouge")
-
-[node name="Gouge2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0.38)
-mesh = SubResource("BoxMesh_gouge")
-
-[node name="Gouge3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 2.85, 0.36)
-mesh = SubResource("BoxMesh_gouge")
+[node name="TrunkMesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_trunk_mesh")
+surface_material_override/0 = ExtResource("3_bark_mat")

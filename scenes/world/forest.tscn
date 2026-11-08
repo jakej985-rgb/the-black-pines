@@ -19,6 +19,9 @@
 [ext_resource type="PackedScene" path="res://scenes/world/firewood_stack.tscn" id="17_firewood"]
 [ext_resource type="PackedScene" path="res://scenes/world/cabin_generator.tscn" id="18_generator"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/trail_marker.tscn" id="19_trail_marker"]
+[ext_resource type="PackedScene" path="res://scenes/world/rock_outcrop.tscn" id="20_rock_outcrop"]
+[ext_resource type="PackedScene" path="res://scenes/world/rock_craggy.tscn" id="21_rock_craggy"]
+[ext_resource type="PackedScene" path="res://scenes/world/rock_flat_slab.tscn" id="22_rock_slab"]
 
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
@@ -111,14 +114,32 @@ transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 
 [node name="FenceRight" parent="." instance=ExtResource("8_fence")]
 transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 4.5, 0, 7)
 
-[node name="Rock1" parent="." instance=ExtResource("6_rock")]
+[node name="RockOutcrop1" parent="." instance=ExtResource("20_rock_outcrop")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 11, 0, 1.5)
+
+[node name="RockOutcrop2" parent="." instance=ExtResource("20_rock_outcrop")]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -13.5, 0, -11)
+
+[node name="RockCraggy1" parent="." instance=ExtResource("21_rock_craggy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, 1.5)
 
-[node name="Rock2" parent="." instance=ExtResource("6_rock")]
-transform = Transform3D(1.3, 0, 0, 0, 1.2, 0, 0, 0, 1.3, -6, 0, -7)
+[node name="RockCraggy2" parent="." instance=ExtResource("21_rock_craggy")]
+transform = Transform3D(1.2, 0, 0, 0, 1.1, 0, 0, 0, 1.2, -6.2, 0, -6.8)
 
-[node name="Rock3" parent="." instance=ExtResource("6_rock")]
-transform = Transform3D(1.5, 0, 0, 0, 1.4, 0, 0, 0, 1.5, -12, 0, -14)
+[node name="RockCraggy3" parent="." instance=ExtResource("21_rock_craggy")]
+transform = Transform3D(1.3, 0, -0.4, 0, 1.2, 0, 0.4, 0, 1.3, -11.5, 0, -14.5)
+
+[node name="RockCraggy4" parent="." instance=ExtResource("21_rock_craggy")]
+transform = Transform3D(1.1, 0, 0.3, 0, 1.05, 0, -0.3, 0, 1.1, 7.8, 0, -14)
+
+[node name="RockSlab1" parent="." instance=ExtResource("22_rock_slab")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0, 2.8)
+
+[node name="RockSlab2" parent="." instance=ExtResource("22_rock_slab")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -4.2, 0, -2.5)
+
+[node name="RockSlab3" parent="." instance=ExtResource("22_rock_slab")]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 6.8, 0, -7.2)
 
 [node name="FallenLog1" parent="." instance=ExtResource("7_log")]
 transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -3.2, 0, -7.5)

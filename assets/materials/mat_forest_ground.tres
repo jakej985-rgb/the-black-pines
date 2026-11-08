@@ -1,32 +1,18 @@
-[gd_resource type="StandardMaterial3D" load_steps=5 format=3 uid="uid://mat_forest_ground_01"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://by17sae6ew2ly"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_soil"]
-noise_type = 0
-frequency = 0.025
-fractal_octaves = 3
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_soil_norm"]
-width = 512
-height = 512
-as_normal_map = true
-bump_strength = 0.85
-noise = SubResource("FastNoiseLite_soil")
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_puddles"]
-noise_type = 1
-frequency = 0.015
-fractal_octaves = 2
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_puddle_rough"]
-width = 512
-height = 512
-noise = SubResource("FastNoiseLite_puddles")
+[ext_resource type="Texture2D" uid="uid://cfumhowuua32" path="res://assets/textures/brown_mud_leaves_01/brown_mud_leaves_01_diffuse_1k.jpg" id="1_diff"]
+[ext_resource type="Texture2D" uid="uid://b7tdw6x64i4c4" path="res://assets/textures/brown_mud_leaves_01/brown_mud_leaves_01_nor_gl_1k.jpg" id="2_norm"]
+[ext_resource type="Texture2D" uid="uid://b802oevyjg655" path="res://assets/textures/brown_mud_leaves_01/brown_mud_leaves_01_rough_1k.jpg" id="3_rough"]
+[ext_resource type="Texture2D" uid="uid://bf8y5e8hgo5xe" path="res://assets/textures/brown_mud_leaves_01/brown_mud_leaves_01_ao_1k.jpg" id="4_ao"]
 
 [resource]
-albedo_color = Color(0.12, 0.1, 0.08, 1)
-roughness = 0.88
-roughness_texture = SubResource("NoiseTexture2D_puddle_rough")
+albedo_color = Color(0.85, 0.82, 0.8, 1)
+albedo_texture = ExtResource("1_diff")
+roughness = 0.9
+roughness_texture = ExtResource("3_rough")
 normal_enabled = true
-normal_scale = 0.9
-normal_texture = SubResource("NoiseTexture2D_soil_norm")
-uv1_scale = Vector3(10, 10, 10)
+normal_scale = 1.2
+normal_texture = ExtResource("2_norm")
+ao_enabled = true
+ao_texture = ExtResource("4_ao")
+uv1_scale = Vector3(25, 25, 25)

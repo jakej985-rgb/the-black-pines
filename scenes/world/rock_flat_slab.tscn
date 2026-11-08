@@ -1,17 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://rock_flat_slab_01"]
+[gd_scene load_steps=3 format=3 uid="uid://rock_flat_slab_01"]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/rock_flat_slab.obj" id="1_mesh"]
-[ext_resource type="Material" path="res://assets/materials/mat_craggy_rock.tres" id="2_rock_mat"]
+[ext_resource type="PackedScene" path="res://assets/imported/rock_moss_set_01/rock_moss_set_01_1k.gltf" id="1_moss_rocks"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_slab"]
-size = Vector3(2.3, 0.4, 1.7)
+size = Vector3(2.4, 0.5, 2.0)
 
 [node name="RockFlatSlab" type="StaticBody3D"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 shape = SubResource("BoxShape3D_slab")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = ExtResource("1_mesh")
-surface_material_override/0 = ExtResource("2_rock_mat")
+[node name="RockModel" parent="." instance=ExtResource("1_moss_rocks")]
+transform = Transform3D(0.9, 0, 0, 0, 0.45, 0, 0, 0, 0.9, 0, 0, 0)

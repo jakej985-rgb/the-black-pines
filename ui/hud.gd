@@ -5,6 +5,8 @@ extends CanvasLayer
 
 @onready var prompt_label: Label = $Root/PromptLabel
 @onready var stamina_bar: ProgressBar = $Root/BottomLeft/StaminaBar
+@onready var health_bar: ProgressBar = $Root/BottomLeft/HealthBar
+@onready var bleed_label: Label = $Root/BottomLeft/BleedLabel
 @onready var flashlight_label: Label = $Root/BottomRight/FlashlightLabel
 @onready var notification_label: Label = $Root/TopCenter/NotificationLabel
 @onready var inspection_panel: PanelContainer = $Root/InspectionPanel
@@ -17,6 +19,8 @@ func _ready() -> void:
 	prompt_label.text = ""
 	notification_label.text = ""
 	inspection_panel.visible = false
+	if bleed_label:
+		bleed_label.visible = false
 
 func _process(delta: float) -> void:
 	if notif_timer > 0.0:
@@ -26,16 +30,26 @@ func _process(delta: float) -> void:
 
 func setup_player(player: Player) -> void:
 	player.stamina_changed.connect(_on_stamina_changed)
+	player.health_changed.connect(_on_health_changed)
 	player.flashlight_toggled.connect(_on_flashlight_toggled)
 	player.interaction_prompt_changed.connect(_on_interaction_prompt_changed)
 	player.inspection_displayed.connect(_on_inspection_displayed)
 	player.notification_posted.connect(_on_notification_posted)
+	if player.health_component:
+		player.health_component.bleed_started.connect(func(): if bleed_label: bleed_label.visible = true)
+		player.health_component.bleed_stopped.connect(func(): if bleed_label: bleed_label.visible = false)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if inspection_panel.visible:
 		if event.is_action_pressed("interact") or event.is_action_pressed("toggle_pause"):
 			inspection_panel.visible = false
 			get_viewport().set_input_as_handled()
+
+func _on_health_changed(curr: float, max_val: float) -> void:
+	if health_bar:
+		health_bar.max_value = max_val
+		health_bar.value = curr
+		health_bar.modulate.a = 0.4 if curr >= max_val - 0.5 else 0.95
 
 func _on_stamina_changed(curr: float, max_val: float) -> void:
 	stamina_bar.max_value = max_val

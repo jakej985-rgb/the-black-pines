@@ -14,6 +14,9 @@ signal notification_posted(message: String)
 const InventoryManagerClass = preload("res://scripts/systems/inventory_manager.gd")
 const ActiveFlareScene = preload("res://scenes/interactables/active_flare.tscn")
 const DeployableTrapScene = preload("res://scenes/interactables/deployable_trap.tscn")
+const HealthComponentClass = preload("res://scripts/player/health_component.gd")
+
+var health_component = null
 
 @export_group("Movement")
 @export var walk_speed: float = 3.2
@@ -69,6 +72,22 @@ func _ready() -> void:
 		default_camera_pos = camera.position
 	stamina = max_stamina
 	stamina_changed.emit(stamina, max_stamina)
+
+	health_component = get_node_or_null("HealthComponent")
+	if not health_component:
+		health_component = HealthComponentClass.new()
+		health_component.name = "HealthComponent"
+		add_child(health_component)
+
+	health_component.health_changed.connect(func(c, m):
+		health = c
+		health_changed.emit(c, m)
+	)
+	health_component.player_died.connect(_on_player_died)
+	health_component.bleed_started.connect(func():
+		show_notification("HEMORRHAGE: You are bleeding! Use Antiseptic Bandage [3].")
+	)
+
 	health_changed.emit(health, 100.0)
 	if flashlight:
 		flashlight_toggled.emit(flashlight.visible)
@@ -105,6 +124,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		deploy_flare()
 	elif event.is_action_pressed("quick_trap"):
 		deploy_trap()
+	elif event.is_action_pressed("quick_heal"):
+		use_antiseptic_bandage()
 
 func _physics_process(delta: float) -> void:
 	# Gravity
@@ -274,6 +295,7 @@ func _ensure_default_input_actions() -> void:
 		"toggle_inventory": KEY_TAB,
 		"quick_flare": KEY_1,
 		"quick_trap": KEY_2,
+		"quick_heal": KEY_3,
 		"reload_battery": KEY_R
 	}
 	for action in default_actions:
@@ -282,6 +304,36 @@ func _ensure_default_input_actions() -> void:
 			var ev = InputEventKey.new()
 			ev.physical_keycode = default_actions[action]
 			InputMap.action_add_event(action, ev)
+
+func take_damage(amount: float, cause_bleed: bool = false, source: String = "") -> void:
+	if health_component:
+		health_component.take_damage(amount, cause_bleed, source)
+	else:
+		health = max(0.0, health - amount)
+		health_changed.emit(health, 100.0)
+	trigger_flashlight_flicker(0.8)
+
+func use_antiseptic_bandage() -> bool:
+	if not health_component:
+		return false
+	var ok = health_component.apply_antiseptic_bandage()
+	if ok:
+		show_notification("Treated lacerations with Antiseptic Bandage (+40 HP). Bleeding stopped.")
+		if AudioDirector.instance:
+			AudioDirector.instance.play_pickup()
+	else:
+		show_notification("No Antiseptic Bandages available in inventory.")
+	return ok
+
+func _on_player_died() -> void:
+	show_notification("CRITICAL INJURY: You collapsed in the freezing fog...")
+	velocity = Vector3.ZERO
+	await get_tree().create_timer(1.2).timeout
+	global_position = Vector3(0.0, 1.2, 5.0)
+	if health_component:
+		health_component.recover()
+	trigger_flashlight_flicker(2.0)
+	show_notification("You awaken revived near Ranger Station #04.")
 
 func _respawn_from_fall() -> void:
 	global_position = Vector3(0.0, 1.2, 5.0)

@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://ui/hud.gd" id="1_hud"]
 [ext_resource type="Shader" path="res://ui/horror_post_process.gdshader" id="2_shader"]
+[ext_resource type="PackedScene" path="res://ui/journal_dialog.tscn" id="3_journal"]
+[ext_resource type="PackedScene" path="res://ui/inventory_dialog.tscn" id="4_inventory"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
 shader = ExtResource("2_shader")
@@ -19,6 +21,13 @@ corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_fill"]
 bg_color = Color(0.35, 0.55, 0.45, 0.85)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_fill"]
+bg_color = Color(0.75, 0.2, 0.15, 0.85)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -125,10 +134,31 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 40.0
-offset_top = -80.0
+offset_top = -140.0
 offset_right = 240.0
 offset_bottom = -35.0
 grow_vertical = 0
+
+[node name="HealthTitle" type="Label" parent="Root/BottomLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.65, 0.65, 0.7)
+theme_override_font_sizes/font_size = 12
+text = "VITALITY"
+
+[node name="HealthBar" type="ProgressBar" parent="Root/BottomLeft"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_stamina_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_health_fill")
+value = 100.0
+show_percentage = false
+
+[node name="BleedLabel" type="Label" parent="Root/BottomLeft"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.15, 1)
+theme_override_font_sizes/font_size = 11
+text = "▲ BLEEDING - [3] Bandage"
 
 [node name="StaminaTitle" type="Label" parent="Root/BottomLeft"]
 layout_mode = 2
@@ -218,3 +248,11 @@ theme_override_colors/font_color = Color(0.55, 0.6, 0.6, 0.8)
 theme_override_font_sizes/font_size = 12
 text = "Press [E] or [Esc] to dismiss"
 horizontal_alignment = 1
+
+[node name="JournalDialog" parent="Root" instance=ExtResource("3_journal")]
+visible = false
+
+[node name="InventoryDialog" parent="Root" instance=ExtResource("4_inventory")]
+visible = false
+
+

@@ -35,11 +35,12 @@ All 8 child issues and the **Graphics Realism Overhaul Master Plan ([Issue #1](h
 - Completely replaced primitive cylinder/sphere visuals with a photorealistic, anatomically proportioned 3D cryptid model (`assets/models/sasquatch_*.obj` and `scenes/creatures/sasquatch.tscn`).
 - Implemented full skeletal hierarchy (Torso, Head, Arms, Hands, Legs, Feet) and fur cards geometry with dynamic cryptid fur shader (`assets/materials/sasquatch_fur.gdshader`).
 - Built complete AnimationPlayer pipeline (`idle_breathe`, `stalk_creep`, `stalk_turn`, `charge_sprint`, `attack_swipe`, `retreat`) fully hooked into `scripts/creatures/sasquatch.gd` state machine.
+- Resolved anatomical eye socket tracking in commit `8387954` ensuring glowing eyes remain locked inside skull orbits during aggressive charge animations.
 - Preserved all collision, eye glints, audio cues, and stalker AI logic.
 
 ### [Issue #7](https://github.com/jakej985-rgb/the-black-pines/issues/7): Upgrade Ranger Station, Props & Environmental Storytelling (P2)
-- **Ranger Station**: Multi-surface weathered plank cabin, corrugated iron roof, rain-spotted glass panes, and sturdy porch framework (`scenes/interactables/ranger_station.tscn`).
-- **Abandoned Camp**: Detailed canvas tent (`assets/models/tent.obj`), expedition stone firepit with charred logs and glowing embers (`camp_firepit.obj`), battered metal cooler (`camp_cooler.obj`), and kerosene lantern (`camp_lantern.obj`).
+- **Ranger Station**: Multi-surface weathered plank cabin, corrugated iron roof, and porch with dedicated deck/steps collision and unobstructed front notice board ([`ranger_station.tscn`](file:///home/m3tal/apps/the-black-pines/scenes/interactables/ranger_station.tscn)).
+- **Abandoned Camp**: Detailed canvas tent, stone firepit with glowing embers, cooler, lantern, and localized collision replacing the legacy blocking box for full clue accessibility.
 - **Mutilated Elk Carcass**: Anatomical bone structure with pried ribcage, broken marrow limbs, dark coagulated gore pool, and warm rising death vapor particles (`scenes/interactables/clue_carcass.tscn`).
 - **Clawed Tree Trunk**: Deep 10cm ragged claw gouges, splintered sapwood, and weeping amber resin veins (`scenes/interactables/clue_clawed_tree.tscn`).
 

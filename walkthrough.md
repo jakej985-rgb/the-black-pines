@@ -109,3 +109,136 @@ In response to gameplay test feedback, completed an end-to-end anatomical and ar
   - [x] `#7` [GRAPHICS][P2] Upgrade ranger station, props, and environmental storytelling assets
   - [x] `#8` [GRAPHICS][P2] Add believable forest weather and environmental motion
   - [x] `#9` [GRAPHICS][P1] Graphics scalability, profiling, and visual QA
+
+---
+
+## 4. 3D Art & Engine MCP Tooling Pipeline Integration
+
+The closed-loop 3D art and engine integration pipeline is fully configured and operational:
+
+```mermaid
+flowchart TD
+    A["Antigravity AI Agent"] --> B["Blender MCP"]
+    A --> C["Godot MCP"]
+    B --> D["Detailed 3D Models"]
+    D --> E["GLB Assets (.glb)"]
+    E --> F["Godot Scene (.tscn)"]
+    C --> F
+    F --> G["Run Game / Playtest"]
+    G --> H["Render Screenshot"]
+    H --> A["Inspect Visuals"]
+    A --> I["Inspect and Improve"]
+    I --> B
+    I --> C
+```
+
+### Installed Components & Tooling:
+1. **Blender 4.2.9 LTS**:
+   - Installed portable binary in `~/.local/opt/blender-4.2.9-linux-x64/` with symlink at `~/.local/bin/blender`.
+   - Blender MCP connector addon installed at `~/.config/blender/4.2/scripts/addons/mcp_connector_v2.py`.
+2. **Blender MCP Server (`blender-mcp`)**:
+   - Cloned from `mackson/blender-mcp` into `~/.local/share/mcp-servers/blender-mcp`.
+   - Built with TypeScript into `dist/index.js`.
+   - Configured in `~/.gemini/config/mcp_config.json` with stdio transport and WebSocket bridge to Blender (`ws://127.0.0.1:9876`).
+3. **Godot MCP Server (`godot-mcp`)**:
+   - Cloned from `Sods2/godot-mcp` into `~/.local/share/mcp-servers/godot-mcp`.
+   - Built with TypeScript into `build/index.js`.
+   - Configured in `~/.gemini/config/mcp_config.json` targeting `GODOT_PATH: /home/m3tal/.local/bin/godot`.
+   - Installed Godot Editor Bridge plugin into [`addons/godot_mcp_bridge/`](file:///home/m3tal/apps/the-black-pines/addons/godot_mcp_bridge) and enabled in [`project.godot`](file:///home/m3tal/apps/the-black-pines/project.godot).
+4. **Poly Haven Asset Sourcing Tool**:
+   - CLI utility created at [`scripts/tools/fetch_polyhaven_asset.py`](file:///home/m3tal/apps/the-black-pines/scripts/tools/fetch_polyhaven_asset.py).
+   - Supports search, asset inspection, downloading GLTF models and PBR texture maps (Albedo, OpenGL Normal, Roughness, AO), and automated Godot `.tres` material generation.
+5. **Agent Rules & Hardware Budget Guidelines**:
+   - Created [`GEMINI.md`](file:///home/m3tal/apps/the-black-pines/GEMINI.md) and [`.agents/rules/3d_art_pipeline.md`](file:///home/m3tal/apps/the-black-pines/.agents/rules/3d_art_pipeline.md).
+   - Enforces the anti-primitive rule, edge bevels, full PBR maps, GLB transfer standard, and strict GTX 960 hardware budgets (1K/2K texture limits, 60 FPS target).
+
+---
+
+## 5. Phase 2: Core Gameplay Loop & Survival Systems (Issues #17–#26)
+
+Following the visual overhaul, Phase 2 established a complete, interconnected, and test-driven gameplay loop:
+
+### Systems Overview & Deliverables
+
+1. **Investigation Journal & Story Objectives ([Issue #18](https://github.com/jakej985-rgb/the-black-pines/issues/18))**:
+   - **`JournalManager`** (`scripts/systems/journal_manager.gd`): Autoload singleton managing objectives (`LOCKED`, `ACTIVE`, `COMPLETED`, `FAILED`), discovered clues, and narrative pacing.
+   - **Interactive Journal UI** (`ui/journal_dialog.tscn` / `ui/journal_dialog.gd`): Toggled with `[J]`. Shows active assignments, completed investigation notes, discovered lore documents, and evidence entries with timestamps.
+   - **Automated Verification**: `tests/test_objectives_journal.gd` (100% pass).
+
+2. **Inventory, Resource Stacks & World Pickups ([Issue #19](https://github.com/jakej985-rgb/the-black-pines/issues/19))**:
+   - **`InventoryManager`** (`scripts/systems/inventory_manager.gd`): Autoload singleton with registry of 11 items across Resources, Tools, Consumables, and Evidence.
+   - **Duplication Prevention**: World pickup tracking by unique ID (`collected_world_objects`) prevents item respawns or duplication across reloads.
+   - **Interactive Inventory UI** (`ui/inventory_dialog.tscn` / `ui/inventory_dialog.gd`): Toggled with `[Tab]`.
+   - **Automated Verification**: `tests/test_inventory_state.gd` (100% pass).
+
+3. **Data-Driven Survival Crafting ([Issue #20](https://github.com/jakej985-rgb/the-black-pines/issues/20))**:
+   - **`CraftingManager`** (`scripts/systems/crafting_manager.gd`): Autoload singleton with atomic ingredient validation and recipe execution.
+   - **Recipes**:
+     - `recipe_spike_trap`: 2x Scrap Metal + 3x Dry Branches $\rightarrow$ 1x Improvised Spike Trap.
+     - `recipe_antiseptic_bandage`: 1x Clean Cloth + 2x Angelica Herbs $\rightarrow$ 1x Antiseptic Bandage.
+   - **UI Integration**: Dedicated Crafting Tab in `inventory_dialog.tscn`.
+   - **Automated Verification**: `tests/test_crafting_system.gd` (100% pass).
+
+4. **Deployable Spike Traps & Active Flares ([Issue #21](https://github.com/jakej985-rgb/the-black-pines/issues/21))**:
+   - **Authentic 3D Models**: Modeled via Blender into `.glb` format:
+     - `assets/models/trap_spike.glb`: Weathered cedar frame with 9 rusted jagged iron spikes.
+     - `assets/models/active_flare.glb`: Magnesium distress flare tube with glowing burning tip.
+   - **Deployables**:
+     - `DeployableTrap` (`scenes/interactables/deployable_trap.tscn`): Proximity trigger, 3.5s creature snare/stagger, single-use collapse.
+     - `ActiveFlare` (`scenes/interactables/active_flare.tscn`): 45s burn time, dynamic flickering omni-light, 14m fear aura.
+   - **Player Controls**: Quick-actions `[1]` (flare) and `[2]` (trap) with raycast ground snapping, steep slope rejection, and overlap prevention.
+   - **Automated Verification**: `tests/test_traps_flares.gd` (100% pass).
+
+5. **Player Health, Injury & Hemorrhage Loop ([Issue #22](https://github.com/jakej985-rgb/the-black-pines/issues/22))**:
+   - **`HealthComponent`** (`scripts/player/health_component.gd`): Modular health state management with bleeding damage over time (2.0 DPS hemorrhage from creature attacks).
+   - **Healing & Treatment**: `apply_antiseptic_bandage()` heals 40 HP and stops bleeding. Quick-use keybind on `[3]`.
+   - **HUD Feedback**: Pulsing red screen vignette and status indicator when bleeding.
+   - **Automated Verification**: `tests/test_health_damage.gd` (100% pass).
+
+6. **Sasquatch Stalking, Flanking & Attack AI ([Issue #23](https://github.com/jakej985-rgb/the-black-pines/issues/23))**:
+   - **State Machine** (`scripts/creatures/sasquatch.gd`):
+     - `IDLE_ROAM`: Ambient patrol in dense timber.
+     - `STALKING`: Shadowing the player while maintaining perimeter distance.
+     - `INVESTIGATING`: Auditory reaction to player sprinting within 22m.
+     - `FLANKING`: Maneuvering out of the player's direct line of sight.
+     - `ALERTED`: Roar telegraph prior to charge.
+     - `ATTACK_CHARGE`: 8.5 m/s charge delivering 28 damage + bleed strike.
+     - `RETREATING`: Safe disengagement into volumetric fog.
+     - `STAGGERED`: 3.5s snare reaction when stepping on spike traps.
+     - `FEARED`: Immediate fleeing when entering a 14m flare illumination aura.
+   - **Automated Verification**: `tests/test_sasquatch_ai.gd` (100% pass).
+
+7. **Spatial & Surface-Aware Audio ([Issue #24](https://github.com/jakej985-rgb/the-black-pines/issues/24))**:
+   - **`AudioDirector`** (`scripts/systems/audio_director.gd`): Procedural synthesis for 4 surface footstep textures (`PINE_NEEDLES`, `WOOD`, `MUD`, `STONE`), low-stamina ragged breathing, and distant territorial 3D wood knocks.
+   - **Surface Classification**: Downward raycast in `scripts/player/player.gd` checking collider and group attributes.
+   - **Automated Verification**: `tests/test_spatial_audio.gd` (100% pass).
+
+8. **Flashlight Battery Drain & Low-Power ([Issue #25](https://github.com/jakej985-rgb/the-black-pines/issues/25))**:
+   - **Power Management**: 0.8%/sec discharge rate while illuminated; zero drain while powered off.
+   - **Low Power & Cutoff**: Brownout flickering under 20% charge; automatic shutdown and toggle lockout at 0%.
+   - **Reload Mechanic**: `[R]` consumes a `battery_pack` from inventory and restores 100% charge.
+   - **HUD Integration**: Real-time battery meter in `ui/hud.tscn`.
+   - **Automated Verification**: `tests/test_flashlight_battery.gd` (100% pass).
+
+9. **Mission Loop & Save/Load Persistence ([Issue #26](https://github.com/jakej985-rgb/the-black-pines/issues/26))**:
+   - **`MissionDirector`** (`scripts/systems/mission_director.gd`): Tracks chapter objectives, evaluates extraction readiness (cabin investigated + 2 clues gathered + defenses crafted), and triggers shortwave radio extraction.
+   - **`SaveManager`** (`scripts/systems/save_manager.gd`): Atomic, versioned JSON serialization of player transform, health, battery, flashlight state, inventory, journal objectives, and world pickups.
+   - **Resilience**: Gracefully handles missing files, detects corrupted JSON syntax, and enforces schema version checks.
+   - **Automated Verification**: `tests/test_save_persistence.gd` (100% pass).
+
+---
+
+## 6. Complete Automated Test Suite (10/10 Passing)
+
+| Test Script | Scope | Result |
+|---|---|---|
+| `test_objectives_journal.gd` | Story objectives, clue discovery, UI state | **PASSED** |
+| `test_inventory_state.gd` | 11 items, stack clamping, atomic removal, world pickups | **PASSED** |
+| `test_crafting_system.gd` | Recipes, atomic deductions, inventory integration | **PASSED** |
+| `test_traps_flares.gd` | Deployable traps, active flares, creature fear/snare | **PASSED** |
+| `test_health_damage.gd` | HealthComponent, bleeding DoT, bandages, downing | **PASSED** |
+| `test_sasquatch_ai.gd` | AI FSM: Stalking, Sprint audio alert, Charge, Flare flee | **PASSED** |
+| `test_spatial_audio.gd` | 4 Surface types, stamina breathing, 3D wood knocks | **PASSED** |
+| `test_flashlight_battery.gd` | Battery drain, brownout flicker, reload with battery pack | **PASSED** |
+| `test_save_persistence.gd` | Save/load round-trip, JSON corruption fallback, extraction | **PASSED** |
+| `test_runtime_verification.gd` | Sasquatch rig, cabin, camp props, carcass, clawed tree | **PASSED** |

@@ -22,6 +22,8 @@ GraphicsSettings="*res://scripts/systems/graphics_settings.gd"
 Journal="*res://scripts/systems/journal_manager.gd"
 Inventory="*res://scripts/systems/inventory_manager.gd"
 Crafting="*res://scripts/systems/crafting_manager.gd"
+Mission="*res://scripts/systems/mission_director.gd"
+Save="*res://scripts/systems/save_manager.gd"
 
 [display]
 

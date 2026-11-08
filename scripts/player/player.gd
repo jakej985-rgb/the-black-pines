@@ -182,7 +182,10 @@ func _physics_process(delta: float) -> void:
 		if step_dist_accum >= threshold:
 			step_dist_accum = 0.0
 			if AudioDirector.instance:
-				AudioDirector.instance.play_footstep(is_sprinting)
+				var surface = _detect_ground_surface()
+				AudioDirector.instance.play_footstep(is_sprinting, surface)
+				if stamina < 25.0:
+					AudioDirector.instance.play_heavy_breathing()
 	else:
 		step_dist_accum = 0.0
 
@@ -422,3 +425,26 @@ func deploy_trap() -> bool:
 	if AudioDirector.instance:
 		AudioDirector.instance.play_pickup()
 	return true
+
+func _detect_ground_surface() -> int:
+	var world3d = get_world_3d()
+	if not world3d:
+		return 0 # PINE_NEEDLES
+	var space_state = world3d.direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.4, 0), global_position + Vector3(0, -1.2, 0))
+	query.exclude = [self.get_rid()]
+	var result = space_state.intersect_ray(query)
+	if result.is_empty():
+		return 0 # PINE_NEEDLES
+
+	var collider = result.get("collider")
+	if collider:
+		var name_str = (collider.name + " " + (collider.get_parent().name if collider.get_parent() else "")).to_lower()
+		if name_str.contains("wood") or name_str.contains("porch") or name_str.contains("cabin") or name_str.contains("step") or name_str.contains("floor") or name_str.contains("plank"):
+			return 1 # WOOD
+		if name_str.contains("rock") or name_str.contains("stone") or name_str.contains("boulder"):
+			return 3 # STONE
+		if name_str.contains("mud") or name_str.contains("marsh") or name_str.contains("wet") or name_str.contains("water"):
+			return 2 # MUD
+
+	return 0 # PINE_NEEDLES

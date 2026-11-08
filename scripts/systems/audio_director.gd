@@ -2,20 +2,36 @@ class_name AudioDirector
 extends Node
 
 ## Procedural horror audio synthesizer for The Black Pines.
-## Generates footsteps, wind ambient, branch snaps, and cryptid rumbles natively.
+## Synthesizes surface-aware footsteps (needles, wood, mud, stone), wind ambient,
+## branch snaps, cryptid roars, heavy stamina breathing, and territorial wood knocks.
 
 static var instance: AudioDirector = null
 
+enum SurfaceType {
+	PINE_NEEDLES = 0,
+	WOOD = 1,
+	MUD = 2,
+	STONE = 3
+}
+
 var wind_player: AudioStreamPlayer = null
 var footstep_player: AudioStreamPlayer = null
+var breath_player: AudioStreamPlayer = null
 var sfx_player: AudioStreamPlayer = null
 var ambient_timer: float = 6.0
+var knock_timer: float = 14.0
 
-var footstep_stream: AudioStreamWAV = null
+var footstep_needles_stream: AudioStreamWAV = null
+var footstep_wood_stream: AudioStreamWAV = null
+var footstep_mud_stream: AudioStreamWAV = null
+var footstep_stone_stream: AudioStreamWAV = null
+
 var branch_snap_stream: AudioStreamWAV = null
 var cryptid_growl_stream: AudioStreamWAV = null
 var click_stream: AudioStreamWAV = null
 var pickup_stream: AudioStreamWAV = null
+var breath_stream: AudioStreamWAV = null
+var wood_knock_stream: AudioStreamWAV = null
 
 func _enter_tree() -> void:
 	instance = self
@@ -35,9 +51,14 @@ func _setup_audio_players() -> void:
 
 	# Footsteps
 	footstep_player = AudioStreamPlayer.new()
-	footstep_player.stream = footstep_stream
 	footstep_player.volume_db = -10.0
 	add_child(footstep_player)
+
+	# Stamina Breathing
+	breath_player = AudioStreamPlayer.new()
+	breath_player.stream = breath_stream
+	breath_player.volume_db = -14.0
+	add_child(breath_player)
 
 	# 2D SFX
 	sfx_player = AudioStreamPlayer.new()
@@ -47,15 +68,36 @@ func _setup_audio_players() -> void:
 func _process(delta: float) -> void:
 	ambient_timer -= delta
 	if ambient_timer <= 0.0:
-		ambient_timer = randf_range(8.0, 18.0)
+		ambient_timer = randf_range(9.0, 20.0)
 		_play_random_distant_snap()
 
-func play_footstep(is_sprint: bool) -> void:
+	knock_timer -= delta
+	if knock_timer <= 0.0:
+		knock_timer = randf_range(18.0, 38.0)
+		play_distant_wood_knock()
+
+func play_footstep(is_sprint: bool, surface: SurfaceType = SurfaceType.PINE_NEEDLES) -> void:
 	if not footstep_player:
 		return
-	footstep_player.pitch_scale = randf_range(0.85, 1.15) if not is_sprint else randf_range(1.1, 1.3)
-	footstep_player.volume_db = -8.0 if is_sprint else -12.0
+
+	match surface:
+		SurfaceType.WOOD:
+			footstep_player.stream = footstep_wood_stream
+		SurfaceType.MUD:
+			footstep_player.stream = footstep_mud_stream
+		SurfaceType.STONE:
+			footstep_player.stream = footstep_stone_stream
+		_:
+			footstep_player.stream = footstep_needles_stream
+
+	footstep_player.pitch_scale = randf_range(0.88, 1.12) if not is_sprint else randf_range(1.10, 1.28)
+	footstep_player.volume_db = -8.0 if is_sprint else -11.0
 	footstep_player.play()
+
+func play_heavy_breathing() -> void:
+	if breath_player and not breath_player.playing:
+		breath_player.pitch_scale = randf_range(0.92, 1.05)
+		breath_player.play()
 
 func play_click() -> void:
 	if sfx_player and click_stream:
@@ -75,9 +117,21 @@ func play_cryptid_roar(pos_3d: Vector3 = Vector3.ZERO) -> void:
 	var player_3d = AudioStreamPlayer3D.new()
 	player_3d.stream = cryptid_growl_stream
 	player_3d.position = pos_3d
-	player_3d.max_distance = 60.0
+	player_3d.max_distance = 65.0
 	player_3d.volume_db = 6.0
 	player_3d.pitch_scale = randf_range(0.85, 1.0)
+	add_child(player_3d)
+	player_3d.play()
+	player_3d.finished.connect(func(): player_3d.queue_free())
+
+func play_distant_wood_knock() -> void:
+	var player_3d = AudioStreamPlayer3D.new()
+	player_3d.stream = wood_knock_stream
+	var angle = randf() * TAU
+	var dist = randf_range(28.0, 50.0)
+	player_3d.position = Vector3(cos(angle) * dist, 2.0, sin(angle) * dist)
+	player_3d.max_distance = 60.0
+	player_3d.volume_db = 4.0
 	add_child(player_3d)
 	player_3d.play()
 	player_3d.finished.connect(func(): player_3d.queue_free())
@@ -85,7 +139,6 @@ func play_cryptid_roar(pos_3d: Vector3 = Vector3.ZERO) -> void:
 func _play_random_distant_snap() -> void:
 	var player_3d = AudioStreamPlayer3D.new()
 	player_3d.stream = branch_snap_stream
-	# Place snap somewhere out in the trees 15-30m away
 	var angle = randf() * TAU
 	var dist = randf_range(16.0, 32.0)
 	player_3d.position = Vector3(cos(angle) * dist, 1.0, sin(angle) * dist)
@@ -98,13 +151,19 @@ func _play_random_distant_snap() -> void:
 # ================= AUDIO SYNTHESIS =================
 
 func _generate_audio_streams() -> void:
-	footstep_stream = _synthesize_footstep()
+	footstep_needles_stream = _synthesize_needles_footstep()
+	footstep_wood_stream = _synthesize_wood_footstep()
+	footstep_mud_stream = _synthesize_mud_footstep()
+	footstep_stone_stream = _synthesize_stone_footstep()
+
 	branch_snap_stream = _synthesize_branch_snap()
 	cryptid_growl_stream = _synthesize_cryptid_roar()
 	click_stream = _synthesize_click()
 	pickup_stream = _synthesize_pickup()
+	breath_stream = _synthesize_breathing()
+	wood_knock_stream = _synthesize_wood_knock()
 
-func _synthesize_footstep() -> AudioStreamWAV:
+func _synthesize_needles_footstep() -> AudioStreamWAV:
 	var sample_rate: int = 22050
 	var duration: float = 0.14
 	var total_samples: int = int(sample_rate * duration)
@@ -115,18 +174,121 @@ func _synthesize_footstep() -> AudioStreamWAV:
 	for i in range(total_samples):
 		var t: float = float(i) / float(total_samples)
 		var env: float = exp(-t * 22.0)
-		# Lowpass filtered noise for damp needle/dirt crunch
 		var white: float = randf_range(-1.0, 1.0)
 		last_val = lerp(last_val, white, 0.18)
 		var val: float = last_val * env * 0.9
 		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, sample)
 
-	var wav = AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = sample_rate
-	wav.data = data
-	return wav
+	return _create_wav(data, sample_rate)
+
+func _synthesize_wood_footstep() -> AudioStreamWAV:
+	var sample_rate: int = 22050
+	var duration: float = 0.16
+	var total_samples: int = int(sample_rate * duration)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+
+	var phase: float = 0.0
+	for i in range(total_samples):
+		var t: float = float(i) / float(total_samples)
+		var env: float = exp(-t * 18.0)
+		# Hollow 160Hz body tone + sharp click transient
+		phase += (160.0 * TAU) / sample_rate
+		var tone: float = sin(phase) * 0.7 + sin(phase * 2.2) * 0.3
+		var transient: float = randf_range(-0.5, 0.5) * exp(-t * 80.0)
+		var val: float = (tone * 0.7 + transient) * env * 0.95
+		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample)
+
+	return _create_wav(data, sample_rate)
+
+func _synthesize_mud_footstep() -> AudioStreamWAV:
+	var sample_rate: int = 22050
+	var duration: float = 0.18
+	var total_samples: int = int(sample_rate * duration)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+
+	var last_val: float = 0.0
+	for i in range(total_samples):
+		var t: float = float(i) / float(total_samples)
+		# Squelch suction envelope: attack, squish, slow suction pull
+		var env: float = (sin(t * PI) if t < 0.3 else exp(-t * 12.0))
+		var freq: float = lerp(130.0, 70.0, t)
+		var squelch_noise: float = randf_range(-1.0, 1.0)
+		last_val = lerp(last_val, squelch_noise, 0.08)
+		var val: float = (last_val * 0.6 + sin(float(i) * freq * TAU / sample_rate) * 0.4) * env * 0.9
+		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample)
+
+	return _create_wav(data, sample_rate)
+
+func _synthesize_stone_footstep() -> AudioStreamWAV:
+	var sample_rate: int = 22050
+	var duration: float = 0.12
+	var total_samples: int = int(sample_rate * duration)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+
+	var last_val: float = 0.0
+	for i in range(total_samples):
+		var t: float = float(i) / float(total_samples)
+		var env: float = exp(-t * 28.0)
+		var white: float = randf_range(-1.0, 1.0)
+		last_val = lerp(last_val, white, 0.45) # Higher frequency grit
+		var val: float = last_val * env * 0.95
+		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample)
+
+	return _create_wav(data, sample_rate)
+
+func _synthesize_breathing() -> AudioStreamWAV:
+	var sample_rate: int = 22050
+	var duration: float = 1.4
+	var total_samples: int = int(sample_rate * duration)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+
+	var last_val: float = 0.0
+	for i in range(total_samples):
+		var t: float = float(i) / float(total_samples)
+		# Inhale (0.0 to 0.6) and Exhale (0.7 to 1.3)
+		var swell: float = sin(t * TAU * 0.8)
+		var env: float = max(0.0, swell) * 0.7
+		var white: float = randf_range(-1.0, 1.0)
+		last_val = lerp(last_val, white, 0.12)
+		var val: float = last_val * env * 0.75
+		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample)
+
+	return _create_wav(data, sample_rate)
+
+func _synthesize_wood_knock() -> AudioStreamWAV:
+	var sample_rate: int = 22050
+	var duration: float = 0.9
+	var total_samples: int = int(sample_rate * duration)
+	var data := PackedByteArray()
+	data.resize(total_samples * 2)
+
+	for i in range(total_samples):
+		var t: float = float(i) / float(sample_rate)
+		var val: float = 0.0
+
+		# Knock 1 at t=0.0
+		if t < 0.35:
+			var env1: float = exp(-t * 26.0)
+			val += sin(t * 230.0 * TAU) * env1 * 0.85
+		# Knock 2 at t=0.38
+		if t >= 0.38:
+			var t2 = t - 0.38
+			var env2: float = exp(-t2 * 24.0)
+			val += sin(t2 * 210.0 * TAU) * env2 * 0.9
+
+		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
+		data.encode_s16(i * 2, sample)
+
+	return _create_wav(data, sample_rate)
 
 func _synthesize_branch_snap() -> AudioStreamWAV:
 	var sample_rate: int = 22050
@@ -144,11 +306,7 @@ func _synthesize_branch_snap() -> AudioStreamWAV:
 		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, sample)
 
-	var wav = AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = sample_rate
-	wav.data = data
-	return wav
+	return _create_wav(data, sample_rate)
 
 func _synthesize_cryptid_roar() -> AudioStreamWAV:
 	var sample_rate: int = 22050
@@ -160,22 +318,16 @@ func _synthesize_cryptid_roar() -> AudioStreamWAV:
 	var lfo_phase: float = 0.0
 	for i in range(total_samples):
 		var t: float = float(i) / float(total_samples)
-		# Slow attack, sustained heavy rumble, long release
 		var env: float = sin(t * PI)
-		var freq: float = lerp(85.0, 48.0, t) # descending guttural pitch
+		var freq: float = lerp(85.0, 48.0, t)
 		lfo_phase += (freq * TAU) / sample_rate
 		var base_tone: float = sin(lfo_phase) + 0.45 * sin(lfo_phase * 2.0) + 0.25 * sin(lfo_phase * 0.5)
-		# Add rough guttural distortion
 		var growl_noise: float = randf_range(-0.35, 0.35) * env
 		var val: float = (base_tone * 0.65 + growl_noise) * env * 0.95
 		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, sample)
 
-	var wav = AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = sample_rate
-	wav.data = data
-	return wav
+	return _create_wav(data, sample_rate)
 
 func _synthesize_click() -> AudioStreamWAV:
 	var sample_rate: int = 22050
@@ -191,55 +343,52 @@ func _synthesize_click() -> AudioStreamWAV:
 		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, sample)
 
-	var wav = AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = sample_rate
-	wav.data = data
-	return wav
+	return _create_wav(data, sample_rate)
 
 func _synthesize_pickup() -> AudioStreamWAV:
 	var sample_rate: int = 22050
-	var duration: float = 0.22
+	var duration: float = 0.12
 	var total_samples: int = int(sample_rate * duration)
 	var data := PackedByteArray()
 	data.resize(total_samples * 2)
 
+	var phase: float = 0.0
 	for i in range(total_samples):
 		var t: float = float(i) / float(total_samples)
-		var env: float = exp(-t * 12.0)
-		var tone1: float = sin(float(i) * (520.0 * TAU / sample_rate))
-		var tone2: float = sin(float(i) * (780.0 * TAU / sample_rate))
-		var val: float = (tone1 * 0.5 + tone2 * 0.5) * env * 0.7
+		var env: float = exp(-t * 16.0)
+		var freq: float = lerp(480.0, 760.0, t)
+		phase += (freq * TAU) / sample_rate
+		var val: float = sin(phase) * env * 0.9
 		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, sample)
 
-	var wav = AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = sample_rate
-	wav.data = data
-	return wav
+	return _create_wav(data, sample_rate)
 
 func _generate_wind_loop() -> AudioStreamWAV:
-	var sample_rate: int = 11025
-	var duration: float = 3.5
+	var sample_rate: int = 22050
+	var duration: float = 4.0
 	var total_samples: int = int(sample_rate * duration)
 	var data := PackedByteArray()
 	data.resize(total_samples * 2)
 
-	var filter_acc: float = 0.0
+	var last_val: float = 0.0
 	for i in range(total_samples):
 		var t: float = float(i) / float(total_samples)
+		var mod: float = 0.65 + 0.35 * sin(t * TAU * 1.5)
 		var white: float = randf_range(-1.0, 1.0)
-		# Deep lowpass filter to mimic howling wind
-		var cut: float = 0.04 + 0.02 * sin(t * TAU * 1.5)
-		filter_acc = lerp(filter_acc, white, cut)
-		var val: float = filter_acc * 0.8
+		last_val = lerp(last_val, white, 0.035)
+		var val: float = last_val * mod * 0.7
 		var sample: int = int(clamp(val * 32767.0, -32768.0, 32767.0))
 		data.encode_s16(i * 2, sample)
 
+	var wav = _create_wav(data, sample_rate)
+	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wav.loop_end = total_samples
+	return wav
+
+func _create_wav(data: PackedByteArray, sample_rate: int) -> AudioStreamWAV:
 	var wav = AudioStreamWAV.new()
 	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	wav.mix_rate = sample_rate
 	wav.data = data
 	return wav

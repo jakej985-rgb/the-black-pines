@@ -4,7 +4,7 @@ extends CharacterBody3D
 ## Cryptid stalker entity for The Black Pines.
 ## Watches from the shadows, flickers player equipment, and vanishes into the fog.
 
-enum State { STALKING, ALERTED, RETREATING, GONE }
+enum State { STALKING, ALERTED, RETREATING, GONE, STAGGERED, FEARED }
 
 @export var stalk_distance_trigger: float = 14.0
 @export var retreat_speed: float = 7.5
@@ -13,6 +13,10 @@ var current_state: State = State.STALKING
 var player_ref: Player = null
 var look_at_timer: float = 0.0
 var retreat_timer: float = 0.0
+var stagger_timer: float = 0.0
+var fear_timer: float = 0.0
+var fear_source_pos: Vector3 = Vector3.ZERO
+var creature_health: float = 120.0
 var eye_mat: StandardMaterial3D = null
 
 @onready var head_visual: Node3D = get_node_or_null("Visuals/Torso/Head")
@@ -59,6 +63,10 @@ func _physics_process(delta: float) -> void:
 			_process_alerted(delta)
 		State.RETREATING:
 			_process_retreating(delta)
+		State.STAGGERED:
+			_process_staggered(delta)
+		State.FEARED:
+			_process_feared(delta)
 
 func _sync_head_transform() -> void:
 	if head_visual and head_node and head_node != head_visual:
@@ -153,3 +161,46 @@ func _process_retreating(delta: float) -> void:
 	if retreat_timer <= 0.0:
 		current_state = State.GONE
 		queue_free()
+
+func _process_staggered(delta: float) -> void:
+	stagger_timer -= delta
+	velocity = Vector3.ZERO
+	move_and_slide()
+	if stagger_timer <= 0.0:
+		current_state = State.RETREATING
+		retreat_timer = 3.5
+
+func _process_feared(delta: float) -> void:
+	fear_timer -= delta
+	var diff = global_position - fear_source_pos
+	diff.y = 0.0
+	if diff.length_squared() > 0.05:
+		var away_dir = diff.normalized()
+		velocity = away_dir * retreat_speed
+		move_and_slide()
+	if fear_timer <= 0.0:
+		current_state = State.RETREATING
+		retreat_timer = 2.0
+
+func apply_trap_stagger(duration: float, damage: float) -> void:
+	creature_health -= damage
+	stagger_timer = duration
+	current_state = State.STAGGERED
+	velocity = Vector3.ZERO
+	if anim_player:
+		anim_player.play("stalking")
+	if AudioDirector.instance:
+		AudioDirector.instance.play_cryptid_roar(global_position)
+
+func apply_flare_fear(flare_pos: Vector3, duration: float) -> void:
+	fear_source_pos = flare_pos
+	fear_timer = duration
+	current_state = State.FEARED
+	if anim_player:
+		anim_player.play("retreat")
+
+func take_damage(amount: float) -> void:
+	creature_health -= amount
+	if creature_health <= 0.0:
+		current_state = State.RETREATING
+		retreat_timer = 2.0

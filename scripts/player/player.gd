@@ -11,6 +11,10 @@ signal inspection_displayed(title: String, body: String)
 signal inventory_updated(inventory: Dictionary)
 signal notification_posted(message: String)
 
+const InventoryManagerClass = preload("res://scripts/systems/inventory_manager.gd")
+const ActiveFlareScene = preload("res://scenes/interactables/active_flare.tscn")
+const DeployableTrapScene = preload("res://scenes/interactables/deployable_trap.tscn")
+
 @export_group("Movement")
 @export var walk_speed: float = 3.2
 @export var sprint_speed: float = 6.0
@@ -96,6 +100,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		if current_interactable and current_interactable.is_usable:
 			current_interactable.interact(self)
+
+	if event.is_action_pressed("quick_flare"):
+		deploy_flare()
+	elif event.is_action_pressed("quick_trap"):
+		deploy_trap()
 
 func _physics_process(delta: float) -> void:
 	# Gravity
@@ -260,7 +269,12 @@ func _ensure_default_input_actions() -> void:
 		"jump": KEY_SPACE,
 		"interact": KEY_E,
 		"toggle_flashlight": KEY_F,
-		"toggle_pause": KEY_ESCAPE
+		"toggle_pause": KEY_ESCAPE,
+		"toggle_journal": KEY_J,
+		"toggle_inventory": KEY_TAB,
+		"quick_flare": KEY_1,
+		"quick_trap": KEY_2,
+		"reload_battery": KEY_R
 	}
 	for action in default_actions:
 		if not InputMap.has_action(action):
@@ -274,3 +288,85 @@ func _respawn_from_fall() -> void:
 	velocity = Vector3.ZERO
 	trigger_flashlight_flicker(1.5)
 	notification_posted.emit("The dense fog and steep ravine drop turn you back towards Ranger Station #04.")
+
+func _find_ground_placement(max_dist: float = 2.8) -> Dictionary:
+	var world3d = get_world_3d()
+	if not world3d:
+		return {}
+	var space_state = world3d.direct_space_state
+	var cam_forward = -camera.global_transform.basis.z if camera else -transform.basis.z
+	var ray_origin = (camera.global_position if camera else global_position) + cam_forward * 0.6
+	var ray_end = ray_origin + cam_forward * (max_dist - 0.6) + Vector3(0, -3.5, 0)
+
+	var query = PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
+	query.exclude = [self.get_rid()]
+	return space_state.intersect_ray(query)
+
+func deploy_flare() -> bool:
+	var inv = InventoryManagerClass.instance
+	if not inv or not inv.has_item("road_flare", 1):
+		show_notification("No road flares in inventory.")
+		return false
+
+	var hit = _find_ground_placement(2.8)
+	var spawn_pos: Vector3
+	if not hit.is_empty():
+		var normal: Vector3 = hit.get("normal", Vector3.UP)
+		if normal.y < 0.4:
+			show_notification("Cannot deploy flare: surface too steep.")
+			return false
+		spawn_pos = hit["position"] + Vector3(0, 0.05, 0)
+	else:
+		# Fallback placement directly in front of feet if on floor
+		spawn_pos = global_position - transform.basis.z * 1.2 + Vector3(0, 0.05, 0)
+
+	if not inv.remove_item("road_flare", 1):
+		show_notification("Failed to retrieve flare from inventory.")
+		return false
+
+	var flare = ActiveFlareScene.instantiate()
+	var parent_node = get_parent() if get_parent() else self
+	parent_node.add_child(flare)
+	flare.global_position = spawn_pos
+
+	show_notification("Distress Flare deployed and burning!")
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
+	return true
+
+func deploy_trap() -> bool:
+	var inv = InventoryManagerClass.instance
+	if not inv or not inv.has_item("trap_spike", 1):
+		show_notification("No spike traps in inventory. Craft one via [Tab].")
+		return false
+
+	var hit = _find_ground_placement(2.5)
+	var spawn_pos: Vector3
+	if not hit.is_empty():
+		var normal: Vector3 = hit.get("normal", Vector3.UP)
+		if normal.y < 0.65:
+			show_notification("Cannot deploy trap: ground is too steep.")
+			return false
+		spawn_pos = hit["position"]
+	else:
+		spawn_pos = global_position - transform.basis.z * 1.5
+
+	# Check for overlapping existing traps within 1.4m
+	for existing in get_tree().get_nodes_in_group("traps"):
+		if existing is Node3D and existing.global_position.distance_to(spawn_pos) < 1.4:
+			show_notification("Cannot place trap: too close to an existing trap.")
+			return false
+
+	if not inv.remove_item("trap_spike", 1):
+		show_notification("Failed to retrieve trap from inventory.")
+		return false
+
+	var trap = DeployableTrapScene.instantiate()
+	var parent_node = get_parent() if get_parent() else self
+	parent_node.add_child(trap)
+	trap.global_position = spawn_pos
+
+	show_notification("Improvised Spike Trap armed and deployed!")
+	if AudioDirector.instance:
+		AudioDirector.instance.play_pickup()
+	return true

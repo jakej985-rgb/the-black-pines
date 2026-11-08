@@ -41,6 +41,7 @@ var foliage_materials: Array[ShaderMaterial] = []
 
 func _enter_tree() -> void:
 	instance = self
+	_init_foliage_materials()
 
 func _ready() -> void:
 	current_wind_speed = base_wind_speed

@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://clue_footprint_01"]
+
+[ext_resource type="Script" path="res://scripts/interaction/inspectable_clue.gd" id="1_clue"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_footprint"]
+size = Vector3(1.2, 0.4, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_imprint"]
+albedo_color = Color(0.12, 0.08, 0.06, 1)
+roughness = 0.95
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_imprint"]
+material = SubResource("StandardMaterial3D_imprint")
+top_radius = 0.35
+bottom_radius = 0.4
+height = 0.04
+
+[node name="ClueFootprint" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_clue")
+prompt_message = "[E] Inspect Massive Track"
+inspection_text = "Enormous bipedal footprint pressed deep into the muddy needle bed. The stride length between steps is unnatural. Long, heavy claw indentations are visible at the toes. Whatever passed through here was massive and walked upright."
+clue_title = "Giant Clawed Track"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("BoxShape3D_footprint")
+
+[node name="ImprintMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.7, 0, 0, 0, 1, 0, 0, 0, 1.3, 0, 0.02, 0)
+mesh = SubResource("CylinderMesh_imprint")

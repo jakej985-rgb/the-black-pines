@@ -1,0 +1,201 @@
+[gd_scene load_steps=5 format=3 uid="uid://hud_scene_01"]
+
+[ext_resource type="Script" path="res://ui/hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_bg"]
+bg_color = Color(0.1, 0.1, 0.1, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_fill"]
+bg_color = Color(0.35, 0.55, 0.45, 0.85)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inspection"]
+bg_color = Color(0.05, 0.07, 0.08, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.35, 0.3, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+expand_margin_left = 20.0
+expand_margin_top = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 20.0
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Crosshair" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.6)
+
+[node name="PromptLabel" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="TopCenter" type="BoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 40.0
+offset_right = 300.0
+offset_bottom = 80.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="NotificationLabel" type="Label" parent="Root/TopCenter"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="BottomLeft" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = -35.0
+grow_vertical = 0
+
+[node name="StaminaTitle" type="Label" parent="Root/BottomLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.7, 0.7)
+theme_override_font_sizes/font_size = 12
+text = "STAMINA"
+
+[node name="StaminaBar" type="ProgressBar" parent="Root/BottomLeft"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_stamina_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_stamina_fill")
+value = 100.0
+show_percentage = false
+
+[node name="BottomRight" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -100.0
+offset_right = -40.0
+offset_bottom = -35.0
+grow_horizontal = 0
+grow_vertical = 0
+alignment = 2
+
+[node name="FlashlightLabel" type="Label" parent="Root/BottomRight"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "[F] FLASHLIGHT: ON"
+horizontal_alignment = 2
+
+[node name="ControlsHint" type="Label" parent="Root/BottomRight"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.6, 0.6)
+theme_override_font_sizes/font_size = 12
+text = "WASD: Move | Shift: Sprint | E: Interact"
+horizontal_alignment = 2
+
+[node name="InspectionPanel" type="PanelContainer" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -140.0
+offset_right = 260.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inspection")
+
+[node name="VBox" type="VBoxContainer" parent="Root/InspectionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InspectionTitle" type="Label" parent="Root/InspectionPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.85, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+text = "Cryptid Clue"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Root/InspectionPanel/VBox"]
+layout_mode = 2
+
+[node name="InspectionBody" type="Label" parent="Root/InspectionPanel/VBox"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.85, 0.88, 0.88, 1)
+theme_override_font_sizes/font_size = 15
+text = "Observation notes..."
+autowrap_mode = 2
+
+[node name="CloseHint" type="Label" parent="Root/InspectionPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.6, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "Press [E] or [Esc] to dismiss"
+horizontal_alignment = 1

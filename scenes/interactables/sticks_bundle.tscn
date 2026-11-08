@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://sticks_bundle_01"]
+
+[ext_resource type="Script" path="res://scripts/interaction/collectible_item.gd" id="1_item"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sticks"]
+size = Vector3(0.8, 0.4, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.28, 0.18, 0.1, 1)
+roughness = 0.9
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_stick"]
+material = SubResource("StandardMaterial3D_wood")
+top_radius = 0.04
+bottom_radius = 0.05
+height = 0.75
+
+[node name="SticksBundle" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1_item")
+item_name = "Dry Pine Branches"
+quantity = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+shape = SubResource("BoxShape3D_sticks")
+
+[node name="Stick1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.258819, 0, 0.965926, 0.965926, 0, -0.258819, 0, 1, 0, 0, 0.04, 0)
+mesh = SubResource("CylinderMesh_stick")
+
+[node name="Stick2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0.258819, 0, 0.965926, 0, 1, 0, 0.05, 0.08, 0)
+mesh = SubResource("CylinderMesh_stick")

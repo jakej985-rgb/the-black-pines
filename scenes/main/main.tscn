@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3 uid="uid://main_scene_01"]
+
+[ext_resource type="Script" path="res://scripts/systems/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/world/forest.tscn" id="2_forest"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="4_hud"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="Forest" parent="." instance=ExtResource("2_forest")]
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 4)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]

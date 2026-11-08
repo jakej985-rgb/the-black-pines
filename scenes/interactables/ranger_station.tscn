@@ -67,11 +67,11 @@ shape = SubResource("BoxShape3D_wall_front_half")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.05, 1.8, 2.6)
 shape = SubResource("BoxShape3D_wall_front_half")
 
-[node name="PorchCollision" type="CollisionShape3D" parent="CabinBody"]
+[node name="CollisionShape3D_porch" type="CollisionShape3D" parent="CabinBody"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19, 3.6)
 shape = SubResource("BoxShape3D_porch")
 
-[node name="StepsCollision" type="CollisionShape3D" parent="CabinBody"]
+[node name="CollisionShape3D_steps" type="CollisionShape3D" parent="CabinBody"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.13, 4.95)
 shape = SubResource("BoxShape3D_steps")
 

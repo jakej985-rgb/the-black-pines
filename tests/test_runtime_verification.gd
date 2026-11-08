@@ -23,12 +23,12 @@ func _init() -> void:
 	assert(sasquatch.get_node("Visuals/Torso/ShoulderRight") != null, "Missing ShoulderRight")
 	assert(sasquatch.get_node("Visuals/Pelvis/LegLeftUpper") != null, "Missing LegLeftUpper")
 	assert(sasquatch.get_node("Visuals/Pelvis/LegRightUpper") != null, "Missing LegRightUpper")
-	assert(sasquatch.get_node("Visuals/Torso/Head/EyeLeft") != null, "Missing EyeLeft")
-	assert(sasquatch.get_node("Visuals/Torso/Head/EyeRight") != null, "Missing EyeRight")
+	assert(sasquatch.get_node("Head/EyeLeft") != null, "Missing Head/EyeLeft")
+	assert(sasquatch.get_node("Head/EyeRight") != null, "Missing Head/EyeRight")
 
 	# Verify eye socket alignment
-	var eye_l: OmniLight3D = sasquatch.get_node("Visuals/Torso/Head/EyeLeft")
-	var eye_r: OmniLight3D = sasquatch.get_node("Visuals/Torso/Head/EyeRight")
+	var eye_l: OmniLight3D = sasquatch.get_node("Head/EyeLeft")
+	var eye_r: OmniLight3D = sasquatch.get_node("Head/EyeRight")
 	assert(abs(eye_l.position.x - (-0.13)) < 0.02, "EyeLeft socket X out of alignment")
 	assert(abs(eye_r.position.x - 0.13) < 0.02, "EyeRight socket X out of alignment")
 	assert(abs(eye_l.position.z - (-0.28)) < 0.02, "EyeLeft socket Z out of alignment")
@@ -54,7 +54,8 @@ func _init() -> void:
 	# Test dynamic head transform synchronization
 	sasquatch._sync_head_transform()
 	var head_vis: Node3D = sasquatch.get_node("Visuals/Torso/Head")
-	assert(head_vis != null, "Missing Visuals/Torso/Head")
+	var head_node: Node3D = sasquatch.get_node("Head")
+	assert(head_node.global_position.distance_to(head_vis.global_position) < 0.01, "Head node failed to synchronize with anatomical head mesh!")
 	print("✓ Sasquatch: Rig, nodes, eye sockets, and animations fully verified.")
 
 	# 2. Verify Ranger Station
@@ -74,8 +75,8 @@ func _init() -> void:
 	assert(cabin_mesh.get_surface_override_material(4) != null, "Missing glass material")
 
 	# Verify porch deck and steps collision
-	assert(ranger.get_node("CabinBody/PorchCollision") != null, "Missing PorchCollision")
-	assert(ranger.get_node("CabinBody/StepsCollision") != null, "Missing StepsCollision")
+	assert(ranger.get_node("CabinBody/CollisionShape3D_porch") != null, "Missing CollisionShape3D_porch")
+	assert(ranger.get_node("CabinBody/CollisionShape3D_steps") != null, "Missing CollisionShape3D_steps")
 
 	# Verify DoorSign interactability from porch
 	var door_sign: Node = ranger.get_node("DoorSign")

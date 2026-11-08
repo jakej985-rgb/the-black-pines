@@ -16,11 +16,11 @@ var retreat_timer: float = 0.0
 var eye_mat: StandardMaterial3D = null
 
 @onready var head_visual: Node3D = get_node_or_null("Visuals/Torso/Head")
-@onready var head_node: Node3D = get_node_or_null("Visuals/Torso/Head")
-@onready var eye_glow_left: OmniLight3D = get_node_or_null("Visuals/Torso/Head/EyeLeft")
-@onready var eye_glow_right: OmniLight3D = get_node_or_null("Visuals/Torso/Head/EyeRight")
-@onready var eye_mesh_left: MeshInstance3D = get_node_or_null("Visuals/Torso/Head/EyeMeshLeft")
-@onready var eye_mesh_right: MeshInstance3D = get_node_or_null("Visuals/Torso/Head/EyeMeshRight")
+@onready var head_node: Node3D = get_node_or_null("Head") if has_node("Head") else get_node_or_null("Visuals/Torso/Head")
+@onready var eye_glow_left: OmniLight3D = get_node_or_null("Head/EyeLeft") if has_node("Head/EyeLeft") else get_node_or_null("Visuals/Torso/Head/EyeLeft")
+@onready var eye_glow_right: OmniLight3D = get_node_or_null("Head/EyeRight") if has_node("Head/EyeRight") else get_node_or_null("Visuals/Torso/Head/EyeRight")
+@onready var eye_mesh_left: MeshInstance3D = get_node_or_null("Head/EyeMeshLeft") if has_node("Head/EyeMeshLeft") else get_node_or_null("Visuals/Torso/Head/EyeMeshLeft")
+@onready var eye_mesh_right: MeshInstance3D = get_node_or_null("Head/EyeMeshRight") if has_node("Head/EyeMeshRight") else get_node_or_null("Visuals/Torso/Head/EyeMeshRight")
 @onready var visual_root: Node3D = get_node_or_null("Visuals")
 @onready var anim_player: AnimationPlayer = get_node_or_null("AnimationPlayer")
 

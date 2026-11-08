@@ -135,6 +135,10 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	# Out-of-bounds fall recovery
+	if global_position.y < -12.0:
+		_respawn_from_fall()
+
 	# Footstep audio
 	var horiz_vel := Vector2(velocity.x, velocity.z).length()
 	if is_on_floor() and horiz_vel > 0.3:
@@ -252,3 +256,9 @@ func _ensure_default_input_actions() -> void:
 			var ev = InputEventKey.new()
 			ev.physical_keycode = default_actions[action]
 			InputMap.action_add_event(action, ev)
+
+func _respawn_from_fall() -> void:
+	global_position = Vector3(0.0, 1.2, 5.0)
+	velocity = Vector3.ZERO
+	trigger_flashlight_flicker(1.5)
+	notification_posted.emit("The dense fog and steep ravine drop turn you back towards Ranger Station #04.")

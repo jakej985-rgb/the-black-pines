@@ -1,0 +1,67 @@
+[gd_scene load_steps=6 format=3 uid="uid://map_boundaries_01"]
+
+[ext_resource type="PackedScene" path="res://assets/imported/rock_07/rock_07_1k.gltf" id="1_cliff_rock"]
+[ext_resource type="PackedScene" path="res://scenes/world/fence_post.tscn" id="2_fence"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ns_wall"]
+size = Vector3(140, 25, 6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ew_wall"]
+size = Vector3(6, 25, 140)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hazard_zone"]
+size = Vector3(138, 8, 138)
+
+[node name="MapBoundaries" type="Node3D"]
+
+[node name="PerimeterColliders" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 1
+
+[node name="NorthWall" type="CollisionShape3D" parent="PerimeterColliders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, -67)
+shape = SubResource("BoxShape3D_ns_wall")
+
+[node name="SouthWall" type="CollisionShape3D" parent="PerimeterColliders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 67)
+shape = SubResource("BoxShape3D_ns_wall")
+
+[node name="EastWall" type="CollisionShape3D" parent="PerimeterColliders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 67, 12, 0)
+shape = SubResource("BoxShape3D_ew_wall")
+
+[node name="WestWall" type="CollisionShape3D" parent="PerimeterColliders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -67, 12, 0)
+shape = SubResource("BoxShape3D_ew_wall")
+
+[node name="PerimeterVisuals" type="Node3D" parent="."]
+
+[node name="CliffNorth1" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(3.5, 0, 0, 0, 4.5, 0, 0, 0, 3.0, -25, 0, -64)
+
+[node name="CliffNorth2" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(4.0, 0, 0, 0, 5.0, 0, 0, 0, 3.2, 0, 0, -65)
+
+[node name="CliffNorth3" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(3.8, 0, 0, 0, 4.8, 0, 0, 0, 3.0, 28, 0, -64)
+
+[node name="CliffWest1" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(3.2, 0, 0, 0, 4.5, 0, 0, 0, 3.5, -64, 0, -25)
+
+[node name="CliffWest2" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(3.5, 0, 0, 0, 5.2, 0, 0, 0, 3.8, -65, 0, 10)
+
+[node name="CliffEast1" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(3.2, 0, 0, 0, 4.5, 0, 0, 0, 3.5, 64, 0, -15)
+
+[node name="CliffSouth1" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(4.0, 0, 0, 0, 4.5, 0, 0, 0, 3.0, -15, 0, 64)
+
+[node name="CliffSouth2" parent="PerimeterVisuals" instance=ExtResource("1_cliff_rock")]
+transform = Transform3D(3.5, 0, 0, 0, 4.5, 0, 0, 0, 3.2, 20, 0, 64)
+
+[node name="FenceSouth1" parent="PerimeterVisuals" instance=ExtResource("2_fence")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 62)
+
+[node name="FenceEast1" parent="PerimeterVisuals" instance=ExtResource("2_fence")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 62, 0, 5)

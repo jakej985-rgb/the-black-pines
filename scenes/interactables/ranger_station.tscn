@@ -56,3 +56,11 @@ clue_title = "Evacuation Notice"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DoorSign"]
 shape = SubResource("BoxShape3D_door_sign")
+
+[node name="PorchLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 2.7)
+light_color = Color(1, 0.76, 0.45, 1)
+light_energy = 2.2
+shadow_enabled = true
+omni_range = 14.0
+omni_attenuation = 1.2

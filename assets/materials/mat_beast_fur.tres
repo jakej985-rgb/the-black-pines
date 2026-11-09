@@ -5,10 +5,10 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_fur_shader")
-shader_parameter/fur_base_color = Color(0.065, 0.052, 0.042, 1)
-shader_parameter/fur_highlight_color = Color(0.14, 0.11, 0.08, 1)
-shader_parameter/roughness_base = 0.88
-shader_parameter/wetness = 0.35
-shader_parameter/rim_strength = 1.6
-shader_parameter/rim_tint = Color(0.28, 0.24, 0.20, 1)
+shader_parameter/fur_base_color = Color(0.18, 0.11, 0.07, 1)
+shader_parameter/fur_highlight_color = Color(0.32, 0.20, 0.12, 1)
+shader_parameter/roughness_base = 0.85
+shader_parameter/wetness = 0.25
+shader_parameter/rim_strength = 2.0
+shader_parameter/rim_tint = Color(0.42, 0.28, 0.16, 1)
 shader_parameter/uv_scale = 6.0

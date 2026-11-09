@@ -3,9 +3,10 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ct3kouvb5avlf"
-path="res://.godot/imported/fallen_log_weathered_fine_grained_wood_rough_1k.png-7c468cd835f0b40c09eee9af3bcb6803.ctex"
+path.s3tc="res://.godot/imported/fallen_log_weathered_fine_grained_wood_rough_1k.png-7c468cd835f0b40c09eee9af3bcb6803.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "def75cd4a9ad1eb8b058bdddde438949"
@@ -14,11 +15,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/fallen_log_weathered_fine_grained_wood_rough_1k.png"
-dest_files=["res://.godot/imported/fallen_log_weathered_fine_grained_wood_rough_1k.png-7c468cd835f0b40c09eee9af3bcb6803.ctex"]
+dest_files=["res://.godot/imported/fallen_log_weathered_fine_grained_wood_rough_1k.png-7c468cd835f0b40c09eee9af3bcb6803.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
@@ -40,4 +41,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
+detect_3d/compress_to=0

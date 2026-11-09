@@ -4,6 +4,17 @@ You are developing **The Black Pines**, a photorealistic 3D Pacific Northwest ho
 
 ---
 
+## 0. Asset Classification & Reference Specifications
+
+Every 3D asset request must first be classified and linked to a reference specification:
+- **Organic Creatures (Hero)**: Author via digital sculpting or base mesh adaptation. Primitive stacking (spheres/cones/cylinders with voxel welding) is **strictly forbidden**. Must pass base untextured anatomy review (Front, Side, Rear, 3/4) before fur/texturing.
+- **Environment & Props**: Photoscanned PBR assets (via Poly Haven tool) or hard-surface modeling with bevels/chamfers.
+- **Procedural Scatter**: Python geometry processing, geometry nodes, and MultiMeshInstance3D scatter.
+
+Every hero asset must maintain an `asset_spec.yaml` and reference directory (`assets/creatures/<asset_id>/` or `assets/props/<asset_id>/`) verified by `scripts/tools/asset_spec_validator.py`.
+
+---
+
 ## 1. Primary Workflow: The Closed-Loop Asset & Engine Cycle
 
 Never generate important game objects directly out of primitive cubes, spheres, or cylinders inside Godot scenes. All 3D assets must pass through the verified art pipeline:

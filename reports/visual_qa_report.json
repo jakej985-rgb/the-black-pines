@@ -1,20 +1,20 @@
 {
 	"godot_version": "4.7.2-stable (official)",
 	"memory_leak_check": {
-		"delta_bytes": 3718004,
-		"final_memory_bytes": 30147617,
-		"initial_memory_bytes": 26429613,
+		"delta_bytes": 5047410,
+		"final_memory_bytes": 32460222,
+		"initial_memory_bytes": 27412812,
 		"passed": true
 	},
 	"overall_passed": true,
 	"presets": {
 		"High": {
 			"avg_draw_calls": 0.0,
-			"avg_frame_time_ms": 6.89,
-			"estimated_fps": 145.1,
-			"max_frame_time_ms": 7.76,
-			"memory_used_mb": 99.8,
-			"min_frame_time_ms": 6.1,
+			"avg_frame_time_ms": 16.65,
+			"estimated_fps": 60.1,
+			"max_frame_time_ms": 17.83,
+			"memory_used_mb": 345.4,
+			"min_frame_time_ms": 15.36,
 			"render_scale": 1.0,
 			"shadow_atlas_size": 4096,
 			"ssao_enabled": true,
@@ -23,11 +23,11 @@
 		},
 		"Low": {
 			"avg_draw_calls": 0.0,
-			"avg_frame_time_ms": 6.89,
-			"estimated_fps": 145.1,
-			"max_frame_time_ms": 7.47,
-			"memory_used_mb": 99.6,
-			"min_frame_time_ms": 6.26,
+			"avg_frame_time_ms": 16.66,
+			"estimated_fps": 60.0,
+			"max_frame_time_ms": 18.0,
+			"memory_used_mb": 345.3,
+			"min_frame_time_ms": 15.11,
 			"render_scale": 0.65,
 			"shadow_atlas_size": 1024,
 			"ssao_enabled": false,
@@ -36,11 +36,11 @@
 		},
 		"Medium": {
 			"avg_draw_calls": 0.0,
-			"avg_frame_time_ms": 6.89,
-			"estimated_fps": 145.0,
-			"max_frame_time_ms": 7.76,
-			"memory_used_mb": 99.7,
-			"min_frame_time_ms": 6.12,
+			"avg_frame_time_ms": 16.66,
+			"estimated_fps": 60.0,
+			"max_frame_time_ms": 19.62,
+			"memory_used_mb": 345.4,
+			"min_frame_time_ms": 12.41,
 			"render_scale": 0.8,
 			"shadow_atlas_size": 2048,
 			"ssao_enabled": true,
@@ -49,11 +49,11 @@
 		},
 		"Ultra": {
 			"avg_draw_calls": 0.0,
-			"avg_frame_time_ms": 6.89,
-			"estimated_fps": 145.2,
-			"max_frame_time_ms": 7.73,
-			"memory_used_mb": 99.8,
-			"min_frame_time_ms": 6.2,
+			"avg_frame_time_ms": 16.65,
+			"estimated_fps": 60.1,
+			"max_frame_time_ms": 18.0,
+			"memory_used_mb": 345.4,
+			"min_frame_time_ms": 14.35,
 			"render_scale": 1.0,
 			"shadow_atlas_size": 8192,
 			"ssao_enabled": true,
@@ -67,5 +67,5 @@
 		"passed": 35,
 		"total_checked": 35
 	},
-	"timestamp": "2026-11-08T00:16:17"
+	"timestamp": "2026-11-08T23:46:21"
 }

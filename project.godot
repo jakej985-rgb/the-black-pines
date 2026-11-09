@@ -24,6 +24,7 @@ Inventory="*res://scripts/systems/inventory_manager.gd"
 Crafting="*res://scripts/systems/crafting_manager.gd"
 Mission="*res://scripts/systems/mission_director.gd"
 Save="*res://scripts/systems/save_manager.gd"
+ClaudeBridgeGameCapture="*uid://bfo026tobms6g"
 
 [display]
 
@@ -31,6 +32,10 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp_bridge/plugin.cfg")
 
 [input]
 
@@ -83,7 +88,3 @@ toggle_pause={
 [rendering]
 
 anti_aliasing/quality/msaa_3d=1
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/godot_mcp_bridge/plugin.cfg")

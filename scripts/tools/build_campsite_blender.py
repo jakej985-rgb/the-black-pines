@@ -162,10 +162,10 @@ def create_tent():
             f.loops[3][uv_layer].uv = (0.0, rt + 0.1)
 
     # 4. Interior Floor / Heavy Groundsheet
-    fl_v1 = bm.verts.new(Vector((-half_w * 0.98, -half_l * 0.98, 0.03)))
-    fl_v2 = bm.verts.new(Vector((half_w * 0.98, -half_l * 0.98, 0.03)))
-    fl_v3 = bm.verts.new(Vector((half_w * 0.98, half_l * 0.98, 0.03)))
-    fl_v4 = bm.verts.new(Vector((-half_w * 0.98, half_l * 0.98, 0.03)))
+    fl_v1 = bm.verts.new(Vector((-half_w * 0.98, -half_l * 0.98, 0.05)))
+    fl_v2 = bm.verts.new(Vector((half_w * 0.98, -half_l * 0.98, 0.05)))
+    fl_v3 = bm.verts.new(Vector((half_w * 0.98, half_l * 0.98, 0.05)))
+    fl_v4 = bm.verts.new(Vector((-half_w * 0.98, half_l * 0.98, 0.05)))
     f_floor = bm.faces.new((fl_v1, fl_v2, fl_v3, fl_v4))
     f_floor.material_index = 0
     f_floor.smooth = True
@@ -180,14 +180,14 @@ def create_tent():
     bed_len = 1.7
     bed_w = 0.55
     bed_h = 0.12
-    bv1 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start, 0.04)))
-    bv2 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start, 0.04)))
-    bv3 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start + bed_len, 0.04)))
-    bv4 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start + bed_len, 0.04)))
-    bv5 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start, 0.04 + bed_h)))
-    bv6 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start, 0.04 + bed_h)))
-    bv7 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start + bed_len, 0.04 + bed_h)))
-    bv8 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start + bed_len, 0.04 + bed_h)))
+    bv1 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start, 0.06)))
+    bv2 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start, 0.06)))
+    bv3 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start + bed_len, 0.06)))
+    bv4 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start + bed_len, 0.06)))
+    bv5 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start, 0.06 + bed_h)))
+    bv6 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start, 0.06 + bed_h)))
+    bv7 = bm.verts.new(Vector((bed_x + bed_w * 0.5, bed_y_start + bed_len, 0.06 + bed_h)))
+    bv8 = bm.verts.new(Vector((bed_x - bed_w * 0.5, bed_y_start + bed_len, 0.06 + bed_h)))
 
     bed_faces = [
         (bv5, bv6, bv7, bv8),

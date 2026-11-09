@@ -1,16 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://firewood_stack_01"]
+[gd_scene load_steps=3 format=3 uid="uid://firewood_stack_01"]
 
-[ext_resource type="Material" path="res://assets/materials/mat_pine_bark.tres" id="1_bark_mat"]
-[ext_resource type="Material" path="res://assets/materials/mat_cabin_wood.tres" id="2_wood_mat"]
+[ext_resource type="PackedScene" uid="uid://xggv0vifavlh" path="res://assets/models/firewood_cord_stack.glb" id="1_stack_mesh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_stack"]
 size = Vector3(2.2, 1.2, 0.9)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_log_split"]
-material = ExtResource("1_bark_mat")
-top_radius = 0.12
-bottom_radius = 0.13
-height = 0.85
 
 [node name="FirewoodStack" type="StaticBody3D"]
 
@@ -18,50 +11,4 @@ height = 0.85
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("BoxShape3D_stack")
 
-[node name="Log1" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.8, 0.15, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Log2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.4, 0.15, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Log3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.15, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Log4" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.4, 0.15, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Log5" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.8, 0.15, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier2_Log1" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.6, 0.38, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier2_Log2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.2, 0.38, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier2_Log3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.2, 0.38, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier2_Log4" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.6, 0.38, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier3_Log1" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -0.4, 0.6, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier3_Log2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.6, 0)
-mesh = SubResource("CylinderMesh_log_split")
-
-[node name="Tier3_Log3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0.4, 0.6, 0)
-mesh = SubResource("CylinderMesh_log_split")
+[node name="FirewoodModel" parent="." instance=ExtResource("1_stack_mesh")]

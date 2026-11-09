@@ -1,0 +1,37 @@
+{
+  "asset": "sasquatch",
+  "reference": "assets/creatures/sasquatch/references/classic_bigfoot_concept.png",
+  "generated_utc": "2026-11-09T08:19:39.501271+00:00",
+  "views": [
+    {
+      "view": "front",
+      "clay": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/render_front.png",
+      "silhouette": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/silhouette_front.png",
+      "comparison": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_front.png"
+    },
+    {
+      "view": "side",
+      "clay": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/render_side.png",
+      "silhouette": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/silhouette_side.png",
+      "comparison": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_side.png"
+    },
+    {
+      "view": "rear",
+      "clay": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/render_rear.png",
+      "silhouette": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/silhouette_rear.png",
+      "comparison": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_rear.png"
+    },
+    {
+      "view": "threequarter",
+      "clay": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/render_threequarter.png",
+      "silhouette": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/silhouette_threequarter.png",
+      "comparison": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_threequarter.png"
+    },
+    {
+      "view": "bust",
+      "clay": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/render_bust.png",
+      "silhouette": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/silhouette_bust.png",
+      "comparison": "assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_bust.png"
+    }
+  ]
+}

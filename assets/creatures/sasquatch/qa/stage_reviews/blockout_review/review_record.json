@@ -1,0 +1,24 @@
+{
+  "stage": "blockout_review",
+  "asset": "sasquatch_classic",
+  "iteration": 1,
+  "reviewer": null,
+  "verdict": "pending",
+  "verdict_options": ["pass", "revise", "reject"],
+  "evidence": {
+    "clay_views": "diagnostic/",
+    "silhouettes": "comparison/silhouette_*.png",
+    "comparison_sheet": "comparison/comparison_sheet.png",
+    "manifest": "comparison/comparison_manifest.json"
+  },
+  "findings": [
+    {
+      "view": "front|side|rear|threequarter|bust",
+      "defect": "specific visual defect observed",
+      "severity": "blocker|major|minor",
+      "correction": "concrete corrective action",
+      "evidence_image": "path/to/crop-or-view.png"
+    }
+  ],
+  "notes": "Human review required: the generating agent cannot view images and no local vision model is available (docker GPU path rejected by user). Do not approve without a human verdict."
+}

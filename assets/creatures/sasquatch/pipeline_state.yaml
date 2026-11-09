@@ -1,0 +1,56 @@
+asset_id: sasquatch_classic
+pipeline_version: 1
+updated: '2026-11-09'
+stages:
+  reference_locked:
+    status: approved
+    evidence:
+    - assets/creatures/sasquatch/references/classic_bigfoot_concept.png
+    - assets/creatures/sasquatch/references/front_reference.png
+    - assets/creatures/sasquatch/references/side_reference.png
+    - assets/creatures/sasquatch/references/rear_reference.png
+    reviewer: agent
+    notes: 'Concept reference and orthographic-style reference set verified present. Target checklist
+      recorded in references/TARGET_CHECKLIST.md. Known limitation: agent cannot visually verify the reference
+      image; human confirmation of reference lock still required.'
+  blockout_review:
+    status: in_progress
+    evidence:
+    - assets/creatures/sasquatch/source/blockout.blend
+    - assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/
+    - assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_sheet.png
+    - assets/creatures/sasquatch/qa/stage_reviews/blockout_review/review_record.json
+    reviewer: null
+    notes: 'Metaball organic blockout (iteration 1) awaiting HUMAN silhouette review.
+      Vision-model critique unavailable (agent text-only; local GPU too weak for
+      generative models). Do not proceed to sculpt_review without human verdict.'
+  sculpt_review:
+    status: pending
+    evidence: []
+    reviewer: null
+    notes: ''
+  retopo_uv_bake:
+    status: pending
+    evidence: []
+    reviewer: null
+    notes: ''
+  materials_fur:
+    status: pending
+    evidence: []
+    reviewer: null
+    notes: ''
+  rig_animation:
+    status: pending
+    evidence: []
+    reviewer: null
+    notes: ''
+  godot_validation:
+    status: pending
+    evidence: []
+    reviewer: null
+    notes: ''
+  approved:
+    status: pending
+    evidence: []
+    reviewer: null
+    notes: ''

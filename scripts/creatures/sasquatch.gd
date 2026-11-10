@@ -150,7 +150,7 @@ func _process_stalking(delta: float) -> void:
 		# Optimization: Only calculate target Basis and perform quaternion slerp if looking direction differs significantly
 		var forward := -global_basis.z
 		var target_dir := diff.normalized()
-		if forward.dot(target_dir) < 0.9995:
+		if forward.dot(target_dir) < 0.99999:
 			var target_basis = Basis.looking_at(target_dir, Vector3.UP)
 			var q_curr = global_basis.get_rotation_quaternion()
 			var q_target = target_basis.get_rotation_quaternion()
@@ -293,7 +293,7 @@ func _process_retreating(delta: float) -> void:
 			# Optimization: Guard retreat slerp with forward dot alignment
 			var forward := -global_basis.z
 			var target_dir := diff.normalized()
-			if forward.dot(target_dir) < 0.9995:
+			if forward.dot(target_dir) < 0.99999:
 				var target_basis = Basis.looking_at(target_dir, Vector3.UP)
 				var q_curr = global_basis.get_rotation_quaternion()
 				var q_target = target_basis.get_rotation_quaternion()

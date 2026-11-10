@@ -138,7 +138,19 @@ func play_distant_wood_knock() -> void:
 
 	var angle = randf() * TAU
 	var dist = randf_range(28.0, 50.0)
-	_wood_knock_player_3d.position = Vector3(cos(angle) * dist, 2.0, sin(angle) * dist)
+	var pos = Vector3(cos(angle) * dist, 2.0, sin(angle) * dist)
+	if _wood_knock_player_3d.playing:
+		# Pooled player busy: spawn a temporary one so the current knock isn't cut off
+		var temp = AudioStreamPlayer3D.new()
+		temp.stream = wood_knock_stream
+		temp.max_distance = 60.0
+		temp.volume_db = 4.0
+		temp.position = pos
+		add_child(temp)
+		temp.play()
+		temp.finished.connect(func(): temp.queue_free())
+		return
+	_wood_knock_player_3d.position = pos
 	_wood_knock_player_3d.play()
 
 func _play_random_distant_snap() -> void:
@@ -151,7 +163,19 @@ func _play_random_distant_snap() -> void:
 
 	var angle = randf() * TAU
 	var dist = randf_range(16.0, 32.0)
-	_distant_snap_player_3d.position = Vector3(cos(angle) * dist, 1.0, sin(angle) * dist)
+	var pos = Vector3(cos(angle) * dist, 1.0, sin(angle) * dist)
+	if _distant_snap_player_3d.playing:
+		# Pooled player busy: spawn a temporary one so the current snap isn't cut off
+		var temp = AudioStreamPlayer3D.new()
+		temp.stream = branch_snap_stream
+		temp.max_distance = 45.0
+		temp.volume_db = 1.0
+		temp.position = pos
+		add_child(temp)
+		temp.play()
+		temp.finished.connect(func(): temp.queue_free())
+		return
+	_distant_snap_player_3d.position = pos
 	_distant_snap_player_3d.play()
 
 # ================= AUDIO SYNTHESIS =================

@@ -3,6 +3,7 @@ extends CanvasLayer
 
 ## Minimalist Survival Horror HUD for The Black Pines.
 
+@onready var crosshair: ColorRect = $Root/Crosshair
 @onready var prompt_label: Label = $Root/PromptLabel
 @onready var stamina_bar: ProgressBar = $Root/BottomLeft/StaminaBar
 @onready var health_bar: ProgressBar = $Root/BottomLeft/HealthBar
@@ -22,11 +23,21 @@ func _ready() -> void:
 	if bleed_label:
 		bleed_label.visible = false
 
+@onready var journal_dialog: Control = $Root/JournalDialog
+@onready var inventory_dialog: Control = $Root/InventoryDialog
+
 func _process(delta: float) -> void:
 	if notif_timer > 0.0:
 		notif_timer -= delta
 		if notif_timer <= 0.0:
 			notification_label.text = ""
+	_update_crosshair_visibility()
+
+func _update_crosshair_visibility() -> void:
+	if not crosshair:
+		return
+	var modal_open = inspection_panel.visible or (journal_dialog and journal_dialog.visible) or (inventory_dialog and inventory_dialog.visible)
+	crosshair.visible = not modal_open
 
 var current_flashlight_on: bool = true
 var current_battery: float = 100.0
@@ -87,6 +98,19 @@ func _update_flashlight_display() -> void:
 
 func _on_interaction_prompt_changed(text: String) -> void:
 	prompt_label.text = text
+	if crosshair:
+		if text != "":
+			crosshair.color = Color(1.0, 0.9, 0.5, 0.95)
+			crosshair.offset_left = -3.0
+			crosshair.offset_top = -3.0
+			crosshair.offset_right = 3.0
+			crosshair.offset_bottom = 3.0
+		else:
+			crosshair.color = Color(1.0, 1.0, 1.0, 0.5)
+			crosshair.offset_left = -2.0
+			crosshair.offset_top = -2.0
+			crosshair.offset_right = 2.0
+			crosshair.offset_bottom = 2.0
 
 func _on_inspection_displayed(title: String, text: String) -> void:
 	inspection_title.text = title

@@ -13,6 +13,7 @@ signal creature_repelled(creature: Node)
 
 var is_burning: bool = true
 var time_remaining: float = 45.0
+var flicker_accum: float = 0.0
 
 @onready var light: OmniLight3D = $OmniLight3D
 @onready var repel_area: Area3D = $RepelArea
@@ -33,14 +34,19 @@ func _process(delta: float) -> void:
 		return
 
 	# Flicker illumination
+	# Optimization: Throttle light energy property updates to ~30Hz (0.033s interval)
+	# rather than calculating trig and dirtying light render state every single process frame.
 	if light:
-		if time_remaining < 5.0:
-			# Dying fade out
-			var factor = time_remaining / 5.0
-			light.light_energy = base_light_energy * factor * randf_range(0.3, 1.0)
-		else:
-			var flicker = sin(Time.get_ticks_msec() * 0.025) * 0.35 + (randf() - 0.5) * 0.25
-			light.light_energy = max(0.5, base_light_energy + flicker)
+		flicker_accum += delta
+		if flicker_accum >= 0.033:
+			flicker_accum = 0.0
+			if time_remaining < 5.0:
+				# Dying fade out
+				var factor = time_remaining / 5.0
+				light.light_energy = base_light_energy * factor * randf_range(0.3, 1.0)
+			else:
+				var flicker = sin(Time.get_ticks_msec() * 0.025) * 0.35 + (randf() - 0.5) * 0.25
+				light.light_energy = max(0.5, base_light_energy + flicker)
 
 func _on_body_entered(body: Node) -> void:
 	if not is_burning:
@@ -48,9 +54,13 @@ func _on_body_entered(body: Node) -> void:
 	_apply_repel_to_target(body)
 
 func _repel_existing_overlapping_bodies() -> void:
+	# Optimization: Fast return if repel_area is null or has no overlapping bodies
 	if not repel_area:
 		return
-	for body in repel_area.get_overlapping_bodies():
+	var bodies = repel_area.get_overlapping_bodies()
+	if bodies.is_empty():
+		return
+	for body in bodies:
 		_apply_repel_to_target(body)
 
 func _apply_repel_to_target(body: Node) -> void:

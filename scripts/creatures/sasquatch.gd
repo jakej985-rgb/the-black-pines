@@ -147,10 +147,14 @@ func _process_stalking(delta: float) -> void:
 	var diff = player_ref.global_position - global_position
 	diff.y = 0.0
 	if diff.length_squared() > 0.05:
-		var target_basis = Basis.looking_at(diff.normalized(), Vector3.UP)
-		var q_curr = global_basis.get_rotation_quaternion()
-		var q_target = target_basis.get_rotation_quaternion()
-		global_basis = Basis(q_curr.slerp(q_target, delta * 2.0).normalized())
+		# Optimization: Only calculate target Basis and perform quaternion slerp if looking direction differs significantly
+		var forward := -global_basis.z
+		var target_dir := diff.normalized()
+		if forward.dot(target_dir) < 0.9995:
+			var target_basis = Basis.looking_at(target_dir, Vector3.UP)
+			var q_curr = global_basis.get_rotation_quaternion()
+			var q_target = target_basis.get_rotation_quaternion()
+			global_basis = Basis(q_curr.slerp(q_target, delta * 2.0).normalized())
 
 	# Optimization: Use distance_squared_to to avoid unnecessary sqrt calculations every physics frame.
 	# Compares against squared radii thresholds for noise, stalk proximity, and flashlight checks.
@@ -286,10 +290,14 @@ func _process_retreating(delta: float) -> void:
 		var diff = player_ref.global_position - global_position
 		diff.y = 0.0
 		if diff.length_squared() > 0.05:
-			var target_basis = Basis.looking_at(diff.normalized(), Vector3.UP)
-			var q_curr = global_basis.get_rotation_quaternion()
-			var q_target = target_basis.get_rotation_quaternion()
-			global_basis = Basis(q_curr.slerp(q_target, delta * 3.0).normalized())
+			# Optimization: Guard retreat slerp with forward dot alignment
+			var forward := -global_basis.z
+			var target_dir := diff.normalized()
+			if forward.dot(target_dir) < 0.9995:
+				var target_basis = Basis.looking_at(target_dir, Vector3.UP)
+				var q_curr = global_basis.get_rotation_quaternion()
+				var q_target = target_basis.get_rotation_quaternion()
+				global_basis = Basis(q_curr.slerp(q_target, delta * 3.0).normalized())
 
 		var away_dir = -diff.normalized()
 		velocity = away_dir * retreat_speed

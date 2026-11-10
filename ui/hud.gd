@@ -33,11 +33,16 @@ func _process(delta: float) -> void:
 			notification_label.text = ""
 	_update_crosshair_visibility()
 
+# Optimization: Cache last modal_open state to avoid mutating crosshair properties every single frame
+var _last_modal_open: Variant = null
+
 func _update_crosshair_visibility() -> void:
 	if not crosshair:
 		return
-	var modal_open = inspection_panel.visible or (journal_dialog and journal_dialog.visible) or (inventory_dialog and inventory_dialog.visible)
-	crosshair.visible = not modal_open
+	var modal_open: bool = inspection_panel.visible or (journal_dialog and journal_dialog.visible) or (inventory_dialog and inventory_dialog.visible)
+	if modal_open != _last_modal_open:
+		_last_modal_open = modal_open
+		crosshair.visible = not modal_open
 
 var current_flashlight_on: bool = true
 var current_battery: float = 100.0

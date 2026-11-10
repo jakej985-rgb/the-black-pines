@@ -156,12 +156,14 @@ func _populate_crafting() -> void:
 		info_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 
 		# Format ingredients list
+		# Optimization: Cache inventory instance lookup outside item iteration
 		var ing_parts: Array = []
 		var ingredients: Dictionary = recipe.get("ingredients", {})
+		var inv_mgr = InventoryManagerClass.instance
 		for item_id in ingredients:
 			var req: int = ingredients[item_id]
-			var owned: int = InventoryManagerClass.instance.get_item_count(item_id) if InventoryManagerClass.instance else 0
-			var item_info = InventoryManagerClass.instance.get_item_info(item_id) if InventoryManagerClass.instance else {}
+			var owned: int = inv_mgr.get_item_count(item_id) if inv_mgr else 0
+			var item_info = inv_mgr.get_item_info(item_id) if inv_mgr else {}
 			var item_name = item_info.get("name", item_id)
 			ing_parts.append("%dx %s (%d/%d)" % [req, item_name, owned, req])
 

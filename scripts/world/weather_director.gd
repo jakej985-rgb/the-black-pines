@@ -23,6 +23,8 @@ static var instance: WeatherDirector = null
 
 var current_wind_speed: float = 1.2
 var current_wind_strength: float = 0.08
+var last_synced_wind_speed: float = -1.0
+var last_synced_wind_strength: float = -1.0
 var gust_intensity: float = 0.0
 var time_accum: float = 0.0
 
@@ -83,9 +85,11 @@ func _process(delta: float) -> void:
 	_process_weather_cycles(delta)
 
 func _update_player_tracking(delta: float) -> void:
+	# Optimization: Cache player_node and only search scene tree when invalid
 	if not player_node or not is_instance_valid(player_node):
 		_find_player()
-		return
+		if not player_node or not is_instance_valid(player_node):
+			return
 	
 	# Follow player horizontally
 	global_position.x = player_node.global_position.x
@@ -130,11 +134,15 @@ func _process_wind_gusts(delta: float) -> void:
 		current_wind_speed = base_wind_speed * (1.0 + speed_boost)
 		current_wind_strength = base_wind_strength * (1.0 + gust_intensity * 1.5)
 		
-		# Synchronize active foliage wind shaders
-		for mat in foliage_materials:
-			if mat:
-				mat.set_shader_parameter("wind_speed", current_wind_speed)
-				mat.set_shader_parameter("wind_strength", current_wind_strength)
+		# Synchronize active foliage wind shaders only when values have measurably changed
+		# Optimization: Prevents dirtying shader parameters across all materials every frame
+		if abs(current_wind_speed - last_synced_wind_speed) > 0.005 or abs(current_wind_strength - last_synced_wind_strength) > 0.001:
+			last_synced_wind_speed = current_wind_speed
+			last_synced_wind_strength = current_wind_strength
+			for mat in foliage_materials:
+				if mat:
+					mat.set_shader_parameter("wind_speed", current_wind_speed)
+					mat.set_shader_parameter("wind_strength", current_wind_strength)
 		
 		# Accelerate drifting mist during gusts
 		if mist_particles and mist_particles.process_material is ParticleProcessMaterial:

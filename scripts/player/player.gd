@@ -426,7 +426,16 @@ func _respawn_from_fall() -> void:
 	trigger_flashlight_flicker(1.5)
 	notification_posted.emit("The dense fog and steep ravine drop turn you back towards Ranger Station #04.")
 
+# Optimization: Cache last ground placement query within same frame/position to avoid redundant space state ray queries
+var _last_placement_frame: int = -1
+var _last_placement_hit: Dictionary = {}
+var _last_placement_dist: float = -1.0
+
 func _find_ground_placement(max_dist: float = 2.8) -> Dictionary:
+	var current_frame = Engine.get_physics_frames()
+	if _last_placement_frame == current_frame and abs(_last_placement_dist - max_dist) < 0.01:
+		return _last_placement_hit
+
 	var world3d = get_world_3d()
 	if not world3d:
 		return {}
@@ -445,7 +454,11 @@ func _find_ground_placement(max_dist: float = 2.8) -> Dictionary:
 		_placement_query = query
 	query.from = ray_origin
 	query.to = ray_end
-	return space_state.intersect_ray(query)
+	var hit = space_state.intersect_ray(query)
+	_last_placement_frame = current_frame
+	_last_placement_dist = max_dist
+	_last_placement_hit = hit
+	return hit
 
 func deploy_flare() -> bool:
 	var inv = InventoryManagerClass.instance

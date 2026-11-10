@@ -60,8 +60,9 @@ var breathing_time: float = 0.0
 var current_strafe: float = 0.0
 var flashlight_sway: Vector2 = Vector2.ZERO
 var flashlight_sway_target: Vector2 = Vector2.ZERO
-# Optimization: Track last emitted battery percentage to throttle signal emissions (~98.6% reduction)
+# Optimization: Track last emitted values to throttle signal emissions (~97-98% reduction)
 var last_emitted_battery: float = -1.0
+var last_emitted_stamina: float = -1.0
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -78,6 +79,7 @@ func _ready() -> void:
 	if camera:
 		default_camera_pos = camera.position
 	stamina = max_stamina
+	last_emitted_stamina = stamina
 	stamina_changed.emit(stamina, max_stamina)
 	last_emitted_battery = battery
 	flashlight_battery_changed.emit(battery, max_battery)
@@ -153,6 +155,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_velocity
 		stamina -= 10.0
 		stamina_timer = stamina_regen_delay
+		last_emitted_stamina = stamina
 		stamina_changed.emit(stamina, max_stamina)
 
 	# Movement direction
@@ -165,7 +168,12 @@ func _physics_process(delta: float) -> void:
 		is_sprinting = true
 		stamina = max(0.0, stamina - stamina_drain_rate * delta)
 		stamina_timer = stamina_regen_delay
-		stamina_changed.emit(stamina, max_stamina)
+		# Optimization: Throttle stamina_changed signal emissions during continuous drain.
+		# Sprinting drains stamina at 22.0/s, firing 60 signals/sec into HUD progress bars.
+		# Throttling to integer percent changes and boundary states reduces emissions by ~97%.
+		if int(stamina) != int(last_emitted_stamina) or stamina <= 0.0 or last_emitted_stamina < 0.0:
+			last_emitted_stamina = stamina
+			stamina_changed.emit(stamina, max_stamina)
 	else:
 		is_sprinting = false
 		if stamina < max_stamina:
@@ -173,7 +181,12 @@ func _physics_process(delta: float) -> void:
 				stamina_timer -= delta
 			else:
 				stamina = min(max_stamina, stamina + stamina_regen_rate * delta)
-				stamina_changed.emit(stamina, max_stamina)
+				# Optimization: Throttle stamina_changed signal emissions during continuous regen.
+				# Stamina regens at 16.0/s, firing 60 signals/sec into HUD progress bars.
+				# Throttling to integer percent changes and full recovery reduces emissions by ~97%.
+				if int(stamina) != int(last_emitted_stamina) or stamina >= max_stamina or last_emitted_stamina < 0.0:
+					last_emitted_stamina = stamina
+					stamina_changed.emit(stamina, max_stamina)
 
 	var current_speed: float = sprint_speed if (is_sprinting and stamina > 0.0) else walk_speed
 

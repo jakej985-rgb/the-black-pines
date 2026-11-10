@@ -111,16 +111,20 @@ func _populate_crafting() -> void:
 			ing_parts.append("%dx %s (%d/%d)" % [req, item_name, owned, req])
 
 		info_btn.text = "%s [%s]" % [recipe_name, ", ".join(ing_parts)]
-		info_btn.mouse_entered.connect(func():
+		var recipe_desc: String = recipe.get("description", "")
+		info_btn.tooltip_text = recipe_desc
+		var on_recipe_inspect = func():
 			if desc_label:
-				desc_label.text = recipe.get("description", "")
-		)
+				desc_label.text = recipe_desc
+		info_btn.mouse_entered.connect(on_recipe_inspect)
+		info_btn.focus_entered.connect(on_recipe_inspect)
 		hbox.add_child(info_btn)
 
 		var craft_btn = Button.new()
 		craft_btn.text = "Craft"
 		craft_btn.custom_minimum_size = Vector2(90, 0)
 		craft_btn.disabled = not can_make
+		craft_btn.tooltip_text = "Craft 1x %s" % recipe_name if can_make else "Cannot craft: missing required materials."
 		craft_btn.pressed.connect(func():
 			var success = CraftingManagerClass.instance.craft_recipe(recipe_id)
 			if success and desc_label:
@@ -133,11 +137,14 @@ func _populate_crafting() -> void:
 func _create_item_row(item_id: String, info: Dictionary, qty: int) -> Button:
 	var btn = Button.new()
 	var max_stack = info.get("max_stack", 99)
+	var item_desc: String = info.get("description", "")
 	btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
+	btn.tooltip_text = item_desc
 	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	btn.mouse_entered.connect(func():
+	var on_item_inspect = func():
 		if desc_label:
-			desc_label.text = info.get("description", "")
-	)
+			desc_label.text = item_desc
+	btn.mouse_entered.connect(on_item_inspect)
+	btn.focus_entered.connect(on_item_inspect)
 	return btn
 

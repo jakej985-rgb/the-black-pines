@@ -65,6 +65,8 @@ var last_emitted_battery: float = -1.0
 var last_emitted_stamina: float = -1.0
 # Optimization: Reusable PhysicsRayQueryParameters3D to eliminate object and array allocations on footsteps
 var _ground_query: PhysicsRayQueryParameters3D = null
+# Optimization: Reusable PhysicsRayQueryParameters3D to eliminate object and array allocations on ground placement raycasts
+var _placement_query: PhysicsRayQueryParameters3D = null
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -109,6 +111,8 @@ func _ready() -> void:
 	# Pre-allocate reusable ground raycast query and self-exclusion array
 	_ground_query = PhysicsRayQueryParameters3D.new()
 	_ground_query.exclude = [get_rid()]
+	_placement_query = PhysicsRayQueryParameters3D.new()
+	_placement_query.exclude = [get_rid()]
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and (Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED or DisplayServer.get_name() == "headless"):
@@ -426,8 +430,16 @@ func _find_ground_placement(max_dist: float = 2.8) -> Dictionary:
 	var ray_origin = (camera.global_position if camera else global_position) + cam_forward * 0.6
 	var ray_end = ray_origin + cam_forward * (max_dist - 0.6) + Vector3(0, -3.5, 0)
 
-	var query = PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
-	query.exclude = [self.get_rid()]
+	# Optimization: Reuse the persistent _placement_query instance rather than allocating
+	# a new PhysicsRayQueryParameters3D object and exclusion array on every placement check.
+	# Expected performance impact: Eliminates temporary ray query allocations and reduces GC pressure.
+	var query: PhysicsRayQueryParameters3D = _placement_query
+	if not query:
+		query = PhysicsRayQueryParameters3D.new()
+		query.exclude = [get_rid()]
+		_placement_query = query
+	query.from = ray_origin
+	query.to = ray_end
 	return space_state.intersect_ray(query)
 
 func deploy_flare() -> bool:

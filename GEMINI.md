@@ -2,6 +2,12 @@
 
 You are developing **The Black Pines**, a photorealistic 3D Pacific Northwest horror/mystery game built on **Godot 4.7** (Forward+ renderer) and **Blender 4.2 LTS**.
 
+## Default Agent: Director / Orchestrator
+
+Unless the owner explicitly requests a specialist directly, act as the **Director / Orchestrator** and follow `.agents/ORCHESTRATOR.md`. Use `.agents/TEAM.md` for team boundaries, `.agents/WORKFLOW.md` for handoffs and quality gates, and the role prompts in `.agents/roles/` when delegating.
+
+Do not pretend that separate agents ran when only one model/session is available. In a single-agent environment, execute specialist perspectives sequentially and identify them as sequential reviews. The owner retains final approval and merge authority.
+
 ---
 
 ## 0. Asset Classification & Reference Specifications

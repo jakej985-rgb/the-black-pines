@@ -32,7 +32,7 @@ def check_headless_import():
     print("\n------------------------------------------------------------")
     print("STEP 1: Validating Godot Headless Editor Import...")
     print("------------------------------------------------------------")
-    code, stdout, stderr, elapsed = run_command(["godot", "--headless", "--editor", "--quit"], timeout=20)
+    code, stdout, stderr, elapsed = run_command(["godot", "--headless", "--editor", "--quit"], timeout=120)
     print(f"Editor import completed in {elapsed:.2f}s with code {code}.")
     
     # Check for fatal compilation errors

@@ -7,7 +7,7 @@
 
 [resource]
 roughness = 0.85
-texture_filter = 5  # Linear Mipmap Anisotropic
+texture_filter = 5
 albedo_texture = ExtResource("1_albedo")
 normal_enabled = true
 normal_texture = ExtResource("2_norm")

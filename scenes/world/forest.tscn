@@ -144,6 +144,12 @@ transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -13.5, -0.
 [node name="RockCraggy1" parent="." instance=ExtResource("21_rock_craggy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.595, 1.5)
 
+[node name="RockClusterMossy1" parent="." instance=ExtResource("6_rock")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -17.4, -0.05, -4.8)
+
+[node name="PineRoots_HeroTree" parent="." instance=ExtResource("28_roots")]
+transform = Transform3D(1.1, 0, 0.3, 0, 1.1, 0, -0.3, 0, 1.1, -19.18, -0.06, -6.31)
+
 [node name="RockCraggy2" parent="." instance=ExtResource("21_rock_craggy")]
 transform = Transform3D(1.2, 0, 0, 0, 1.1, 0, 0, 0, 1.2, -6.2, 0.289, -6.8)
 
@@ -160,7 +166,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.249, 2.8)
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -4.2, 0.329, -2.5)
 
 [node name="RockSlab3" parent="." instance=ExtResource("22_rock_slab")]
-transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 6.8, -0.143, -7.2)
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 4.2, -0.15, -6.8)
 
 [node name="FallenLog1" parent="." instance=ExtResource("7_log")]
 transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -3.2, 0.721, -7.5)
@@ -178,16 +184,25 @@ transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, 
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -8.5, 0, -28)
 
 [node name="Firewood" parent="." instance=ExtResource("17_firewood")]
-transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 3.4, 0.017, 10.8)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 3.75, 0.02, 11.2)
 
 [node name="Generator" parent="." instance=ExtResource("18_generator")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0, 9.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0, 0, 8.8)
 
 
 [node name="TrailMarker04" parent="." instance=ExtResource("19_trail_marker")]
 transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, -2.8, 0.011, 4.2)
 
 [node name="Undergrowth" type="Node3D" parent="."]
+
+[node name="Fern_Hero_Log1" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -5.5, 0.68, -6.8)
+
+[node name="Fern_Hero_Log2" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1.05, 0, 0.707107, 0, 0.707107, -1.4, 0.65, -8.2)
+
+[node name="Fern_Hero_Rock1" parent="Undergrowth" instance=ExtResource("14_fern")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1.1, 0, -0.5, 0, 0.866025, -15.4, 0.02, -3.6)
 
 [node name="Grass_001" parent="Undergrowth" instance=ExtResource("15_grass")]
 transform = Transform3D(-1.140725, 0, 0.213887, 0, 1.160604, 0, -0.213887, 0, -1.140725, -26.56, 1.28, -51.98)

@@ -63,6 +63,8 @@ var flashlight_sway_target: Vector2 = Vector2.ZERO
 # Optimization: Track last emitted values to throttle signal emissions (~97-98% reduction)
 var last_emitted_battery: float = -1.0
 var last_emitted_stamina: float = -1.0
+# Optimization: Reusable PhysicsRayQueryParameters3D to eliminate object and array allocations on footsteps
+var _ground_query: PhysicsRayQueryParameters3D = null
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 
@@ -103,6 +105,10 @@ func _ready() -> void:
 	flashlight_battery_changed.emit(battery, max_battery)
 	if flashlight:
 		flashlight_toggled.emit(flashlight.visible)
+
+	# Pre-allocate reusable ground raycast query and self-exclusion array
+	_ground_query = PhysicsRayQueryParameters3D.new()
+	_ground_query.exclude = [get_rid()]
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and (Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED or DisplayServer.get_name() == "headless"):
@@ -498,8 +504,16 @@ func _detect_ground_surface() -> int:
 	if not world3d:
 		return 0 # PINE_NEEDLES
 	var space_state = world3d.direct_space_state
-	var query = PhysicsRayQueryParameters3D.create(global_position + Vector3(0, 0.4, 0), global_position + Vector3(0, -1.2, 0))
-	query.exclude = [self.get_rid()]
+	# Optimization: Reuse the persistent _ground_query instance rather than allocating
+	# a new PhysicsRayQueryParameters3D object and exclusion array on every footstep (~150-200/min).
+	# Expected performance impact: Eliminates 100% of temporary ray query allocations and reduces GC pressure.
+	var query: PhysicsRayQueryParameters3D = _ground_query
+	if not query:
+		query = PhysicsRayQueryParameters3D.new()
+		query.exclude = [get_rid()]
+		_ground_query = query
+	query.from = global_position + Vector3(0, 0.4, 0)
+	query.to = global_position + Vector3(0, -1.2, 0)
 	var result = space_state.intersect_ray(query)
 	if result.is_empty():
 		return 0 # PINE_NEEDLES

@@ -21,9 +21,12 @@ signal player_recovered
 var is_bleeding: bool = false
 var bleed_timer: float = 0.0
 var is_dead: bool = false
+# Optimization: Track last emitted health to throttle signal emissions (~96.7% reduction during bleeding)
+var last_emitted_health: float = -1.0
 
 func _ready() -> void:
 	current_health = clamp(current_health, 0.0, max_health)
+	last_emitted_health = current_health
 	health_changed.emit(current_health, max_health)
 
 func _process(delta: float) -> void:
@@ -34,10 +37,20 @@ func _process(delta: float) -> void:
 		bleed_timer -= delta
 		var tick_damage = bleed_dps * delta
 		current_health = max(0.0, current_health - tick_damage)
-		health_changed.emit(current_health, max_health)
+		# Optimization: Bleeding deals 2.0 DPS continuously, firing 60 signals/sec into Player and HUD ProgressBar.
+		# The HUD bar displays integer/smooth values where sub-integer changes are imperceptible per frame.
+		# Emit only when discrete integer health changes, health depletes, or timer expires.
+		# Expected performance impact: ~96.7% fewer signal emissions and HUD updates (from 60/sec to ~2/sec).
+		if int(current_health) != int(last_emitted_health) or current_health <= 0.0 or last_emitted_health < 0.0:
+			last_emitted_health = current_health
+			health_changed.emit(current_health, max_health)
 		if current_health <= 0.0:
 			_trigger_death("Bleedout")
 		elif bleed_timer <= 0.0:
+			# Ensure the final health value is emitted when bleeding finishes
+			if current_health != last_emitted_health:
+				last_emitted_health = current_health
+				health_changed.emit(current_health, max_health)
 			stop_bleeding()
 
 func take_damage(amount: float, cause_bleed: bool = false, source: String = "") -> void:
@@ -45,6 +58,7 @@ func take_damage(amount: float, cause_bleed: bool = false, source: String = "") 
 		return
 
 	current_health = clamp(current_health - amount, 0.0, max_health)
+	last_emitted_health = current_health
 	damage_taken.emit(amount, source)
 	health_changed.emit(current_health, max_health)
 
@@ -75,6 +89,7 @@ func heal(amount: float, stop_bleed: bool = false) -> bool:
 		return false
 
 	current_health = min(max_health, current_health + amount)
+	last_emitted_health = current_health
 	if stop_bleed:
 		stop_bleeding()
 	healed.emit(amount)
@@ -98,6 +113,7 @@ func _trigger_death(source: String) -> void:
 	is_dead = true
 	is_bleeding = false
 	current_health = 0.0
+	last_emitted_health = current_health
 	health_changed.emit(current_health, max_health)
 	player_died.emit()
 
@@ -106,5 +122,6 @@ func recover(respawn_pos: Vector3 = Vector3(0, 1.2, 5.0)) -> void:
 	is_bleeding = false
 	bleed_timer = 0.0
 	current_health = 75.0
+	last_emitted_health = current_health
 	health_changed.emit(current_health, max_health)
 	player_recovered.emit()

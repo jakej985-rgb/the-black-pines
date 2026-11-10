@@ -17,6 +17,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_journal"):
 		toggle_journal()
 		get_viewport().set_input_as_handled()
+	elif visible and event.is_action_pressed("toggle_inventory"):
+		close_journal()
 	elif visible and (event.is_action_pressed("toggle_pause") or event.is_action_pressed("interact")):
 		close_journal()
 		get_viewport().set_input_as_handled()
@@ -28,6 +30,9 @@ func toggle_journal() -> void:
 		open_journal()
 
 func open_journal() -> void:
+	var inventory = get_parent().get_node_or_null("InventoryDialog") if get_parent() else null
+	if inventory and inventory.visible:
+		inventory.close_inventory()
 	refresh_display()
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

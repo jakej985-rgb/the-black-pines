@@ -15,3 +15,7 @@
 ## 2026-11-13 - Dynamic reticle focus state and modal occlusion hiding in survival horror HUDs
 **Learning:** In first-person games with sparse, minimalist HUDs, keeping the reticle static forces players to read peripheral prompt text to verify interactability. Providing micro-feedback directly on the crosshair (subtle expansion and warm chromatic tint when an interactable enters raycast focus) creates instant, non-verbal targeting confirmation. Furthermore, leaving the center crosshair rendered while modal dialogs (inspection sheets, inventory, journal) are active produces visual obstruction over readable text and breaks immersive diegesis.
 **Action:** Bind interactable prompt state changes to reticle modulate/dimension properties, and hide the crosshair whenever full-screen or centered modal overlays are active.
+
+## 2026-11-14 - Modal backdrop dimming and mutual exclusivity for inspection panels
+**Learning:** Clue inspection popups that lack a full-screen backdrop dimming scrim suffer severe legibility problems in dynamic 3D environments, as varying background luminance (flashlight cones, fog, moonlight) reduces contrast against small text. In addition, without mutual modal exclusivity, inspecting a clue while the inventory or journal is open leads to colliding UI layers and conflicting dismiss hotkeys.
+**Action:** Always place an atmospheric dimming scrim behind modal inspection dialogs, ensure opening an inspection closes active dialogs, and allow pressing dialog hotkeys (`Tab`/`J`) to dismiss the active inspection panel seamlessly.

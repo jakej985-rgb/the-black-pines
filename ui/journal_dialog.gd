@@ -9,6 +9,8 @@ extends Control
 
 func _ready() -> void:
 	visible = false
+	if tab_container:
+		tab_container.tab_changed.connect(func(_idx): _focus_active_tab())
 	if JournalManager.instance:
 		JournalManager.instance.objective_status_changed.connect(_on_objective_status_changed)
 		JournalManager.instance.clue_recorded.connect(_on_clue_recorded)
@@ -22,6 +24,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif visible and (event.is_action_pressed("toggle_pause") or event.is_action_pressed("interact")):
 		close_journal()
 		get_viewport().set_input_as_handled()
+	elif visible and event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_Q or event.physical_keycode == KEY_E:
+			var step = -1 if event.physical_keycode == KEY_Q else 1
+			_switch_tab(step)
+			get_viewport().set_input_as_handled()
+
+func _switch_tab(direction: int) -> void:
+	if not tab_container or tab_container.get_tab_count() == 0:
+		return
+	var count = tab_container.get_tab_count()
+	tab_container.current_tab = (tab_container.current_tab + direction + count) % count
+	_focus_active_tab()
 
 func toggle_journal() -> void:
 	if visible:
@@ -36,6 +50,14 @@ func open_journal() -> void:
 	refresh_display()
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	_focus_active_tab()
+
+func _focus_active_tab() -> void:
+	if not tab_container:
+		return
+	var current_bar = tab_container.get_tab_bar()
+	if current_bar:
+		current_bar.grab_focus()
 
 func close_journal() -> void:
 	visible = false

@@ -13,3 +13,8 @@ __pycache__/
 # Generated creature pipeline artifacts (blockouts, test exports)
 assets/creatures/*/build/
 *.blend1
+
+# Hero sculpt sources exceed GitHub's 100MB limit (use Git LFS to track)
+assets/creatures/sasquatch/source/hero_sculpt.blend
+assets/creatures/sasquatch/working/hero_rm.blend
+assets/creatures/sasquatch/working/hero_sculpt_v6.blend

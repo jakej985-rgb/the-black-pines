@@ -87,13 +87,13 @@ cam = bpy.data.objects.new("SilCam", cam_data)
 scene.collection.objects.link(cam)
 scene.camera = cam
 
-dist = max(height * 2.2, 5.0)
+dist = max(height * 2.9, 7.0)
 views = {
     "front":        (Vector((center.x, center.y + dist, center.z)), Vector((center.x, center.y, center.z))),
     "side":         (Vector((center.x - dist, center.y, center.z)), Vector((center.x, center.y, center.z))),
     "rear":         (Vector((center.x, center.y - dist, center.z)), Vector((center.x, center.y, center.z))),
     "threequarter": (Vector((center.x - dist * 0.72, center.y + dist * 0.72, center.z + 0.3)), Vector((center.x, center.y, center.z))),
-    "bust":         (Vector((center.x - 0.25, center.y + 1.85, center.z + 0.75)), Vector((center.x, center.y + 0.15, center.z + 0.75))),
+    "bust":         (Vector((center.x - 0.25, center.y + 1.85, center.z + 1.15)), Vector((center.x, center.y + 0.15, center.z + 1.15))),
 }
 out = Path(a.out)
 out.mkdir(parents=True, exist_ok=True)

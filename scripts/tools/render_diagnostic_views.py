@@ -16,11 +16,12 @@ if __name__ == "__main__" and "bpy" not in sys.modules:
     parser = argparse.ArgumentParser(description="Render 5-angle diagnostic clay views in Blender.")
     parser.add_argument("--asset", default="sasquatch", help="Asset ID under assets/creatures/")
     parser.add_argument("--source", default=None, help="Path to .blend, .obj, or directory of .objs to render")
+    parser.add_argument("--out", default=None, help="Path to output directory for diagnostic renders")
     args = parser.parse_args()
 
     project_root = Path(__file__).resolve().parent.parent.parent
     asset_dir = project_root / "assets" / "creatures" / args.asset
-    out_dir = asset_dir / "qa" / "diagnostic_views"
+    out_dir = Path(args.out).resolve() if args.out else asset_dir / "qa" / "diagnostic_views"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     cmd = [
@@ -274,8 +275,8 @@ cam_obj = bpy.data.objects.new("DiagnosticCam", cam_data)
 main_col.objects.link(cam_obj)
 bpy.context.scene.camera = cam_obj
 
-# Camera Distance based on creature height
-dist = max(height * 2.2, 5.0)
+# Camera Distance based on creature height (with ~15% top/bottom margin for 85mm lens)
+dist = max(height * 2.9, 7.0)
 
 # Render Settings
 scene = bpy.context.scene
@@ -296,7 +297,7 @@ views = {
     # 3/4 Dynamic Perspective View
     "render_threequarter.png": (Vector((center.x - dist * 0.72, center.y + dist * 0.72, center.z + 0.3)), Vector((center.x, center.y, center.z))),
     # Close-up Bust Portrait (Head, Brow, Face Mask, Beard, Pectorals)
-    "render_bust.png": (Vector((center.x - 0.25, center.y + 1.85, center.z + 0.75)), Vector((center.x, center.y + 0.15, center.z + 0.75))),
+    "render_bust.png": (Vector((center.x - 0.25, center.y + 1.85, center.z + 1.15)), Vector((center.x, center.y + 0.15, center.z + 1.15))),
 }
 
 for filename, (cam_pos, target_pos) in views.items():

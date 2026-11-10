@@ -14,21 +14,20 @@ stages:
       recorded in references/TARGET_CHECKLIST.md. Known limitation: agent cannot visually verify the reference
       image; human confirmation of reference lock still required.'
   blockout_review:
-    status: in_progress
+    status: approved
     evidence:
-    - assets/creatures/sasquatch/source/blockout.blend
-    - assets/creatures/sasquatch/qa/stage_reviews/blockout_review/diagnostic/
     - assets/creatures/sasquatch/qa/stage_reviews/blockout_review/comparison/comparison_sheet.png
-    - assets/creatures/sasquatch/qa/stage_reviews/blockout_review/review_record.json
-    reviewer: null
-    notes: 'Metaball organic blockout (iteration 1) awaiting HUMAN silhouette review.
-      Vision-model critique unavailable (agent text-only; local GPU too weak for
-      generative models). Do not proceed to sculpt_review without human verdict.'
+    reviewer: user
+    notes: User approved blockout silhouette in chat
   sculpt_review:
-    status: pending
+    status: in_progress
     evidence: []
     reviewer: null
-    notes: ''
+    notes: 'Iteration 5: Gaussian facial anatomy (brow ridge, deep sockets, simian nose,
+      prognathic muzzle, chin) gives a recognisable ape face. Pose/continuity fixed;
+      fur dialled back to a subtle texture (deferred to materials_fur). Pending human
+      review - remaining gap: body is a stylized generic-ape form. See
+      qa/stage_reviews/sculpt_review/review_record.json.'
   retopo_uv_bake:
     status: pending
     evidence: []

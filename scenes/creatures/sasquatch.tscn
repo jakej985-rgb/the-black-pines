@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/creatures/sasquatch.gd" id="1_sasquatch"]
 [ext_resource type="Material" uid="uid://csvewr5uuy0yc" path="res://assets/materials/mat_beast_fur.tres" id="2_fur_mat"]
 [ext_resource type="Material" uid="uid://bc4iu27v4o0lk" path="res://assets/materials/mat_creature_claw.tres" id="3_claw_mat"]
-[ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_torso.obj" id="4_torso_mesh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_retopo.obj" id="4_retopo_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_head.obj" id="5_head_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_arm_upper.obj" id="6_arm_up_mesh"]
 [ext_resource type="ArrayMesh" path="res://assets/models/sasquatch_arm_lower.obj" id="7_arm_low_mesh"]
@@ -302,7 +302,7 @@ shape = SubResource("CapsuleShape3D_creature")
 
 [node name="Torso" type="MeshInstance3D" parent="Visuals"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
-mesh = ExtResource("4_torso_mesh")
+mesh = ExtResource("4_retopo_mesh")
 surface_material_override/0 = ExtResource("2_fur_mat")
 
 [node name="FurCards" type="MeshInstance3D" parent="Visuals/Torso"]

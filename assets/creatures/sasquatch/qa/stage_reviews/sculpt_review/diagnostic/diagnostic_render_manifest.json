@@ -1,0 +1,12 @@
+{
+  "asset": "sasquatch",
+  "source": "/home/m3tal/apps/the-black-pines/assets/creatures/sasquatch/source/hero_sculpt.blend",
+  "completed": true,
+  "views": [
+    "render_front.png",
+    "render_side.png",
+    "render_rear.png",
+    "render_threequarter.png",
+    "render_bust.png"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "stage": "sculpt_review",
+  "asset": "sasquatch_classic",
+  "iteration": 5,
+  "reviewer": "agent_rework",
+  "verdict": "pending_human_review",
+  "verdict_options": ["pass", "revise", "reject"],
+  "evidence": {
+    "clay_views": "assets/creatures/sasquatch/qa/stage_reviews/sculpt_review/diagnostic/",
+    "silhouettes": "assets/creatures/sasquatch/qa/stage_reviews/sculpt_review/comparison/silhouette_*.png",
+    "comparison_sheet": "assets/creatures/sasquatch/qa/stage_reviews/sculpt_review/comparison/comparison_sheet.png",
+    "manifest": "assets/creatures/sasquatch/qa/stage_reviews/sculpt_review/comparison/comparison_manifest.json"
+  },
+  "sculpt_stats": {
+    "dimensions_meters": { "x": 0.96, "y": 2.41, "z": 2.55 },
+    "vertices": 372582,
+    "polygons": 372584,
+    "generator": "scripts/tools/build_sasquatch_sculpt.py",
+    "source_asset": "assets/creatures/sasquatch/source/hero_sculpt.blend",
+    "build_export": "assets/creatures/sasquatch/build/hero_sculpt.obj"
+  },
+  "changes_vs_iteration4": [
+    "Replaced the box-conditional face code with smooth Gaussian anatomical features in normalised head coordinates: supraorbital brow ridge with glabella, deep-set orbital sockets with eyeball domes, nasal bridge, broad flat simian nose with flared alae and nostril recesses, prognathic muzzle, closed-mouth line groove, and lower-lip/chin mass.",
+    "The head now reads as a real ape face (heavy brow, dark eye sockets, broad nose, protruding muzzle) instead of a smooth mask.",
+    "Fur-volume amplitude reduced to a subtle surface texture (0.003). At higher amplitudes the sinusoidal strands wrapped badly on the cylindrical arms/legs and read as 'pleating'. Real fur clumping/direction remains the materials_fur stage's job.",
+    "Added a light post-fur relax smooth so fine fur grooves do not dominate while large facial/muscular forms stay intact."
+  ],
+  "findings": [
+    {
+      "view": "bust/front/threequarter",
+      "defect": "Face now has brow, sockets, nose and muzzle, but is still a stylized clay ape rather than a photo-accurate match to the reference artwork's face.",
+      "severity": "minor",
+      "correction": "Large improvement over iteration 4's mask; needs human check against front_reference.png.",
+      "evidence_image": "assets/creatures/sasquatch/qa/stage_reviews/sculpt_review/comparison/comparison_bust.png"
+    },
+    {
+      "view": "side/rear",
+      "defect": "Body remains a stylized generic-ape form; fur is only a faint surface texture and does not read as shaggy fur.",
+      "severity": "major",
+      "correction": "Fur is intentionally deferred to the materials_fur stage; flagged for human review.",
+      "evidence_image": "assets/creatures/sasquatch/qa/stage_reviews/sculpt_review/comparison/comparison_side.png"
+    }
+  ],
+  "checklist_status": {
+    "forward_leaning_bent_knee_crouch": true,
+    "continuous_watertight_anatomy": true,
+    "no_hollow_chest_shell": true,
+    "no_flat_brow_plate_artifact": true,
+    "long_arms_hanging_past_thigh": true,
+    "colossal_trapezius_hump": true,
+    "heavy_supraorbital_brow_shelf": true,
+    "deep_set_orbital_sockets": true,
+    "broad_simian_nose_muzzle": true,
+    "conical_sagittal_crest_sloping_backward": "partial",
+    "fur_volume_breaks_silhouette": "partial - subtle only; real fur is materials_fur stage",
+    "18_inch_plantigrade_wide_feet": "partial",
+    "game_triangle_budget": "n/a pre-retopo (373k polys; retopo stage)"
+  },
+  "notes": "Iteration 5 focuses on the face: Gaussian brow/socket/nose/muzzle/chin features give a recognisable ape countenance with a bulging brow and deep sockets. Fur is deliberately dialled back to a subtle texture (it pleated at higher amplitude) and left for the materials_fur stage. Silhouettes track the reference's hunched, long-armed, crested profile. Human sign-off still required."
+}

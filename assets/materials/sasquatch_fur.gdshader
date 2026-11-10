@@ -3,6 +3,7 @@ render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_sc
 
 // Photorealistic cryptid pelt & layered fur shader for The Black Pines
 uniform vec4 fur_base_color : source_color = vec4(0.065, 0.052, 0.042, 1.0);
+
 uniform vec4 fur_highlight_color : source_color = vec4(0.14, 0.11, 0.08, 1.0);
 uniform float roughness_base : hint_range(0.0, 1.0) = 0.88;
 uniform float wetness : hint_range(0.0, 1.0) = 0.35;
@@ -63,6 +64,7 @@ void fragment() {
 
 	// Gentle Fresnel rim to carve dark cryptid silhouette against foggy backdrop
 	RIM = rim_strength * 0.28;
+
 	RIM_TINT = 0.6;
 }
 

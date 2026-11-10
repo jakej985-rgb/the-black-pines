@@ -10,6 +10,7 @@ extends CanvasLayer
 @onready var bleed_label: Label = $Root/BottomLeft/BleedLabel
 @onready var flashlight_label: Label = $Root/BottomRight/FlashlightLabel
 @onready var notification_label: Label = $Root/TopCenter/NotificationLabel
+@onready var inspection_backdrop: ColorRect = $Root/InspectionBackdrop
 @onready var inspection_panel: PanelContainer = $Root/InspectionPanel
 @onready var inspection_title: Label = $Root/InspectionPanel/VBox/InspectionTitle
 @onready var inspection_body: Label = $Root/InspectionPanel/VBox/InspectionBody
@@ -20,6 +21,8 @@ func _ready() -> void:
 	prompt_label.text = ""
 	notification_label.text = ""
 	inspection_panel.visible = false
+	if inspection_backdrop:
+		inspection_backdrop.visible = false
 	if bleed_label:
 		bleed_label.visible = false
 
@@ -54,11 +57,19 @@ func setup_player(player: Player) -> void:
 		player.health_component.bleed_started.connect(func(): if bleed_label: bleed_label.visible = true)
 		player.health_component.bleed_stopped.connect(func(): if bleed_label: bleed_label.visible = false)
 
+func close_inspection() -> void:
+	inspection_panel.visible = false
+	if inspection_backdrop:
+		inspection_backdrop.visible = false
+	_update_crosshair_visibility()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if inspection_panel.visible:
 		if event.is_action_pressed("interact") or event.is_action_pressed("toggle_pause"):
-			inspection_panel.visible = false
+			close_inspection()
 			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("toggle_inventory") or event.is_action_pressed("toggle_journal"):
+			close_inspection()
 
 func _on_health_changed(curr: float, max_val: float) -> void:
 	if health_bar:
@@ -113,9 +124,16 @@ func _on_interaction_prompt_changed(text: String) -> void:
 			crosshair.offset_bottom = 2.0
 
 func _on_inspection_displayed(title: String, text: String) -> void:
+	if journal_dialog and journal_dialog.visible and journal_dialog.has_method("close_journal"):
+		journal_dialog.close_journal()
+	if inventory_dialog and inventory_dialog.visible and inventory_dialog.has_method("close_inventory"):
+		inventory_dialog.close_inventory()
 	inspection_title.text = title
 	inspection_body.text = text
 	inspection_panel.visible = true
+	if inspection_backdrop:
+		inspection_backdrop.visible = true
+	_update_crosshair_visibility()
 
 func _on_notification_posted(msg: String) -> void:
 	notification_label.text = msg

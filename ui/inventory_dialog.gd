@@ -6,6 +6,13 @@ extends Control
 const InventoryManagerClass = preload("res://scripts/systems/inventory_manager.gd")
 const CraftingManagerClass = preload("res://scripts/systems/crafting_manager.gd")
 
+const ITEM_HOTKEYS: Dictionary = {
+	"road_flare": {"key": "[1]", "hint": "Press [1] in field to deploy flare."},
+	"trap_spike": {"key": "[2]", "hint": "Press [2] in field to arm spike trap."},
+	"antiseptic_bandage": {"key": "[3]", "hint": "Press [3] to heal (+40 HP) & stop bleeding."},
+	"battery_pack": {"key": "[R]", "hint": "Press [R] to reload flashlight."}
+}
+
 @onready var resources_list: VBoxContainer = $Panel/Margin/VBox/Tabs/Resources/Scroll/List
 @onready var tools_list: VBoxContainer = $Panel/Margin/VBox/Tabs/Tools/Scroll/List
 @onready var evidence_list: VBoxContainer = $Panel/Margin/VBox/Tabs/Evidence/Scroll/List
@@ -27,6 +34,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_inventory"):
 		toggle_inventory()
 		get_viewport().set_input_as_handled()
+	elif visible and event.is_action_pressed("toggle_journal"):
+		close_inventory()
 	elif visible and (event.is_action_pressed("toggle_pause") or event.is_action_pressed("interact")):
 		close_inventory()
 		get_viewport().set_input_as_handled()
@@ -38,13 +47,25 @@ func toggle_inventory() -> void:
 		open_inventory()
 
 func open_inventory() -> void:
+	var journal = get_parent().get_node_or_null("JournalDialog") if get_parent() else null
+	if journal and journal.visible:
+		journal.close_journal()
 	refresh_display()
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	_focus_first_item()
 
 func close_inventory() -> void:
 	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func _focus_first_item() -> void:
+	for container in [resources_list, tools_list, evidence_list, crafting_list]:
+		if container and container.get_child_count() > 0:
+			var first = container.get_child(0)
+			if first is Button:
+				first.grab_focus()
+				return
 
 func refresh_display() -> void:
 	_populate_category(resources_list, [InventoryManager.ItemType.RESOURCE])
@@ -131,8 +152,11 @@ func _populate_crafting() -> void:
 		craft_btn.tooltip_text = "Craft 1x %s" % recipe_name if can_make else "Cannot craft: missing required materials."
 		craft_btn.pressed.connect(func():
 			var success = CraftingManagerClass.instance.craft_recipe(recipe_id)
-			if success and desc_label:
-				desc_label.text = "Crafted 1x %s successfully!" % recipe_name
+			if success:
+				if AudioDirector.instance:
+					AudioDirector.instance.play_pickup()
+				if desc_label:
+					desc_label.text = "Crafted 1x %s successfully!" % recipe_name
 		)
 		hbox.add_child(craft_btn)
 
@@ -142,7 +166,12 @@ func _create_item_row(item_id: String, info: Dictionary, qty: int) -> Button:
 	var btn = Button.new()
 	var max_stack = info.get("max_stack", 99)
 	var item_desc: String = info.get("description", "")
-	btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
+	var hotkey_data: Dictionary = ITEM_HOTKEYS.get(item_id, {})
+	if not hotkey_data.is_empty():
+		btn.text = "%s  x%d/%d  •  %s" % [info.get("name", item_id), qty, max_stack, hotkey_data["key"]]
+		item_desc += "\n▶ Quick Action: " + hotkey_data["hint"]
+	else:
+		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
 	btn.tooltip_text = item_desc
 	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var on_item_inspect = func():

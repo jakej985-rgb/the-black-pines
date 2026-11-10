@@ -492,8 +492,11 @@ func deploy_trap() -> bool:
 		spawn_pos = global_position - transform.basis.z * 1.5
 
 	# Check for overlapping existing traps within 1.4m
+	# Optimization: Use distance_squared_to to avoid expensive sqrt calculation
+	# 1.4 * 1.4 = 1.96. Expected performance impact: Eliminates square root overhead in trap overlap checks.
+	var min_trap_dist_sq: float = 1.96
 	for existing in get_tree().get_nodes_in_group("traps"):
-		if existing is Node3D and existing.global_position.distance_to(spawn_pos) < 1.4:
+		if existing is Node3D and existing.global_position.distance_squared_to(spawn_pos) < min_trap_dist_sq:
 			show_notification("Cannot place trap: too close to an existing trap.")
 			return false
 

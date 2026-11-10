@@ -131,10 +131,12 @@ func _process_idle_roam(delta: float) -> void:
 	if anim_player and anim_player.current_animation != "stalking":
 		anim_player.play("stalking")
 
-	var dist = global_position.distance_to(player_ref.global_position)
-	if dist <= 30.0:
+	# Optimization: Use distance_squared_to to avoid expensive sqrt operations every physics frame.
+	# Expected performance impact: Eliminates square root calculations during roaming checks.
+	var dist_sq: float = global_position.distance_squared_to(player_ref.global_position)
+	if dist_sq <= 900.0: # 30.0 * 30.0
 		set_state(State.STALKING)
-	elif player_ref.is_sprinting and dist <= noise_hearing_radius:
+	elif player_ref.is_sprinting and dist_sq <= (noise_hearing_radius * noise_hearing_radius):
 		noise_target_pos = player_ref.global_position
 		set_state(State.INVESTIGATING)
 
@@ -150,16 +152,19 @@ func _process_stalking(delta: float) -> void:
 		var q_target = target_basis.get_rotation_quaternion()
 		global_basis = Basis(q_curr.slerp(q_target, delta * 2.0).normalized())
 
-	var dist_to_player: float = global_position.distance_to(player_ref.global_position)
+	# Optimization: Use distance_squared_to to avoid unnecessary sqrt calculations every physics frame.
+	# Compares against squared radii thresholds for noise, stalk proximity, and flashlight checks.
+	# Expected performance impact: Eliminates 60 sqrt calls per second during active stalking.
+	var dist_sq_to_player: float = global_position.distance_squared_to(player_ref.global_position)
 
 	# Stimulus: Sprint noise
-	if player_ref.is_sprinting and dist_to_player <= noise_hearing_radius:
+	if player_ref.is_sprinting and dist_sq_to_player <= (noise_hearing_radius * noise_hearing_radius):
 		noise_target_pos = player_ref.global_position
 		set_state(State.INVESTIGATING)
 		return
 
 	# Trigger encounter if player is too close
-	if dist_to_player <= stalk_distance_trigger:
+	if dist_sq_to_player <= (stalk_distance_trigger * stalk_distance_trigger):
 		_trigger_encounter()
 		return
 
@@ -171,7 +176,7 @@ func _process_stalking(delta: float) -> void:
 			var to_creature = target_point - cam.global_position
 			var forward = -cam.global_transform.basis.z
 			var dot = forward.dot(to_creature.normalized())
-			if dot > 0.94 and dist_to_player < 36.0:
+			if dot > 0.94 and dist_sq_to_player < 1296.0: # 36.0 * 36.0
 				look_at_timer += delta
 				if look_at_timer >= 0.6:
 					_trigger_encounter()

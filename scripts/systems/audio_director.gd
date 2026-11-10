@@ -124,29 +124,59 @@ func play_cryptid_roar(pos_3d: Vector3 = Vector3.ZERO) -> void:
 	player_3d.play()
 	player_3d.finished.connect(func(): player_3d.queue_free())
 
+# Optimization: Persistent pooled 3D audio players to eliminate heap allocations and queue_free churn
+var _wood_knock_player_3d: AudioStreamPlayer3D = null
+var _distant_snap_player_3d: AudioStreamPlayer3D = null
+
 func play_distant_wood_knock() -> void:
-	var player_3d = AudioStreamPlayer3D.new()
-	player_3d.stream = wood_knock_stream
+	if not _wood_knock_player_3d or not is_instance_valid(_wood_knock_player_3d):
+		_wood_knock_player_3d = AudioStreamPlayer3D.new()
+		_wood_knock_player_3d.stream = wood_knock_stream
+		_wood_knock_player_3d.max_distance = 60.0
+		_wood_knock_player_3d.volume_db = 4.0
+		add_child(_wood_knock_player_3d)
+
 	var angle = randf() * TAU
 	var dist = randf_range(28.0, 50.0)
-	player_3d.position = Vector3(cos(angle) * dist, 2.0, sin(angle) * dist)
-	player_3d.max_distance = 60.0
-	player_3d.volume_db = 4.0
-	add_child(player_3d)
-	player_3d.play()
-	player_3d.finished.connect(func(): player_3d.queue_free())
+	var pos = Vector3(cos(angle) * dist, 2.0, sin(angle) * dist)
+	if _wood_knock_player_3d.playing:
+		# Pooled player busy: spawn a temporary one so the current knock isn't cut off
+		var temp = AudioStreamPlayer3D.new()
+		temp.stream = wood_knock_stream
+		temp.max_distance = 60.0
+		temp.volume_db = 4.0
+		temp.position = pos
+		add_child(temp)
+		temp.play()
+		temp.finished.connect(func(): temp.queue_free())
+		return
+	_wood_knock_player_3d.position = pos
+	_wood_knock_player_3d.play()
 
 func _play_random_distant_snap() -> void:
-	var player_3d = AudioStreamPlayer3D.new()
-	player_3d.stream = branch_snap_stream
+	if not _distant_snap_player_3d or not is_instance_valid(_distant_snap_player_3d):
+		_distant_snap_player_3d = AudioStreamPlayer3D.new()
+		_distant_snap_player_3d.stream = branch_snap_stream
+		_distant_snap_player_3d.max_distance = 45.0
+		_distant_snap_player_3d.volume_db = 1.0
+		add_child(_distant_snap_player_3d)
+
 	var angle = randf() * TAU
 	var dist = randf_range(16.0, 32.0)
-	player_3d.position = Vector3(cos(angle) * dist, 1.0, sin(angle) * dist)
-	player_3d.max_distance = 45.0
-	player_3d.volume_db = 1.0
-	add_child(player_3d)
-	player_3d.play()
-	player_3d.finished.connect(func(): player_3d.queue_free())
+	var pos = Vector3(cos(angle) * dist, 1.0, sin(angle) * dist)
+	if _distant_snap_player_3d.playing:
+		# Pooled player busy: spawn a temporary one so the current snap isn't cut off
+		var temp = AudioStreamPlayer3D.new()
+		temp.stream = branch_snap_stream
+		temp.max_distance = 45.0
+		temp.volume_db = 1.0
+		temp.position = pos
+		add_child(temp)
+		temp.play()
+		temp.finished.connect(func(): temp.queue_free())
+		return
+	_distant_snap_player_3d.position = pos
+	_distant_snap_player_3d.play()
 
 # ================= AUDIO SYNTHESIS =================
 

@@ -101,5 +101,5 @@ theme_override_constants/separation = 10
 [node name="FooterLabel" type="Label" parent="Panel/MarginContainer/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-text = "[J] Close Journal  |  [Esc] Resume"
+text = "[Q/E] Switch Section  |  [J] Close Journal  |  [Esc] Resume"
 horizontal_alignment = 1

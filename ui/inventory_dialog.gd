@@ -13,6 +13,7 @@ const ITEM_HOTKEYS: Dictionary = {
 	"battery_pack": {"key": "[R]", "hint": "Press [R] to reload flashlight."}
 }
 
+@onready var tab_container: TabContainer = $Panel/Margin/VBox/Tabs
 @onready var resources_list: VBoxContainer = $Panel/Margin/VBox/Tabs/Resources/Scroll/List
 @onready var tools_list: VBoxContainer = $Panel/Margin/VBox/Tabs/Tools/Scroll/List
 @onready var evidence_list: VBoxContainer = $Panel/Margin/VBox/Tabs/Evidence/Scroll/List
@@ -21,6 +22,8 @@ const ITEM_HOTKEYS: Dictionary = {
 
 func _ready() -> void:
 	visible = false
+	if tab_container:
+		tab_container.tab_changed.connect(func(_idx): _focus_first_item())
 	# Optimization: Only rebuild inventory UI nodes when the inventory dialog is open/visible.
 	# When hidden, open_inventory() already calls refresh_display(). Skipping offscreen rebuilds
 	# avoids tearing down and allocating dozens of UI controls, labels, and buttons on every pickup.
@@ -39,6 +42,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif visible and (event.is_action_pressed("toggle_pause") or event.is_action_pressed("interact")):
 		close_inventory()
 		get_viewport().set_input_as_handled()
+	elif visible and event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_Q or event.physical_keycode == KEY_E:
+			var step = -1 if event.physical_keycode == KEY_Q else 1
+			_switch_tab(step)
+			get_viewport().set_input_as_handled()
+
+func _switch_tab(direction: int) -> void:
+	if not tab_container or tab_container.get_tab_count() == 0:
+		return
+	var count = tab_container.get_tab_count()
+	tab_container.current_tab = (tab_container.current_tab + direction + count) % count
+	_focus_first_item()
 
 func toggle_inventory() -> void:
 	if visible:
@@ -60,12 +75,27 @@ func close_inventory() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _focus_first_item() -> void:
-	for container in [resources_list, tools_list, evidence_list, crafting_list]:
-		if container and container.get_child_count() > 0:
-			var first = container.get_child(0)
-			if first is Button:
-				first.grab_focus()
+	var active_container: VBoxContainer = null
+	if tab_container:
+		match tab_container.current_tab:
+			0: active_container = resources_list
+			1: active_container = tools_list
+			2: active_container = evidence_list
+			3: active_container = crafting_list
+
+	if active_container and active_container.get_child_count() > 0:
+		var first = active_container.get_child(0)
+		if first is Button:
+			first.grab_focus()
+			return
+		elif first is HBoxContainer and first.get_child_count() > 0:
+			var child_btn = first.get_child(0)
+			if child_btn is Button:
+				child_btn.grab_focus()
 				return
+
+	if desc_label:
+		desc_label.text = "Hover over an item to inspect details."
 
 func refresh_display() -> void:
 	_populate_category(resources_list, [InventoryManager.ItemType.RESOURCE])

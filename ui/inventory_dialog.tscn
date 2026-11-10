@@ -150,5 +150,5 @@ autowrap_mode = 2
 [node name="FooterLabel" type="Label" parent="Panel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-text = "[Tab] Close Inventory  |  [Esc] Resume"
+text = "[Q/E] Switch Category  |  [Tab] Close Inventory  |  [Esc] Resume"
 horizontal_alignment = 1

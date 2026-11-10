@@ -41,6 +41,8 @@ You play as an investigator arriving at the abandoned Black Pine Ranger Station 
 | **Jump** | `Space` |
 | **Toggle Flashlight** | `F` |
 | **Interact / Inspect / Gather** | `E` |
+| **Field Inventory** | `Tab` |
+| **Field Journal / Objectives** | `J` |
 | **Unlock / Capture Mouse** | `Escape` / Left Click |
 
 ---

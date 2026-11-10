@@ -173,7 +173,8 @@ func _physics_process(delta: float) -> void:
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
 	# Sprint logic
-	var wants_sprint: bool = Input.is_action_pressed("sprint") and input_dir.length() > 0.1 and is_on_floor()
+	# Optimization: Use length_squared() > 0.01 (0.1^2) to skip unnecessary sqrt calculation every physics frame
+	var wants_sprint: bool = Input.is_action_pressed("sprint") and input_dir.length_squared() > 0.01 and is_on_floor()
 	if wants_sprint and stamina > 0.0:
 		is_sprinting = true
 		stamina = max(0.0, stamina - stamina_drain_rate * delta)
@@ -214,8 +215,11 @@ func _physics_process(delta: float) -> void:
 		_respawn_from_fall()
 
 	# Footstep audio
-	var horiz_vel := Vector2(velocity.x, velocity.z).length()
-	if is_on_floor() and horiz_vel > 0.3:
+	# Optimization: Check horizontal velocity squared first against threshold (0.3^2 = 0.09)
+	# to avoid expensive sqrt calculation when the player is idle or moving insignificantly.
+	var horiz_vel_sq := velocity.x * velocity.x + velocity.z * velocity.z
+	if is_on_floor() and horiz_vel_sq > 0.09:
+		var horiz_vel: float = sqrt(horiz_vel_sq)
 		step_dist_accum += horiz_vel * delta
 		var threshold: float = 1.6 if is_sprinting else 2.2
 		if step_dist_accum >= threshold:
@@ -242,7 +246,8 @@ func _physics_process(delta: float) -> void:
 		camera.rotation.z = -current_strafe * deg_to_rad(1.6)
 
 	# Head bob & breathing
-	_process_head_bob(delta, direction.length() > 0.1 and is_on_floor())
+	# Optimization: Use length_squared() > 0.01 (0.1^2) to skip sqrt calculation on direction vector
+	_process_head_bob(delta, direction.length_squared() > 0.01 and is_on_floor())
 	
 	# Flashlight inertial sway & battery drain
 	if flashlight:

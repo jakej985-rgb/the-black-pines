@@ -59,11 +59,20 @@ func open_journal() -> void:
 	_focus_active_tab()
 
 func _focus_active_tab() -> void:
-	if not tab_container:
-		return
-	var current_bar = tab_container.get_tab_bar()
-	if current_bar:
-		current_bar.grab_focus()
+	var active_container: VBoxContainer = null
+	if tab_container:
+		match tab_container.current_tab:
+			0: active_container = objectives_container
+			1: active_container = clues_container
+
+	if active_container:
+		for child in active_container.get_children():
+			if child is Control and child.focus_mode != Control.FOCUS_NONE:
+				child.grab_focus()
+				return
+
+	if tab_container and tab_container.get_tab_bar():
+		tab_container.get_tab_bar().grab_focus()
 
 ## Whether the last close_journal() recaptured the mouse. Lets headless tests
 ## verify the close path honors the guard (headless ignores mouse mode).
@@ -135,6 +144,7 @@ func _refresh_objectives() -> void:
 
 func _create_objective_card(obj: Dictionary, is_completed: bool) -> PanelContainer:
 	var panel = PanelContainer.new()
+	panel.focus_mode = Control.FOCUS_ALL
 	var vbox = VBoxContainer.new()
 	panel.add_child(vbox)
 
@@ -171,6 +181,7 @@ func _refresh_clues() -> void:
 
 	for clue in clues:
 		var panel = PanelContainer.new()
+		panel.focus_mode = Control.FOCUS_ALL
 		var vbox = VBoxContainer.new()
 		panel.add_child(vbox)
 

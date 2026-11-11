@@ -17,6 +17,12 @@ extends CanvasLayer
 
 var notif_timer: float = 0.0
 
+@onready var journal_dialog: Control = $Root/JournalDialog
+@onready var inventory_dialog: Control = $Root/InventoryDialog
+
+# Optimization: Cache last modal_open state to avoid mutating crosshair properties unnecessarily
+var _last_modal_open: Variant = null
+
 func _ready() -> void:
 	prompt_label.text = ""
 	notification_label.text = ""
@@ -26,18 +32,24 @@ func _ready() -> void:
 	if bleed_label:
 		bleed_label.visible = false
 
-@onready var journal_dialog: Control = $Root/JournalDialog
-@onready var inventory_dialog: Control = $Root/InventoryDialog
+	# Optimization: Event-driven modal visibility updates.
+	# Rather than polling multiple modal states every frame in _process() (60-144+ FPS),
+	# connect to the visibility_changed signals of the modal dialogs and panels.
+	# Expected performance impact: Completely eliminates crosshair modal visibility polling
+	# (saving 3,600 to 8,640+ evaluations per minute) with zero frame overhead.
+	if inspection_panel:
+		inspection_panel.visibility_changed.connect(_update_crosshair_visibility)
+	if journal_dialog:
+		journal_dialog.visibility_changed.connect(_update_crosshair_visibility)
+	if inventory_dialog:
+		inventory_dialog.visibility_changed.connect(_update_crosshair_visibility)
+	_update_crosshair_visibility()
 
 func _process(delta: float) -> void:
 	if notif_timer > 0.0:
 		notif_timer -= delta
 		if notif_timer <= 0.0:
 			notification_label.text = ""
-	_update_crosshair_visibility()
-
-# Optimization: Cache last modal_open state to avoid mutating crosshair properties every single frame
-var _last_modal_open: Variant = null
 
 func _update_crosshair_visibility() -> void:
 	if not crosshair:

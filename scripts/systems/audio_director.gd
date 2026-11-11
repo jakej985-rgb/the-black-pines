@@ -113,20 +113,39 @@ func play_pickup() -> void:
 		sfx_player.volume_db = -4.0
 		sfx_player.play()
 
-func play_cryptid_roar(pos_3d: Vector3 = Vector3.ZERO) -> void:
-	var player_3d = AudioStreamPlayer3D.new()
-	player_3d.stream = cryptid_growl_stream
-	player_3d.position = pos_3d
-	player_3d.max_distance = 65.0
-	player_3d.volume_db = 6.0
-	player_3d.pitch_scale = randf_range(0.85, 1.0)
-	add_child(player_3d)
-	player_3d.play()
-	player_3d.finished.connect(func(): player_3d.queue_free())
-
 # Optimization: Persistent pooled 3D audio players to eliminate heap allocations and queue_free churn
+var _cryptid_roar_player_3d: AudioStreamPlayer3D = null
 var _wood_knock_player_3d: AudioStreamPlayer3D = null
 var _distant_snap_player_3d: AudioStreamPlayer3D = null
+
+func play_cryptid_roar(pos_3d: Vector3 = Vector3.ZERO) -> void:
+	# Optimization: Reuse a persistent AudioStreamPlayer3D instance rather than allocating
+	# a new node, adding it to the SceneTree, connecting a signal lambda, and queuing free on every roar.
+	# Expected performance impact: Eliminates heap node allocation and garbage churn during encounter triggers.
+	if not _cryptid_roar_player_3d or not is_instance_valid(_cryptid_roar_player_3d):
+		_cryptid_roar_player_3d = AudioStreamPlayer3D.new()
+		_cryptid_roar_player_3d.stream = cryptid_growl_stream
+		_cryptid_roar_player_3d.max_distance = 65.0
+		_cryptid_roar_player_3d.volume_db = 6.0
+		add_child(_cryptid_roar_player_3d)
+
+	var pitch = randf_range(0.85, 1.0)
+	if _cryptid_roar_player_3d.playing:
+		# Pooled player busy: spawn a temporary one so the current roar is not cut off
+		var temp = AudioStreamPlayer3D.new()
+		temp.stream = cryptid_growl_stream
+		temp.max_distance = 65.0
+		temp.volume_db = 6.0
+		temp.position = pos_3d
+		temp.pitch_scale = pitch
+		add_child(temp)
+		temp.play()
+		temp.finished.connect(func(): temp.queue_free())
+		return
+
+	_cryptid_roar_player_3d.position = pos_3d
+	_cryptid_roar_player_3d.pitch_scale = pitch
+	_cryptid_roar_player_3d.play()
 
 func play_distant_wood_knock() -> void:
 	if not _wood_knock_player_3d or not is_instance_valid(_wood_knock_player_3d):

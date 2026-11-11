@@ -103,18 +103,33 @@ func _focus_first_item() -> void:
 				return
 
 	if desc_label:
-		desc_label.text = "Hover over an item to inspect details."
+		desc_label.text = "No items in this category." if (tab_container and tab_container.current_tab != 3) else "No crafting blueprints available."
+	if tab_container and tab_container.get_tab_bar():
+		tab_container.get_tab_bar().grab_focus()
 
 func refresh_display() -> void:
+	# Detect whether focus sits on a list button that is about to be rebuilt.
+	var focus_owner: Control = get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	var focus_in_lists: bool = false
+	if focus_owner:
+		for list in [resources_list, tools_list, evidence_list, crafting_list]:
+			if list and list.is_ancestor_of(focus_owner):
+				focus_in_lists = true
+				break
+
 	_populate_category(resources_list, [InventoryManager.ItemType.RESOURCE])
 	_populate_category(tools_list, [InventoryManager.ItemType.TOOL, InventoryManager.ItemType.CONSUMABLE])
 	_populate_category(evidence_list, [InventoryManager.ItemType.EVIDENCE])
 	_populate_crafting()
 
+	if visible and (focus_in_lists or focus_owner == null):
+		_focus_first_item()
+
 func _populate_category(container: VBoxContainer, allowed_types: Array) -> void:
 	if not container:
 		return
 	for child in container.get_children():
+		container.remove_child(child)
 		child.queue_free()
 
 	if not InventoryManagerClass.instance:
@@ -138,6 +153,7 @@ func _populate_crafting() -> void:
 	if not crafting_list:
 		return
 	for child in crafting_list.get_children():
+		crafting_list.remove_child(child)
 		child.queue_free()
 
 	if not CraftingManagerClass.instance:
@@ -168,9 +184,12 @@ func _populate_crafting() -> void:
 		var ing_parts: Array = []
 		var ingredients: Dictionary = recipe.get("ingredients", {})
 		var inv_mgr = InventoryManagerClass.instance
+		var has_materials: bool = true
 		for item_id in ingredients:
 			var req: int = ingredients[item_id]
 			var owned: int = inv_mgr.get_item_count(item_id) if inv_mgr else 0
+			if owned < req:
+				has_materials = false
 			var item_info = inv_mgr.get_item_info(item_id) if inv_mgr else {}
 			var item_name = item_info.get("name", item_id)
 			ing_parts.append("%dx %s (%d/%d)" % [req, item_name, owned, req])
@@ -178,9 +197,12 @@ func _populate_crafting() -> void:
 		info_btn.text = "%s [%s]" % [recipe_name, ", ".join(ing_parts)]
 		var recipe_desc: String = recipe.get("description", "")
 		info_btn.tooltip_text = recipe_desc
+		var status: String = "✓ Ready to craft"
+		if not can_make:
+			status = "✗ Missing required materials" if not has_materials else "✗ Output stack is full"
 		var on_recipe_inspect = func():
 			if desc_label:
-				desc_label.text = recipe_desc
+				desc_label.text = "%s (%s)\n%s" % [recipe_name, status, recipe_desc]
 		info_btn.mouse_entered.connect(on_recipe_inspect)
 		info_btn.focus_entered.connect(on_recipe_inspect)
 		hbox.add_child(info_btn)
@@ -189,7 +211,14 @@ func _populate_crafting() -> void:
 		craft_btn.text = "Craft"
 		craft_btn.custom_minimum_size = Vector2(90, 0)
 		craft_btn.disabled = not can_make
-		craft_btn.tooltip_text = "Craft 1x %s" % recipe_name if can_make else "Cannot craft: missing required materials."
+		if can_make:
+			craft_btn.tooltip_text = "Craft 1x %s" % recipe_name
+		elif not has_materials:
+			craft_btn.tooltip_text = "Cannot craft: missing required materials."
+		else:
+			craft_btn.tooltip_text = "Cannot craft: output stack is full."
+		craft_btn.mouse_entered.connect(on_recipe_inspect)
+		craft_btn.focus_entered.connect(on_recipe_inspect)
 		craft_btn.pressed.connect(func():
 			var success = CraftingManagerClass.instance.craft_recipe(recipe_id)
 			if success:
@@ -206,10 +235,17 @@ func _create_item_row(item_id: String, info: Dictionary, qty: int) -> Button:
 	var btn = Button.new()
 	var max_stack = info.get("max_stack", 99)
 	var item_desc: String = info.get("description", "")
+	var item_type = info.get("type", 0)
 	var hotkey_data: Dictionary = ITEM_HOTKEYS.get(item_id, {})
 	if not hotkey_data.is_empty():
 		btn.text = "%s  x%d/%d  •  %s" % [info.get("name", item_id), qty, max_stack, hotkey_data["key"]]
 		item_desc += "\n▶ Quick Action: " + hotkey_data["hint"]
+	elif item_type == InventoryManager.ItemType.RESOURCE:
+		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
+		item_desc += "\n▶ Crafting Material: Check the Crafting tab [Q/E] for blueprints."
+	elif item_type == InventoryManager.ItemType.EVIDENCE:
+		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
+		item_desc += "\n▶ Forensic Clue: Check the Field Journal [J] for investigation logs."
 	else:
 		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
 	btn.tooltip_text = item_desc

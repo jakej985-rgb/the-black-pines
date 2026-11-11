@@ -170,9 +170,12 @@ func _populate_crafting() -> void:
 		var ing_parts: Array = []
 		var ingredients: Dictionary = recipe.get("ingredients", {})
 		var inv_mgr = InventoryManagerClass.instance
+		var has_materials: bool = true
 		for item_id in ingredients:
 			var req: int = ingredients[item_id]
 			var owned: int = inv_mgr.get_item_count(item_id) if inv_mgr else 0
+			if owned < req:
+				has_materials = false
 			var item_info = inv_mgr.get_item_info(item_id) if inv_mgr else {}
 			var item_name = item_info.get("name", item_id)
 			ing_parts.append("%dx %s (%d/%d)" % [req, item_name, owned, req])
@@ -180,9 +183,11 @@ func _populate_crafting() -> void:
 		info_btn.text = "%s [%s]" % [recipe_name, ", ".join(ing_parts)]
 		var recipe_desc: String = recipe.get("description", "")
 		info_btn.tooltip_text = recipe_desc
+		var status: String = "✓ Ready to craft"
+		if not can_make:
+			status = "✗ Missing required materials" if not has_materials else "✗ Output stack is full"
 		var on_recipe_inspect = func():
 			if desc_label:
-				var status = "✓ Ready to craft" if can_make else "✗ Missing required materials"
 				desc_label.text = "%s (%s)\n%s" % [recipe_name, status, recipe_desc]
 		info_btn.mouse_entered.connect(on_recipe_inspect)
 		info_btn.focus_entered.connect(on_recipe_inspect)
@@ -192,7 +197,12 @@ func _populate_crafting() -> void:
 		craft_btn.text = "Craft"
 		craft_btn.custom_minimum_size = Vector2(90, 0)
 		craft_btn.disabled = not can_make
-		craft_btn.tooltip_text = "Craft 1x %s" % recipe_name if can_make else "Cannot craft: missing required materials."
+		if can_make:
+			craft_btn.tooltip_text = "Craft 1x %s" % recipe_name
+		elif not has_materials:
+			craft_btn.tooltip_text = "Cannot craft: missing required materials."
+		else:
+			craft_btn.tooltip_text = "Cannot craft: output stack is full."
 		craft_btn.mouse_entered.connect(on_recipe_inspect)
 		craft_btn.focus_entered.connect(on_recipe_inspect)
 		craft_btn.pressed.connect(func():

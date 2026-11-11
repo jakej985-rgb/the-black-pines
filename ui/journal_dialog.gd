@@ -105,6 +105,7 @@ func _refresh_objectives() -> void:
 	if not objectives_container:
 		return
 	for child in objectives_container.get_children():
+		objectives_container.remove_child(child)
 		child.queue_free()
 
 	if not JournalManager.instance:
@@ -166,6 +167,7 @@ func _refresh_clues() -> void:
 	if not clues_container:
 		return
 	for child in clues_container.get_children():
+		clues_container.remove_child(child)
 		child.queue_free()
 
 	if not JournalManager.instance:

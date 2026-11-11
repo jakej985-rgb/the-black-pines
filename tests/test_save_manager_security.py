@@ -8,10 +8,17 @@ from pathlib import Path
 
 
 def is_valid_save_path(path: str) -> bool:
-    """Python reference implementation replicating SaveManager.is_valid_save_path()."""
+    """Reference copy of SaveManager.is_valid_save_path() for documenting intended rules.
+
+    NOTE: This does NOT test the GDScript implementation. Real behavior is verified
+    by tests/test_save_persistence.gd, which must run under Godot in CI.
+    Keep this copy in sync manually.
+    """
     if not path.startswith("user://"):
         return False
     if ".." in path or "\\" in path:
+        return False
+    if "/" in path[len("user://"):]:
         return False
     if not path.endswith(".json"):
         return False
@@ -22,7 +29,10 @@ class TestSaveManagerSecurity(unittest.TestCase):
     def test_valid_save_paths(self):
         self.assertTrue(is_valid_save_path("user://black_pines_save.json"))
         self.assertTrue(is_valid_save_path("user://save_slot_1.json"))
-        self.assertTrue(is_valid_save_path("user://backup/save_2026.json"))
+
+    def test_reject_nested_paths(self):
+        self.assertFalse(is_valid_save_path("user://backup/save_2026.json"))
+        self.assertFalse(is_valid_save_path("user://linked/config.json"))
 
     def test_reject_directory_traversal(self):
         self.assertFalse(is_valid_save_path("user://../etc/passwd.json"))

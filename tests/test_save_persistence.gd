@@ -155,7 +155,7 @@ func _init() -> void:
 
 	# 11. Test Path Traversal and Unauthorized Path Security
 	assert(SaveManagerClass.is_valid_save_path("user://save_01.json") == true, "Valid save path should pass")
-	assert(SaveManagerClass.is_valid_save_path("user://saves/slot1.json") == true, "Valid nested save path should pass")
+	assert(SaveManagerClass.is_valid_save_path("user://saves/slot1.json") == false, "Nested save paths must be rejected")
 	assert(SaveManagerClass.is_valid_save_path("user://../escape.json") == false, "Path traversal with .. must be rejected")
 	assert(SaveManagerClass.is_valid_save_path("res://scripts/malicious.gd") == false, "res:// paths must be rejected")
 	assert(SaveManagerClass.is_valid_save_path("/etc/shadow") == false, "Absolute OS paths must be rejected")

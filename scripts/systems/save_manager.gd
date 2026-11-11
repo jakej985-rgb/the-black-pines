@@ -23,10 +23,13 @@ func _enter_tree() -> void:
 
 ## Security helper: validates that save paths reside strictly within the user:// sandboxed storage,
 ## avoid directory traversal (..) sequences, and use the .json extension.
+## Only flat paths (no subdirectories) are allowed, so saves cannot cross a symlinked directory.
 static func is_valid_save_path(path: String) -> bool:
 	if not path.begins_with("user://"):
 		return false
 	if ".." in path or "\\" in path:
+		return false
+	if "/" in path.trim_prefix("user://"):
 		return false
 	if not path.ends_with(".json"):
 		return false

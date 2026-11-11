@@ -5,8 +5,11 @@ extends SceneTree
 ## Exits with code 0 on success, 1 on failure.
 ## Note: the headless DisplayServer ignores mouse mode changes, so mouse-mode
 ## assertions only run with a real display (e.g. `godot -s res://tests/test_modal_input.gd`).
+## Skipped assertions are counted and reported; pass `-- --require-mouse` to make
+## any skipped mouse-mode assertion fail the run (use this in CI with a display).
 
 var _failures: int = 0
+var _skipped: int = 0
 var _hud: Node = null
 
 
@@ -29,7 +32,13 @@ func _run_all() -> void:
 	_test_inventory_close_keeps_cursor_with_inspection_open()
 	_test_journal_close_keeps_cursor_with_inspection_open()
 	_test_inspection_close_keeps_cursor_with_inventory_open()
+	_test_escape_dismisses_inspection()
+	_test_interact_dismisses_inspection()
 
+	if _skipped > 0:
+		printerr("SKIPPED %d mouse-mode assertion(s) (headless display)" % _skipped)
+		if "--require-mouse" in OS.get_cmdline_user_args():
+			_failures += _skipped
 	if _failures == 0:
 		print("ALL TESTS PASSED")
 	else:
@@ -57,6 +66,13 @@ func _key(code: Key, echo: bool = false) -> InputEventKey:
 	return ev
 
 
+## Dispatch a key through the real engine pipeline (Input state + viewport
+## GUI/unhandled routing) instead of calling _unhandled_input directly.
+func _send(ev: InputEvent) -> void:
+	Input.parse_input_event(ev)
+	Input.flush_buffered_events()
+
+
 func _open_inspection() -> void:
 	_hud._on_inspection_displayed("Test Clue", "Body")
 
@@ -71,7 +87,10 @@ func _reset() -> void:
 
 
 func _mouse_testable() -> bool:
-	return DisplayServer.get_name() != "headless"
+	if DisplayServer.get_name() != "headless":
+		return true
+	_skipped += 1
+	return false
 
 
 func _check(cond: bool, name: String) -> void:
@@ -88,7 +107,7 @@ func _test_dismiss_key(code: Key, label: String) -> void:
 	_reset()
 	_open_inspection()
 	_check(_hud.inspection_panel.visible, "%s: inspection opens" % label)
-	_hud._unhandled_input(_key(code))
+	_send(_key(code))
 	_check(not _hud.inspection_panel.visible, "%s dismisses inspection" % label)
 	if _mouse_testable():
 		_check(Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED, "%s dismiss recaptures mouse" % label)
@@ -97,9 +116,8 @@ func _test_dismiss_key(code: Key, label: String) -> void:
 func _test_space_dismiss_releases_jump() -> void:
 	_reset()
 	_open_inspection()
-	# Simulate the engine having registered the Space press as a jump.
-	Input.action_press("jump")
-	_hud._unhandled_input(_key(KEY_SPACE))
+	# Real dispatch: Input registers the Space press as "jump" before the HUD sees it.
+	_send(_key(KEY_SPACE))
 	_check(not Input.is_action_pressed("jump"), "Space dismiss releases jump action")
 	_check(not Input.is_action_just_pressed("jump"), "Space dismiss clears jump just_pressed")
 
@@ -107,14 +125,14 @@ func _test_space_dismiss_releases_jump() -> void:
 func _test_echo_does_not_dismiss() -> void:
 	_reset()
 	_open_inspection()
-	_hud._unhandled_input(_key(KEY_ENTER, true))
+	_send(_key(KEY_ENTER, true))
 	_check(_hud.inspection_panel.visible, "Echo Enter does not dismiss")
 
 
 func _test_unrelated_key_does_not_dismiss() -> void:
 	_reset()
 	_open_inspection()
-	_hud._unhandled_input(_key(KEY_W))
+	_send(_key(KEY_W))
 	_check(_hud.inspection_panel.visible, "Unrelated key (W) does not dismiss")
 
 
@@ -159,3 +177,19 @@ func _test_inspection_close_keeps_cursor_with_inventory_open() -> void:
 	_check(not _hud.inspection_panel.visible, "close_inspection hides panel")
 	if _mouse_testable():
 		_check(Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE, "close_inspection keeps cursor while inventory open")
+
+
+func _test_escape_dismisses_inspection() -> void:
+	_reset()
+	_open_inspection()
+	_send(_key(KEY_ESCAPE))
+	_check(not _hud.inspection_panel.visible, "Esc dismisses inspection")
+	if _mouse_testable():
+		_check(Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED, "Esc dismiss recaptures mouse")
+
+
+func _test_interact_dismisses_inspection() -> void:
+	_reset()
+	_open_inspection()
+	_send(_key(KEY_E))
+	_check(not _hud.inspection_panel.visible, "E dismisses inspection")

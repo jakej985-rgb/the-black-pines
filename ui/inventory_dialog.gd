@@ -74,13 +74,28 @@ func open_inventory() -> void:
 		AudioDirector.instance.play_click()
 	_focus_first_item()
 
+## Whether the last close_inventory() recaptured the mouse. Lets headless tests
+## verify the close path honors the guard (headless ignores mouse mode).
+var last_close_recaptured: bool = false
+
 func close_inventory() -> void:
 	if not visible:
 		return
 	visible = false
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	last_close_recaptured = not is_other_modal_open()
+	if last_close_recaptured:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if AudioDirector.instance:
 		AudioDirector.instance.play_click()
+
+## True if a sibling modal (journal or inspection panel) is still visible,
+## in which case the cursor must stay visible.
+func is_other_modal_open() -> bool:
+	if not get_parent():
+		return false
+	var journal = get_parent().get_node_or_null("JournalDialog")
+	var inspection = get_parent().get_node_or_null("InspectionPanel")
+	return (journal != null and journal.visible) or (inspection != null and inspection.visible)
 
 func _focus_first_item() -> void:
 	var active_container: VBoxContainer = null

@@ -29,29 +29,39 @@ func _ready() -> void:
 	last_emitted_health = current_health
 	health_changed.emit(current_health, max_health)
 
+	# Optimization: Start with processing disabled since bleeding is inactive by default.
+	# Rather than registering and invoking _process() every frame (60-144+ FPS) when healthy,
+	# processing is activated on-demand only while the player is actively hemorrhaging.
+	# Expected performance impact: Eliminates 100% of idle _process() calls on HealthComponent (~3,600-8,640/min).
+	set_process(is_bleeding)
+
 func _process(delta: float) -> void:
 	if is_dead:
+		set_process(false)
 		return
 
-	if is_bleeding:
-		bleed_timer -= delta
-		var tick_damage = bleed_dps * delta
-		current_health = max(0.0, current_health - tick_damage)
-		# Optimization: Bleeding deals 2.0 DPS continuously, firing 60 signals/sec into Player and HUD ProgressBar.
-		# The HUD bar displays integer/smooth values where sub-integer changes are imperceptible per frame.
-		# Emit only when discrete integer health changes, health depletes, or timer expires.
-		# Expected performance impact: ~96.7% fewer signal emissions and HUD updates (from 60/sec to ~2/sec).
-		if int(current_health) != int(last_emitted_health) or current_health <= 0.0 or last_emitted_health < 0.0:
+	if not is_bleeding:
+		set_process(false)
+		return
+
+	bleed_timer -= delta
+	var tick_damage = bleed_dps * delta
+	current_health = max(0.0, current_health - tick_damage)
+	# Optimization: Bleeding deals 2.0 DPS continuously, firing 60 signals/sec into Player and HUD ProgressBar.
+	# The HUD bar displays integer/smooth values where sub-integer changes are imperceptible per frame.
+	# Emit only when discrete integer health changes, health depletes, or timer expires.
+	# Expected performance impact: ~96.7% fewer signal emissions and HUD updates (from 60/sec to ~2/sec).
+	if int(current_health) != int(last_emitted_health) or current_health <= 0.0 or last_emitted_health < 0.0:
+		last_emitted_health = current_health
+		health_changed.emit(current_health, max_health)
+	if current_health <= 0.0:
+		_trigger_death("Bleedout")
+	elif bleed_timer <= 0.0:
+		# Ensure the final health value is emitted when bleeding finishes
+		if current_health != last_emitted_health:
 			last_emitted_health = current_health
 			health_changed.emit(current_health, max_health)
-		if current_health <= 0.0:
-			_trigger_death("Bleedout")
-		elif bleed_timer <= 0.0:
-			# Ensure the final health value is emitted when bleeding finishes
-			if current_health != last_emitted_health:
-				last_emitted_health = current_health
-				health_changed.emit(current_health, max_health)
-			stop_bleeding()
+		stop_bleeding()
 
 func take_damage(amount: float, cause_bleed: bool = false, source: String = "") -> void:
 	if is_dead or amount <= 0.0:
@@ -73,6 +83,8 @@ func start_bleeding(duration: float = 25.0) -> void:
 		return
 	is_bleeding = true
 	bleed_timer = duration
+	# Re-enable process loop on demand to tick bleeding damage
+	set_process(true)
 	bleed_started.emit()
 
 func stop_bleeding() -> void:
@@ -80,6 +92,8 @@ func stop_bleeding() -> void:
 		return
 	is_bleeding = false
 	bleed_timer = 0.0
+	# Suspend process loop while player is not bleeding
+	set_process(false)
 	bleed_stopped.emit()
 
 func heal(amount: float, stop_bleed: bool = false) -> bool:
@@ -114,6 +128,7 @@ func _trigger_death(source: String) -> void:
 	is_bleeding = false
 	current_health = 0.0
 	last_emitted_health = current_health
+	set_process(false)
 	health_changed.emit(current_health, max_health)
 	player_died.emit()
 
@@ -123,5 +138,6 @@ func recover(respawn_pos: Vector3 = Vector3(0, 1.2, 5.0)) -> void:
 	bleed_timer = 0.0
 	current_health = 75.0
 	last_emitted_health = current_health
+	set_process(false)
 	health_changed.emit(current_health, max_health)
 	player_recovered.emit()

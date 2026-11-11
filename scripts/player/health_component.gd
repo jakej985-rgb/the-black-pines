@@ -29,10 +29,7 @@ func _ready() -> void:
 	last_emitted_health = current_health
 	health_changed.emit(current_health, max_health)
 
-	# Optimization: Start with processing disabled since bleeding is inactive by default.
-	# Rather than registering and invoking _process() every frame (60-144+ FPS) when healthy,
-	# processing is activated on-demand only while the player is actively hemorrhaging.
-	# Expected performance impact: Eliminates 100% of idle _process() calls on HealthComponent (~3,600-8,640/min).
+	# Processing is enabled only while bleeding; idle frames skip _process entirely.
 	set_process(is_bleeding)
 
 func _process(delta: float) -> void:

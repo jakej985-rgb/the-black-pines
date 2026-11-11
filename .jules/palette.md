@@ -19,3 +19,7 @@
 ## 2026-11-14 - Modal backdrop dimming and mutual exclusivity for inspection panels
 **Learning:** Clue inspection popups that lack a full-screen backdrop dimming scrim suffer severe legibility problems in dynamic 3D environments, as varying background luminance (flashlight cones, fog, moonlight) reduces contrast against small text. In addition, without mutual modal exclusivity, inspecting a clue while the inventory or journal is open leads to colliding UI layers and conflicting dismiss hotkeys.
 **Action:** Always place an atmospheric dimming scrim behind modal inspection dialogs, ensure opening an inspection closes active dialogs, and allow pressing dialog hotkeys (`Tab`/`J`) to dismiss the active inspection panel seamlessly.
+
+## 2026-11-15 - Tactile acoustic confirmation for modal states and tab transitions
+**Learning:** In minimalist survival horror user interfaces with dark, translucent overlays, silent transitions during dialog toggle actions (`Tab`, `J`, `Esc`) and tab page cycling (`Q`/`E`) make state changes feel unresponsive and disconnected. Adding subtle non-diegetic click feedback (`AudioDirector.instance.play_click()`) on modal open, close, and tab index switching provides vital sensory confirmation that an input has successfully taken effect, reinforcing accessibility for both keyboard and gamepad navigation.
+**Action:** Always pair modal dialog open/close lifecycle methods and tab cycling input handlers with procedural tactile audio feedback cues.

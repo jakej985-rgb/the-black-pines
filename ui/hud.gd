@@ -48,7 +48,7 @@ func _ready() -> void:
 	# Optimization: Start with processing disabled since there are no active notifications.
 	# Rather than running _process() every frame (60-144+ FPS) when no notification is visible,
 	# we enable processing on-demand only when a notification is displayed.
-	set_process(false)
+	set_process(notif_timer > 0.0)
 
 func _process(delta: float) -> void:
 	# Optimization: On-demand notification timer processing.

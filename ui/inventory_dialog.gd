@@ -108,15 +108,28 @@ func _focus_first_item() -> void:
 		tab_container.get_tab_bar().grab_focus()
 
 func refresh_display() -> void:
+	# Detect whether focus sits on a list button that is about to be rebuilt.
+	var focus_owner: Control = get_viewport().gui_get_focus_owner() if is_inside_tree() else null
+	var focus_in_lists: bool = false
+	if focus_owner:
+		for list in [resources_list, tools_list, evidence_list, crafting_list]:
+			if list and list.is_ancestor_of(focus_owner):
+				focus_in_lists = true
+				break
+
 	_populate_category(resources_list, [InventoryManager.ItemType.RESOURCE])
 	_populate_category(tools_list, [InventoryManager.ItemType.TOOL, InventoryManager.ItemType.CONSUMABLE])
 	_populate_category(evidence_list, [InventoryManager.ItemType.EVIDENCE])
 	_populate_crafting()
 
+	if visible and (focus_in_lists or focus_owner == null):
+		_focus_first_item()
+
 func _populate_category(container: VBoxContainer, allowed_types: Array) -> void:
 	if not container:
 		return
 	for child in container.get_children():
+		container.remove_child(child)
 		child.queue_free()
 
 	if not InventoryManagerClass.instance:
@@ -140,6 +153,7 @@ func _populate_crafting() -> void:
 	if not crafting_list:
 		return
 	for child in crafting_list.get_children():
+		crafting_list.remove_child(child)
 		child.queue_free()
 
 	if not CraftingManagerClass.instance:

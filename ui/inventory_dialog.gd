@@ -78,7 +78,14 @@ func close_inventory() -> void:
 	if not visible:
 		return
 	visible = false
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	var other_modal_open: bool = false
+	if get_parent():
+		var journal = get_parent().get_node_or_null("JournalDialog")
+		var hud = get_parent().get_node_or_null("InspectionPanel")
+		if (journal and journal.visible) or (hud and hud.visible):
+			other_modal_open = true
+	if not other_modal_open:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if AudioDirector.instance:
 		AudioDirector.instance.play_click()
 

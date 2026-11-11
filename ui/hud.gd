@@ -79,10 +79,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if inspection_panel.visible:
 		var is_dismiss_key: bool = false
 		if event is InputEventKey and event.pressed and not event.echo:
-			if event.physical_keycode == KEY_SPACE or event.physical_keycode == KEY_ENTER:
+			if event.physical_keycode == KEY_SPACE or event.physical_keycode == KEY_ENTER or event.physical_keycode == KEY_KP_ENTER:
 				is_dismiss_key = true
 		if is_dismiss_key or event.is_action_pressed("interact") or event.is_action_pressed("toggle_pause"):
 			close_inspection()
+			# Prevent the dismissing press (e.g. Space) from also triggering a jump
+			if event.is_action_pressed("jump"):
+				Input.action_release("jump")
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed("toggle_inventory") or event.is_action_pressed("toggle_journal"):
 			close_inspection()

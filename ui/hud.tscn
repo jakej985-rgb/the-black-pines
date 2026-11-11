@@ -256,7 +256,7 @@ autowrap_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.6, 0.6, 0.8)
 theme_override_font_sizes/font_size = 12
-text = "Press [E] or [Esc] to dismiss"
+text = "Press [E], [Space], or [Esc] to dismiss"
 horizontal_alignment = 1
 
 [node name="JournalDialog" parent="Root" instance=ExtResource("3_journal")]

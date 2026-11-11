@@ -63,14 +63,25 @@ func setup_player(player: Player) -> void:
 		player.health_component.bleed_stopped.connect(func(): if bleed_label: bleed_label.visible = false)
 
 func close_inspection() -> void:
+	if not inspection_panel.visible:
+		return
 	inspection_panel.visible = false
 	if inspection_backdrop:
 		inspection_backdrop.visible = false
+	var other_modal_open: bool = (journal_dialog and journal_dialog.visible) or (inventory_dialog and inventory_dialog.visible)
+	if not other_modal_open:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 	_update_crosshair_visibility()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if inspection_panel.visible:
-		if event.is_action_pressed("interact") or event.is_action_pressed("toggle_pause"):
+		var is_dismiss_key: bool = false
+		if event is InputEventKey and event.pressed and not event.echo:
+			if event.physical_keycode == KEY_SPACE or event.physical_keycode == KEY_ENTER:
+				is_dismiss_key = true
+		if is_dismiss_key or event.is_action_pressed("interact") or event.is_action_pressed("toggle_pause"):
 			close_inspection()
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed("toggle_inventory") or event.is_action_pressed("toggle_journal"):
@@ -138,6 +149,9 @@ func _on_inspection_displayed(title: String, text: String) -> void:
 	inspection_panel.visible = true
 	if inspection_backdrop:
 		inspection_backdrop.visible = true
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 	_update_crosshair_visibility()
 
 func _on_notification_posted(msg: String) -> void:

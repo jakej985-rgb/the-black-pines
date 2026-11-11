@@ -54,7 +54,7 @@ func _process(delta: float) -> void:
 	# Optimization: On-demand notification timer processing.
 	# When the notification countdown reaches 0, clear text and disable processing immediately
 	# so the engine spends zero CPU cycles invoking _process() on this CanvasLayer while idle.
-	# Expected performance impact: Eliminates ~99% of HUD per-frame calls during normal gameplay.
+	# _process() only runs while a notification is visible.
 	if notif_timer > 0.0:
 		notif_timer -= delta
 		if notif_timer <= 0.0:

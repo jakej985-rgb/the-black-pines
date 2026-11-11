@@ -65,11 +65,16 @@ func _focus_active_tab() -> void:
 	if current_bar:
 		current_bar.grab_focus()
 
+## Whether the last close_journal() recaptured the mouse. Lets headless tests
+## verify the close path honors the guard (headless ignores mouse mode).
+var last_close_recaptured: bool = false
+
 func close_journal() -> void:
 	if not visible:
 		return
 	visible = false
-	if not is_other_modal_open():
+	last_close_recaptured = not is_other_modal_open()
+	if last_close_recaptured:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if AudioDirector.instance:
 		AudioDirector.instance.play_click()

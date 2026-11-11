@@ -154,6 +154,7 @@ func _test_inventory_close_keeps_cursor_with_inspection_open() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	_hud.inventory_dialog.close_inventory()
 	_check(not _hud.inventory_dialog.visible, "close_inventory hides inventory")
+	_check(not _hud.inventory_dialog.last_close_recaptured, "close_inventory skips recapture while inspection open")
 	if _mouse_testable():
 		_check(Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE, "close_inventory keeps cursor while inspection open")
 
@@ -165,6 +166,7 @@ func _test_journal_close_keeps_cursor_with_inspection_open() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	_hud.journal_dialog.close_journal()
 	_check(not _hud.journal_dialog.visible, "close_journal hides journal")
+	_check(not _hud.journal_dialog.last_close_recaptured, "close_journal skips recapture while inspection open")
 	if _mouse_testable():
 		_check(Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE, "close_journal keeps cursor while inspection open")
 
@@ -197,6 +199,22 @@ func _test_guard_decisions_headless() -> void:
 	jrn.visible = false
 	inv.visible = true
 	_check(jrn.is_other_modal_open(), "journal guard: inventory open -> keep cursor")
+	inv.visible = false
+	# Close paths with nothing else open must recapture.
+	inv.visible = true
+	inv.close_inventory()
+	_check(inv.last_close_recaptured, "close_inventory recaptures when nothing else open")
+	jrn.visible = true
+	jrn.close_journal()
+	_check(jrn.last_close_recaptured, "close_journal recaptures when nothing else open")
+	# Close paths with a sibling open must not recapture.
+	jrn.visible = true
+	inv.visible = true
+	inv.close_inventory()
+	_check(not inv.last_close_recaptured, "close_inventory skips recapture while journal open")
+	inv.visible = true
+	jrn.close_journal()
+	_check(not jrn.last_close_recaptured, "close_journal skips recapture while inventory open")
 	inv.visible = false
 
 

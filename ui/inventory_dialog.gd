@@ -74,11 +74,16 @@ func open_inventory() -> void:
 		AudioDirector.instance.play_click()
 	_focus_first_item()
 
+## Whether the last close_inventory() recaptured the mouse. Lets headless tests
+## verify the close path honors the guard (headless ignores mouse mode).
+var last_close_recaptured: bool = false
+
 func close_inventory() -> void:
 	if not visible:
 		return
 	visible = false
-	if not is_other_modal_open():
+	last_close_recaptured = not is_other_modal_open()
+	if last_close_recaptured:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if AudioDirector.instance:
 		AudioDirector.instance.play_click()

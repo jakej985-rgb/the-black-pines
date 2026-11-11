@@ -103,7 +103,9 @@ func _focus_first_item() -> void:
 				return
 
 	if desc_label:
-		desc_label.text = "Hover over an item to inspect details."
+		desc_label.text = "No items in this category." if (tab_container and tab_container.current_tab != 3) else "No crafting blueprints available."
+	if tab_container and tab_container.get_tab_bar():
+		tab_container.get_tab_bar().grab_focus()
 
 func refresh_display() -> void:
 	_populate_category(resources_list, [InventoryManager.ItemType.RESOURCE])
@@ -180,7 +182,8 @@ func _populate_crafting() -> void:
 		info_btn.tooltip_text = recipe_desc
 		var on_recipe_inspect = func():
 			if desc_label:
-				desc_label.text = recipe_desc
+				var status = "✓ Ready to craft" if can_make else "✗ Missing required materials"
+				desc_label.text = "%s (%s)\n%s" % [recipe_name, status, recipe_desc]
 		info_btn.mouse_entered.connect(on_recipe_inspect)
 		info_btn.focus_entered.connect(on_recipe_inspect)
 		hbox.add_child(info_btn)
@@ -190,6 +193,8 @@ func _populate_crafting() -> void:
 		craft_btn.custom_minimum_size = Vector2(90, 0)
 		craft_btn.disabled = not can_make
 		craft_btn.tooltip_text = "Craft 1x %s" % recipe_name if can_make else "Cannot craft: missing required materials."
+		craft_btn.mouse_entered.connect(on_recipe_inspect)
+		craft_btn.focus_entered.connect(on_recipe_inspect)
 		craft_btn.pressed.connect(func():
 			var success = CraftingManagerClass.instance.craft_recipe(recipe_id)
 			if success:
@@ -206,10 +211,17 @@ func _create_item_row(item_id: String, info: Dictionary, qty: int) -> Button:
 	var btn = Button.new()
 	var max_stack = info.get("max_stack", 99)
 	var item_desc: String = info.get("description", "")
+	var item_type = info.get("type", 0)
 	var hotkey_data: Dictionary = ITEM_HOTKEYS.get(item_id, {})
 	if not hotkey_data.is_empty():
 		btn.text = "%s  x%d/%d  •  %s" % [info.get("name", item_id), qty, max_stack, hotkey_data["key"]]
 		item_desc += "\n▶ Quick Action: " + hotkey_data["hint"]
+	elif item_type == InventoryManager.ItemType.RESOURCE:
+		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
+		item_desc += "\n▶ Crafting Material: Check the Crafting tab [Q/E] for blueprints."
+	elif item_type == InventoryManager.ItemType.EVIDENCE:
+		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
+		item_desc += "\n▶ Forensic Clue: Check the Field Journal [J] for investigation logs."
 	else:
 		btn.text = "%s  x%d / %d" % [info.get("name", item_id), qty, max_stack]
 	btn.tooltip_text = item_desc

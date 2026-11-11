@@ -37,6 +37,8 @@ func _switch_tab(direction: int) -> void:
 		return
 	var count = tab_container.get_tab_count()
 	tab_container.current_tab = (tab_container.current_tab + direction + count) % count
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 	_focus_active_tab()
 
 func toggle_journal() -> void:
@@ -52,6 +54,8 @@ func open_journal() -> void:
 	refresh_display()
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 	_focus_active_tab()
 
 func _focus_active_tab() -> void:
@@ -62,8 +66,12 @@ func _focus_active_tab() -> void:
 		current_bar.grab_focus()
 
 func close_journal() -> void:
+	if not visible:
+		return
 	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 
 func refresh_display() -> void:
 	_refresh_objectives()

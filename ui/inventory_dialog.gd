@@ -53,6 +53,8 @@ func _switch_tab(direction: int) -> void:
 		return
 	var count = tab_container.get_tab_count()
 	tab_container.current_tab = (tab_container.current_tab + direction + count) % count
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 	_focus_first_item()
 
 func toggle_inventory() -> void:
@@ -68,11 +70,17 @@ func open_inventory() -> void:
 	refresh_display()
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 	_focus_first_item()
 
 func close_inventory() -> void:
+	if not visible:
+		return
 	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if AudioDirector.instance:
+		AudioDirector.instance.play_click()
 
 func _focus_first_item() -> void:
 	var active_container: VBoxContainer = null

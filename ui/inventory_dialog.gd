@@ -78,16 +78,19 @@ func close_inventory() -> void:
 	if not visible:
 		return
 	visible = false
-	var other_modal_open: bool = false
-	if get_parent():
-		var journal = get_parent().get_node_or_null("JournalDialog")
-		var hud = get_parent().get_node_or_null("InspectionPanel")
-		if (journal and journal.visible) or (hud and hud.visible):
-			other_modal_open = true
-	if not other_modal_open:
+	if not is_other_modal_open():
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if AudioDirector.instance:
 		AudioDirector.instance.play_click()
+
+## True if a sibling modal (journal or inspection panel) is still visible,
+## in which case the cursor must stay visible.
+func is_other_modal_open() -> bool:
+	if not get_parent():
+		return false
+	var journal = get_parent().get_node_or_null("JournalDialog")
+	var inspection = get_parent().get_node_or_null("InspectionPanel")
+	return (journal != null and journal.visible) or (inspection != null and inspection.visible)
 
 func _focus_first_item() -> void:
 	var active_container: VBoxContainer = null

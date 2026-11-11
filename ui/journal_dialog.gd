@@ -69,16 +69,19 @@ func close_journal() -> void:
 	if not visible:
 		return
 	visible = false
-	var other_modal_open: bool = false
-	if get_parent():
-		var inv = get_parent().get_node_or_null("InventoryDialog")
-		var hud = get_parent().get_node_or_null("InspectionPanel")
-		if (inv and inv.visible) or (hud and hud.visible):
-			other_modal_open = true
-	if not other_modal_open:
+	if not is_other_modal_open():
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if AudioDirector.instance:
 		AudioDirector.instance.play_click()
+
+## True if a sibling modal (inventory or inspection panel) is still visible,
+## in which case the cursor must stay visible.
+func is_other_modal_open() -> bool:
+	if not get_parent():
+		return false
+	var inv = get_parent().get_node_or_null("InventoryDialog")
+	var inspection = get_parent().get_node_or_null("InspectionPanel")
+	return (inv != null and inv.visible) or (inspection != null and inspection.visible)
 
 func refresh_display() -> void:
 	_refresh_objectives()

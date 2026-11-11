@@ -32,6 +32,7 @@ func _run_all() -> void:
 	_test_inventory_close_keeps_cursor_with_inspection_open()
 	_test_journal_close_keeps_cursor_with_inspection_open()
 	_test_inspection_close_keeps_cursor_with_inventory_open()
+	_test_guard_decisions_headless()
 	_test_escape_dismisses_inspection()
 	_test_interact_dismisses_inspection()
 
@@ -177,6 +178,26 @@ func _test_inspection_close_keeps_cursor_with_inventory_open() -> void:
 	_check(not _hud.inspection_panel.visible, "close_inspection hides panel")
 	if _mouse_testable():
 		_check(Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE, "close_inspection keeps cursor while inventory open")
+
+
+## Display-independent: asserts the guard decision itself, so a regression that
+## recaptures the cursor while another modal is open fails even in headless runs.
+func _test_guard_decisions_headless() -> void:
+	_reset()
+	var inv = _hud.inventory_dialog
+	var jrn = _hud.journal_dialog
+	_check(not inv.is_other_modal_open(), "inventory guard: nothing open -> recapture allowed")
+	_check(not jrn.is_other_modal_open(), "journal guard: nothing open -> recapture allowed")
+	_hud.inspection_panel.visible = true
+	_check(inv.is_other_modal_open(), "inventory guard: inspection open -> keep cursor")
+	_check(jrn.is_other_modal_open(), "journal guard: inspection open -> keep cursor")
+	_hud.inspection_panel.visible = false
+	jrn.visible = true
+	_check(inv.is_other_modal_open(), "inventory guard: journal open -> keep cursor")
+	jrn.visible = false
+	inv.visible = true
+	_check(jrn.is_other_modal_open(), "journal guard: inventory open -> keep cursor")
+	inv.visible = false
 
 
 func _test_escape_dismisses_inspection() -> void:

@@ -21,14 +21,33 @@ signal save_corrupted(reason: String)
 func _enter_tree() -> void:
 	instance = self
 
+## Security helper: validates that save paths reside strictly within the user:// sandboxed storage,
+## avoid directory traversal (..) sequences, and use the .json extension.
+static func is_valid_save_path(path: String) -> bool:
+	if not path.begins_with("user://"):
+		return false
+	if ".." in path or "\\" in path:
+		return false
+	if not path.ends_with(".json"):
+		return false
+	return true
+
 func has_save_file(path: String = SAVE_PATH) -> bool:
+	if not is_valid_save_path(path):
+		return false
 	return FileAccess.file_exists(path)
 
 func delete_save_file(path: String = SAVE_PATH) -> void:
+	if not is_valid_save_path(path):
+		push_error("Blocked attempt to delete invalid save path: " + path)
+		return
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(path)
 
 func save_game(player: Node = null, path: String = SAVE_PATH) -> bool:
+	if not is_valid_save_path(path):
+		push_error("Blocked attempt to save to invalid or unauthorized path: " + path)
+		return false
 	var save_dict: Dictionary = {
 		"version": CURRENT_VERSION,
 		"timestamp": Time.get_unix_time_from_system(),
@@ -77,6 +96,10 @@ func save_game(player: Node = null, path: String = SAVE_PATH) -> bool:
 	return true
 
 func load_game(player: Node = null, path: String = SAVE_PATH) -> bool:
+	if not is_valid_save_path(path):
+		save_corrupted.emit("Blocked attempt to load invalid or unauthorized path: " + path)
+		return false
+
 	if not FileAccess.file_exists(path):
 		push_warning("Save file does not exist: " + path)
 		return false

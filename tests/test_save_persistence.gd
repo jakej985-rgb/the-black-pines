@@ -153,6 +153,24 @@ func _init() -> void:
 	assert(corrupt_signal_fired[0] == true, "save_corrupted signal should be emitted on corrupted JSON")
 	print("✓ Save corruption and error handling verified.")
 
+	# 11. Test Path Traversal and Unauthorized Path Security
+	assert(SaveManagerClass.is_valid_save_path("user://save_01.json") == true, "Valid save path should pass")
+	assert(SaveManagerClass.is_valid_save_path("user://saves/slot1.json") == true, "Valid nested save path should pass")
+	assert(SaveManagerClass.is_valid_save_path("user://../escape.json") == false, "Path traversal with .. must be rejected")
+	assert(SaveManagerClass.is_valid_save_path("res://scripts/malicious.gd") == false, "res:// paths must be rejected")
+	assert(SaveManagerClass.is_valid_save_path("/etc/shadow") == false, "Absolute OS paths must be rejected")
+	assert(SaveManagerClass.is_valid_save_path("user://save.exe") == false, "Non-JSON extensions must be rejected")
+
+	var traversal_saved = save_mgr.save_game(player, "user://../escaped_save.json")
+	assert(traversal_saved == false, "Saving with path traversal sequence must fail")
+
+	var traversal_corrupt_fired = [false]
+	save_mgr.save_corrupted.connect(func(reason): traversal_corrupt_fired[0] = true)
+	var traversal_loaded = save_mgr.load_game(player, "user://../escaped_save.json")
+	assert(traversal_loaded == false, "Loading path with traversal must fail")
+	assert(traversal_corrupt_fired[0] == true, "save_corrupted signal must fire on invalid path attempt")
+	print("✓ Path traversal and unauthorized path protections verified.")
+
 	# Clean up files & nodes
 	save_mgr.delete_save_file(TEST_SAVE_PATH)
 	save_mgr.delete_save_file(CORRUPT_SAVE_PATH)

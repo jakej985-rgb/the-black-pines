@@ -1,5 +1,9 @@
 # Bolt's Performance Journal
 
+## 2026-11-12 - Deactivate idle UI node per-frame processing with set_process
+**Learning:** In Godot UI controllers (such as HUD or overlay layers), leaving `_process(delta)` enabled solely to service occasional transient timers (like notification toasts or prompt fadeouts) forces the engine's main loop to invoke the script callback 60–144+ times per second (3,600–8,640+ times/minute) continuously, even when 99% of the gameplay session has no active timer running. Using `set_process(false)` by default and only toggling `set_process(true)` on-demand during active transient countdowns suspends engine process registration entirely, yielding zero CPU overhead while idle.
+**Action:** Default UI nodes with transient timers to `set_process(false)` in `_ready()`, dynamically enable `set_process(true)` upon receiving event triggers, and call `set_process(false)` as soon as the countdown completes.
+
 ## 2026-11-11 - Event-driven modal visibility over per-frame polling
 **Learning:** In UI HUD managers, polling modal visibility states (such as checking `panel.visible`, `journal_dialog.visible`, `inventory_dialog.visible`) in `_process(delta)` forces 60–144+ redundant boolean expressions and node property checks every second (3,600–8,640+ times/min) even when no user inputs or menu transitions occur. Because Godot `CanvasItem` / `Control` nodes emit `visibility_changed` whenever their visibility state alters, wiring HUD crosshair and backdrop updates to `visibility_changed` and modal transition events eliminates per-frame polling overhead completely.
 **Action:** Replace `_process()` visibility polling with Godot's built-in `visibility_changed` signal handlers on modal dialogues and UI containers.

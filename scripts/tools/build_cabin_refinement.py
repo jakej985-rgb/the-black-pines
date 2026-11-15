@@ -134,16 +134,15 @@ def build_stove_tools(m):
     o=[]
     # Tool stand, shovel, poker, brush and small ash bucket
     o.append(box("Tool_stand_base",(0,0,.035),(.30,.22,.07),m["iron"],.015))
-    rod("Tool_stand_upright",(0,0,.07),(0,0,.72),.018,m["iron"])
+    o.append(rod("Tool_stand_upright",(0,0,.07),(0,0,.72),.018,m["iron"]))
     for i,ang in enumerate((-.32,0,.32)):
         x=math.sin(ang)*.11
-        rod("Hanging_tool_handle_%d"%i,(x,-.02,.12),(x,-.02,.67),.012,m["darkwood"])
-        rod("Hanging_tool_head_%d"%i,(x-.045,-.02,.12),(x+.045,-.02,.12),.018,m["iron"])
-    o.extend([bpy.data.objects[n] for n in ("Tool_stand_upright",) if n in bpy.data.objects])
+        o.append(rod("Hanging_tool_handle_%d"%i,(x,-.02,.12),(x,-.02,.67),.012,m["darkwood"]))
+        o.append(rod("Hanging_tool_head_%d"%i,(x-.045,-.02,.12),(x+.045,-.02,.12),.018,m["iron"]))
     o.append(cyl("Ash_bucket_body",(0,.38,.17),.17,.32,m["iron"],16,.01))
     o.append(cyl("Ash_bucket_rim",(0,.38,.34),.18,.025,m["metal"],20,.004))
-    rod("Bucket_handle",(-.17,.38,.30),(0,.38,.53),.012,m["iron"])
-    rod("Bucket_handle_right",(0,.38,.53),(.17,.38,.30),.012,m["iron"])
+    o.append(rod("Bucket_handle",(-.17,.38,.30),(0,.38,.53),.012,m["iron"]))
+    o.append(rod("Bucket_handle_right",(0,.38,.53),(.17,.38,.30),.012,m["iron"]))
     return o
 
 def build_boot_pair(m):
@@ -161,11 +160,11 @@ def build_mugs_and_kettle(m):
     for x in (-.18,.18):
         o.append(cyl("Enamel_mug",(x,0,.055),.055,.11,m["enamel"],20,.004))
         # side loop handle
-        rod("Mug_handle_a",(x+.045,0,.075),(x+.105,0,.075),.009,m["iron"])
-        rod("Mug_handle_b",(x+.105,0,.075),(x+.105,0,.025),.009,m["iron"])
+        o.append(rod("Mug_handle_a",(x+.045,0,.075),(x+.105,0,.075),.009,m["iron"]))
+        o.append(rod("Mug_handle_b",(x+.105,0,.075),(x+.105,0,.025),.009,m["iron"]))
     o.append(cyl("Kettle_body",(0,.32,.13),.15,.24,m["metal"],24,.012))
     o.append(cyl("Kettle_lid",(0,.32,.26),.13,.025,m["iron"],24,.004))
-    rod("Kettle_spout",(0,.18,.18),(0,.06,.25),.035,m["metal"])
+    o.append(rod("Kettle_spout",(0,.18,.18),(0,.06,.25),.035,m["metal"]))
     return o
 
 def build_firewood_basket(m):
@@ -202,8 +201,8 @@ def build_split_block(m):
     o=[cyl("Splitting_block",(0,0,.30),.34,.60,m["bark"],12,.025)]
     for i in range(5):
         a=i*math.tau/5
-        rod("Endgrain_split",(math.cos(a)*.03,math.sin(a)*.03,.605),
-            (math.cos(a)*.29,math.sin(a)*.29,.605),.003,m["darkwood"],6)
+        o.append(rod("Endgrain_split",(math.cos(a)*.03,math.sin(a)*.03,.605),
+            (math.cos(a)*.29,math.sin(a)*.29,.605),.003,m["darkwood"],6))
     return o
 
 def build_axe(m):

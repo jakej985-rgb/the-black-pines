@@ -71,8 +71,19 @@ def export_asset(objects, out, asset_name):
     out.parent.mkdir(parents=True,exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=str(out),export_format="GLB",use_selection=True,
                               export_apply=True,export_yup=True,export_materials="EXPORT")
-    tris=sum(sum(max(0,len(p.vertices)-2) for p in o.data.polygons) for o in objects if o.type=="MESH")
+    deps=bpy.context.evaluated_depsgraph_get(); tris=0
+    for o in objects:
+        if o.type!="MESH": continue
+        ev=o.evaluated_get(deps); me=ev.to_mesh()
+        me.calc_loop_triangles(); tris+=len(me.loop_triangles)
+        ev.to_mesh_clear()
     return {"asset":asset_name,"path":str(out),"objects":len(objects),"triangles":tris}
+
+def layout_for_review(groups, spacing=1.8):
+    # Spread exported groups along X so the saved review scene doesn't overlap.
+    start=-spacing*(len(groups)-1)/2
+    for i,(_,objects) in enumerate(groups):
+        for o in objects: o.location.x+=start+i*spacing
 
 def create_review_camera():
     bpy.ops.object.camera_add(location=(3.6,-4.6,3.0))
@@ -169,16 +180,16 @@ def build_mugs_and_kettle(m):
 
 def build_firewood_basket(m):
     o=[]
-    cyl("Basket_base",(0,0,.04),.25,.07,m["darkwood"],20,.008)
+    o.append(cyl("Basket_base",(0,0,.04),.25,.07,m["darkwood"],20,.008))
     for i in range(12):
         a=2*math.pi*i/12
         x,y=math.cos(a)*.22,math.sin(a)*.22
-        rod("Basket_upright_%02d"%i,(x,y,.06),(x,y,.48),.012,m["wood"])
+        o.append(rod("Basket_upright_%02d"%i,(x,y,.06),(x,y,.48),.012,m["wood"]))
     for z in (.15,.30,.45):
         for i in range(12):
             a=2*math.pi*i/12; b=2*math.pi*(i+1)/12
-            rod("Basket_weave_%02d"%i,(math.cos(a)*.22,math.sin(a)*.22,z),
-                (math.cos(b)*.22,math.sin(b)*.22,z),.009,m["darkwood"])
+            o.append(rod("Basket_weave_%02d"%i,(math.cos(a)*.22,math.sin(a)*.22,z),
+                (math.cos(b)*.22,math.sin(b)*.22,z),.009,m["darkwood"]))
     return o
 
 def build_interior(root, passdir, mats):
@@ -195,6 +206,7 @@ def build_interior(root, passdir, mats):
     for name,objects in groups:
         p=passdir/"exports"/(name+".glb")
         reports.append(export_asset(objects,p,name))
+    layout_for_review(groups)
     return reports
 
 def build_split_block(m):
@@ -232,6 +244,7 @@ def build_exterior(root, passdir, mats):
     reports=[]
     for name,objects in groups:
         reports.append(export_asset(objects,passdir/"exports"/(name+".glb"),name))
+    layout_for_review(groups)
     return reports
 
 def main():
